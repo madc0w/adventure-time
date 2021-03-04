@@ -8,6 +8,12 @@ const state = {
 	},
 	room: rooms[0],
 };
+const backgroundColor = '#c1e5be';
+const doorSize = 0.1;
+const doorwaySize = {
+	width: 0.006,
+	height: 0.04
+};
 const wallWidth = 0.01;
 const playerImageStanding = new Image();
 const playerImageLeft = new Image();
@@ -19,8 +25,8 @@ let canvas, ctx;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
-	canvas.width = innerWidth * 0.9;
-	canvas.height = innerHeight * 0.9;
+	canvas.width = Math.min(innerWidth * 0.9, innerHeight * 0.9);
+	canvas.height = canvas.width;
 	ctx = canvas.getContext('2d');
 
 	playerImageStanding.src = 'img/player standing.png';
@@ -35,10 +41,11 @@ function load() {
 }
 
 function draw() {
-	ctx.fillStyle = '#c1e5be';
+	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	{
+		// room background
 		const roomBackground = new Image();
 		roomBackground.src = `img/rooms/${state.room.backgroundImage}`;
 		const x = (1 - state.room.width) * canvas.width / 2;
@@ -46,6 +53,7 @@ function draw() {
 		ctx.drawImage(roomBackground, x, y, state.room.width * canvas.width, state.room.height * canvas.height);
 	}
 	{
+		// wall
 		ctx.strokeStyle = state.room.wallColor;
 		ctx.lineWidth = canvas.width * wallWidth;
 		ctx.beginPath();
@@ -55,6 +63,65 @@ function draw() {
 		ctx.stroke();
 	}
 	{
+		// doors
+		for (const door of state.room.doors) {
+			ctx.fillStyle = backgroundColor;
+			let x, y;
+			if (door.wall == 'w') {
+				x = ((1 - state.room.width - wallWidth) / 2) * canvas.width - 1;
+				y = ((1 - state.room.height) / 2 + (door.location * state.room.height)) * canvas.height;
+				width = wallWidth * canvas.width + 1;
+				height = doorSize * canvas.height;
+			} else if (door.wall == 'e') {
+				x = ((1 + state.room.width - wallWidth) / 2) * canvas.width;
+				y = ((1 - state.room.height) / 2 + (door.location * state.room.height)) * canvas.height;
+				width = wallWidth * canvas.width + 1;
+				height = doorSize * canvas.height;
+			} else if (door.wall == 'n') {
+				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
+				y = (1 - state.room.height - wallWidth) * canvas.height / 2 - 1;
+				height = wallWidth * canvas.width + 1;
+				width = doorSize * canvas.height;
+			} else if (door.wall == 's') {
+				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
+				y = ((1 + state.room.height - wallWidth) / 2) * canvas.height;
+				height = wallWidth * canvas.width + 4;
+				width = doorSize * canvas.height;
+			}
+			ctx.fillRect(x, y, width, height);
+
+			ctx.fillStyle = state.room.wallColor;
+			if (['e', 'w'].includes(door.wall)) {
+				ctx.fillRect(
+					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
+					y,
+					doorwaySize.height * canvas.width,
+					doorwaySize.width * canvas.width
+				);
+				ctx.fillRect(
+					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
+					y + doorSize * canvas.height,
+					doorwaySize.height * canvas.width,
+					doorwaySize.width * canvas.width
+				);
+			} else {
+				ctx.fillRect(
+					x,
+					y - ((doorwaySize.width + wallWidth) * canvas.height),
+					doorwaySize.width * canvas.width,
+					doorwaySize.height * canvas.width
+				);
+				ctx.fillRect(
+					x + (doorSize * canvas.width),
+					y - ((doorwaySize.width + wallWidth) * canvas.height),
+					doorwaySize.width * canvas.width,
+					doorwaySize.height * canvas.width
+				);
+			}
+		}
+	}
+	{
+		// player
 		const x = (state.player.x - state.player.width / 2) * canvas.width;
 		const y = (state.player.y - state.player.height / 2) * canvas.height;
 		ctx.drawImage(playerImage, x, y, state.player.width * canvas.width, state.player.height * canvas.height);
@@ -78,10 +145,10 @@ function draw() {
 		state.player.x = Math.min((1 + state.room.width - state.player.width) / 2, state.player.x + inc);
 	}
 	if (keysDown.ArrowUp) {
-		state.player.y = Math.max((1 - state.room.height + state.player.height) / 2, state.player.y - inc);
+		state.player.y = Math.max((1 - state.room.height + state.player.height + wallWidth) / 2, state.player.y - inc);
 	}
 	if (keysDown.ArrowDown) {
-		state.player.y = Math.min((1 + state.room.height - state.player.height) / 2, state.player.y + inc);
+		state.player.y = Math.min((1 + state.room.height - state.player.height - wallWidth) / 2, state.player.y + inc);
 	}
 
 	requestAnimationFrame(draw);
