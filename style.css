@@ -1,0 +1,14 @@
+body {
+	font-family: Lato;
+}
+
+#header {
+	font-size: 22px;
+	margin-bottom: 8px;
+}
+
+#game-canvas {
+	border-style: solid;
+	border-width: 2px;
+	border-color: #222;
+}
