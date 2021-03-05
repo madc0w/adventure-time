@@ -8,6 +8,7 @@ const state = {
 	},
 	room: rooms[0],
 };
+const wallColor = '#3f2f0c';
 const backgroundColor = '#c1e5be';
 const doorSize = 0.15;
 const doorThreshold = 0.04;
@@ -18,6 +19,13 @@ const doorwaySize = {
 const wallWidth = 0.01;
 const moveIncrement = 0.006;
 
+const mapBackgroundColor = '#e2e2b1';
+const mapRoomColor = '#a5a5a4';
+const mapPassageColor = '#aaa';
+const mapMargin = 0.04;
+const mapScale = 0.3;
+
+let drawFunc = drawGame;
 let throughDoor;
 const playerImageStanding = new Image();
 const playerImageLeft = new Image();
@@ -46,7 +54,11 @@ function load() {
 function draw() {
 	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	drawFunc();
+	requestAnimationFrame(draw);
+}
 
+function drawGame() {
 	{
 		// room background
 		const roomBackground = new Image();
@@ -57,7 +69,7 @@ function draw() {
 	}
 	{
 		// wall
-		ctx.strokeStyle = state.room.wallColor;
+		ctx.strokeStyle = state.room.wallColor || wallColor;
 		ctx.lineWidth = canvas.width * wallWidth;
 		ctx.beginPath();
 		const x = (1 - state.room.width) * canvas.width / 2;
@@ -93,7 +105,7 @@ function draw() {
 			}
 			ctx.fillRect(x, y, width, height);
 
-			ctx.fillStyle = state.room.wallColor;
+			ctx.fillStyle = state.room.wallColor || wallColor;
 			if (['e', 'w'].includes(door.wall)) {
 				ctx.fillRect(
 					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
@@ -247,13 +259,13 @@ function draw() {
 				const door = state.room.doors.find(d => d.wall == 'e' && d.roomId == prevRoom.id);
 				state.player.x = (1 + state.room.width - state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
-				console.log(state.player.y)
+				// console.log(state.player.y)
 			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
 				state.room = rooms.find(r => r.id == throughDoor.roomId);
 				const door = state.room.doors.find(d => d.wall == 'w' && d.roomId == prevRoom.id);
 				state.player.x = (1 - state.room.width + state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
-				console.log(state.player.y)
+				// console.log(state.player.y)
 			}
 		} else {
 			const minX = (1 - state.room.width) / 2 + (throughDoor.location * state.room.width);
@@ -265,17 +277,98 @@ function draw() {
 			} else if (playerX1 < minX) {
 				state.player.x = minX + state.player.width / 2;
 			}
+
+			const prevRoom = state.room;
+			if (throughDoor.wall == 'n' && state.player.y < (1 - state.room.height - wallWidth) / 2 - doorThreshold) {
+				state.room = rooms.find(r => r.id == throughDoor.roomId);
+				const door = state.room.doors.find(d => d.wall == 's' && d.roomId == prevRoom.id);
+				state.player.y = (1 + state.room.height - state.player.height) / 2;
+				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
+			} else if (throughDoor.wall == 's' && state.player.y > (1 + state.room.height + wallWidth) / 2 + doorThreshold) {
+				state.room = rooms.find(r => r.id == throughDoor.roomId);
+				const door = state.room.doors.find(d => d.wall == 'n' && d.roomId == prevRoom.id);
+				state.player.y = (1 - state.room.height + state.player.height) / 2;
+				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
+			}
 		}
 	}
-
-
-	requestAnimationFrame(draw);
 }
+
+function drawMap() {
+	{
+		// map background
+		ctx.fillStyle = mapBackgroundColor;
+		ctx.fillRect(canvas.width * mapMargin, canvas.height * mapMargin, canvas.width * (1 - 2 * mapMargin), canvas.height * (1 - 2 * mapMargin));
+	}
+	{
+		// wall
+		{
+			ctx.strokeStyle = state.room.wallColor || wallColor;
+			ctx.lineWidth = wallWidth * mapScale * canvas.width;
+			ctx.beginPath();
+			const width = state.room.width * mapScale * canvas.width;
+			const height = state.room.height * mapScale * canvas.height;
+			const x = (canvas.width - width) / 2;
+			const y = (canvas.height - height) / 2;
+			ctx.rect(x, y, width, height);
+			ctx.stroke();
+			ctx.fillStyle = mapRoomColor;
+			ctx.fillRect(x, y, width, height);
+		}
+
+		ctx.fillStyle = mapPassageColor;
+		for (const door of state.room.doors) {
+			const adjoiningRoom = rooms.find(r => r.id == door.roomId);
+			let x, y, width, height;
+			if (['e', 'w'].includes(door.wall)) {
+				width = (2 - state.room.width - adjoiningRoom.width) * mapScale * canvas.width / 2;
+				height = doorSize * mapScale * canvas.height;
+				y = (door.location - state.room.height / 2) * mapScale * canvas.width;
+				if (door.wall == 'e') {
+					x = state.room.width * mapScale * canvas.width / 2;
+				} else {
+					x = - state.room.width * mapScale * canvas.width / 2 - width;
+				}
+			} else {
+				height = (2 - state.room.height - adjoiningRoom.height) * mapScale * canvas.height / 2;
+				width = doorSize * mapScale * canvas.height;
+				x = (door.location - state.room.width / 2) * mapScale * canvas.height;
+				if (door.wall == 's') {
+					y = state.room.height * mapScale * canvas.height / 2;
+				} else {
+					y = - state.room.height * mapScale * canvas.height / 2 - height;
+				}
+			}
+			ctx.fillRect(x + canvas.width / 2, y + canvas.height / 2, width, height);
+		}
+		ctx.fillStyle = '#f00';
+		ctx.beginPath();
+		ctx.arc(canvas.width / 2, canvas.height / 2, 8, 0, Math.PI * 2);
+		ctx.fill();
+
+	}
+	{
+		// player
+		const width = state.player.width * mapScale * canvas.width;
+		const height = state.player.height * mapScale * canvas.height;
+		const x = (canvas.width - width) / 2;
+		const y = (canvas.height - height) / 2;
+		ctx.drawImage(playerImageStanding, x, y, width, height);
+	}
+
+}
+
 
 function onKeyUp(e) {
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
 		playerImage = playerImageStanding;
+	}
+
+	if (e.key.toUpperCase() == 'M') {
+		drawFunc = drawMap;
+	} else if (e.key == 'Escape') {
+		drawFunc = drawGame;
 	}
 }
 
