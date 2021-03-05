@@ -9,18 +9,21 @@ const state = {
 	room: rooms[0],
 };
 const backgroundColor = '#c1e5be';
-const doorSize = 0.1;
+const doorSize = 0.15;
+const doorThreshold = 0.04;
 const doorwaySize = {
 	width: 0.006,
 	height: 0.04
 };
 const wallWidth = 0.01;
+const moveIncrement = 0.006;
+
+let throughDoor;
 const playerImageStanding = new Image();
 const playerImageLeft = new Image();
 const playerImageRight = new Image();
 let playerImage;
 const keysDown = {};
-const moveIncrement = 0.006;
 let canvas, ctx;
 
 function load() {
@@ -80,13 +83,13 @@ function draw() {
 			} else if (door.wall == 'n') {
 				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
 				y = (1 - state.room.height - wallWidth) * canvas.height / 2 - 1;
-				height = wallWidth * canvas.width + 1;
-				width = doorSize * canvas.height;
+				height = wallWidth * canvas.height + 1;
+				width = doorSize * canvas.width;
 			} else if (door.wall == 's') {
 				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
 				y = ((1 + state.room.height - wallWidth) / 2) * canvas.height;
-				height = wallWidth * canvas.width + 4;
-				width = doorSize * canvas.height;
+				height = wallWidth * canvas.height + 4;
+				width = doorSize * canvas.width;
 			}
 			ctx.fillRect(x, y, width, height);
 
@@ -139,17 +142,132 @@ function draw() {
 	}
 
 	if (keysDown.ArrowLeft) {
-		state.player.x = Math.max((1 - state.room.width + state.player.width) / 2, state.player.x - inc);
+		const edge = (1 - state.room.width + state.player.width + wallWidth) / 2;
+		state.player.x = state.player.x - inc;
+		if (state.player.x <= edge) {
+			const playerPos = state.player.y - state.player.height / 2;
+			let y1, y2;
+			for (const door of state.room.doors.filter(d => d.wall == 'w')) {
+				y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
+				y2 = y1 + doorSize - state.player.height;
+				if (playerPos >= y1 && playerPos <= y2) {
+					throughDoor = door;
+					break;
+				}
+			}
+			if (!throughDoor || throughDoor.wall != 'w') {
+				state.player.x = edge;
+			}
+		}
 	}
 	if (keysDown.ArrowRight) {
-		state.player.x = Math.min((1 + state.room.width - state.player.width) / 2, state.player.x + inc);
+		const edge = (1 + state.room.width - state.player.width - wallWidth) / 2;
+		state.player.x = state.player.x + inc;
+		if (state.player.x >= edge) {
+			const playerPos = state.player.y - state.player.height / 2;
+			for (const door of state.room.doors.filter(d => d.wall == 'e')) {
+				const y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
+				const y2 = y1 + doorSize - state.player.height;
+				if (playerPos >= y1 && playerPos <= y2) {
+					throughDoor = door;
+					break;
+				}
+			}
+			if (!throughDoor || throughDoor.wall != 'e') {
+				state.player.x = edge;
+			}
+		}
 	}
 	if (keysDown.ArrowUp) {
-		state.player.y = Math.max((1 - state.room.height + state.player.height + wallWidth) / 2, state.player.y - inc);
+		const edge = (1 - state.room.height + state.player.height + wallWidth) / 2;
+		state.player.y = state.player.y - inc;
+		if (state.player.y <= edge) {
+			const playerPos = state.player.x - state.player.width / 2;
+			for (const door of state.room.doors.filter(d => d.wall == 'n')) {
+				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
+				const x2 = x1 + doorSize - state.player.width;
+				if (playerPos >= x1 && playerPos <= x2) {
+					throughDoor = door;
+					break;
+				}
+			}
+			if (!throughDoor || throughDoor.wall != 'n') {
+				state.player.y = edge;
+			}
+		}
 	}
 	if (keysDown.ArrowDown) {
-		state.player.y = Math.min((1 + state.room.height - state.player.height - wallWidth) / 2, state.player.y + inc);
+		const edge = (1 + state.room.height - state.player.height - wallWidth) / 2;
+		state.player.y = state.player.y + inc;
+		if (state.player.y >= edge) {
+			const playerPos = state.player.x - state.player.width / 2;
+			for (const door of state.room.doors.filter(d => d.wall == 's')) {
+				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
+				const x2 = x1 + doorSize - state.player.width;
+				if (playerPos >= x1 && playerPos <= x2) {
+					throughDoor = door;
+					break;
+				}
+			}
+			if (!throughDoor || throughDoor.wall != 's') {
+				state.player.y = edge;
+			}
+		}
 	}
+
+	if (throughDoor) {
+		const playerX1 = state.player.x - state.player.width / 2;
+		const playerY1 = state.player.y - state.player.height / 2;
+		const playerX2 = state.player.x + state.player.width / 2;
+		const playerY2 = state.player.y + state.player.height / 2;
+		const roomX1 = (1 - state.room.width + wallWidth) / 2;
+		const roomY1 = (1 - state.room.height + wallWidth) / 2;
+		const roomX2 = (1 + state.room.width + wallWidth) / 2;
+		const roomY2 = (1 + state.room.height + wallWidth) / 2;
+		if (playerX2 < roomX2 && playerX1 > roomX1 && playerY2 < roomY2 && playerY1 > roomY1) {
+			throughDoor = null;
+		}
+	}
+	// console.log('throughDoor', throughDoor);
+	if (throughDoor) {
+		if (['w', 'e'].includes(throughDoor.wall)) {
+			const minY = (1 - state.room.height) / 2 + (throughDoor.location * state.room.height);
+			const maxY = minY + doorSize;
+			const playerY1 = state.player.y - state.player.height / 2;
+			const playerY2 = state.player.y + state.player.height / 2;
+			if (playerY2 > maxY) {
+				state.player.y = maxY - state.player.height / 2;
+			} else if (playerY1 < minY) {
+				state.player.y = minY + state.player.height / 2;
+			}
+
+			const prevRoom = state.room;
+			if (throughDoor.wall == 'w' && state.player.x < (1 - state.room.width - wallWidth) / 2 - doorThreshold) {
+				state.room = rooms.find(r => r.id == throughDoor.roomId);
+				const door = state.room.doors.find(d => d.wall == 'e' && d.roomId == prevRoom.id);
+				state.player.x = (1 + state.room.width - state.player.width) / 2;
+				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
+				console.log(state.player.y)
+			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
+				state.room = rooms.find(r => r.id == throughDoor.roomId);
+				const door = state.room.doors.find(d => d.wall == 'w' && d.roomId == prevRoom.id);
+				state.player.x = (1 - state.room.width + state.player.width) / 2;
+				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
+				console.log(state.player.y)
+			}
+		} else {
+			const minX = (1 - state.room.width) / 2 + (throughDoor.location * state.room.width);
+			const maxX = minX + doorSize;
+			const playerX1 = state.player.x - state.player.width / 2;
+			const playerX2 = state.player.x + state.player.width / 2;
+			if (playerX2 > maxX) {
+				state.player.x = maxX - state.player.width / 2;
+			} else if (playerX1 < minX) {
+				state.player.x = minX + state.player.width / 2;
+			}
+		}
+	}
+
 
 	requestAnimationFrame(draw);
 }
