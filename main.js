@@ -386,24 +386,16 @@ function drawMap() {
 
 			for (const door of room.doors) {
 				if (mappedRooms.includes(door.room)) {
-					let x, y;
 					if (door.wall == 'n') {
-						x = offset.x;
-						y = offset.y - canvas.height * mapScale;
+						offset.y -= canvas.height * mapScale;
 					} else if (door.wall == 's') {
-						x = offset.x;
-						y = offset.y + canvas.height * mapScale;
+						offset.y += canvas.height * mapScale;
 					} else if (door.wall == 'w') {
-						x = offset.x - canvas.width * mapScale;
-						y = offset.y;
+						offset.x -= canvas.width * mapScale;
 					} else if (door.wall == 'e') {
-						x = offset.x + canvas.width * mapScale;
-						y = offset.y;
+						offset.x += canvas.width * mapScale;
 					}
-					mapRoom(door.room, {
-						x,
-						y
-					});
+					mapRoom(door.room, offset);
 				}
 			}
 		}
