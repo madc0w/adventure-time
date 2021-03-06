@@ -24,15 +24,14 @@ const mapRoomColor = '#a5a5a4';
 const mapPassageColor = '#aaa';
 const mapMargin = 0.04;
 const mapScale = 0.3;
+const mappedRooms = [rooms[0]];
 
 let drawFunc = drawGame;
-let throughDoor;
 const playerImageStanding = new Image();
 const playerImageLeft = new Image();
 const playerImageRight = new Image();
-let playerImage;
 const keysDown = {};
-let canvas, ctx;
+let throughDoor, playerImage, canvas, ctx;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -47,6 +46,36 @@ function load() {
 
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
+
+	for (const room of rooms) {
+		for (const door of room.doors) {
+			door.room = rooms.find(r => r.id == door.roomId);
+		}
+	}
+
+	for (const room of rooms) {
+		for (const door of room.doors) {
+			if (!door.isOneWay) {
+				const wall = {
+					n: 's',
+					s: 'n',
+					e: 'w',
+					w: 'e'
+				}[door.wall];
+				const location = door.location;
+
+				const oppositeDoor = {
+					room,
+					wall,
+					location,
+					oppositeDoor: door,
+				};
+				door.room.doors.push(oppositeDoor);
+				door.oppositeDoor = oppositeDoor;
+			}
+		}
+	}
+	console.log(rooms);
 
 	requestAnimationFrame(draw);
 }
@@ -242,6 +271,14 @@ function drawGame() {
 	}
 	// console.log('throughDoor', throughDoor);
 	if (throughDoor) {
+		function goThroughDoor() {
+			state.room = throughDoor.room;
+			if (!mappedRooms.includes(state.room)) {
+				mappedRooms.push(state.room);
+				// console.log(mappedRooms);
+			}
+		}
+
 		if (['w', 'e'].includes(throughDoor.wall)) {
 			const minY = (1 - state.room.height) / 2 + (throughDoor.location * state.room.height);
 			const maxY = minY + doorSize;
@@ -253,16 +290,17 @@ function drawGame() {
 				state.player.y = minY + state.player.height / 2;
 			}
 
+
 			const prevRoom = state.room;
 			if (throughDoor.wall == 'w' && state.player.x < (1 - state.room.width - wallWidth) / 2 - doorThreshold) {
-				state.room = rooms.find(r => r.id == throughDoor.roomId);
-				const door = state.room.doors.find(d => d.wall == 'e' && d.roomId == prevRoom.id);
+				goThroughDoor();
+				const door = state.room.doors.find(d => d.wall == 'e' && d.room == prevRoom);
 				state.player.x = (1 + state.room.width - state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
 				// console.log(state.player.y)
 			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
-				state.room = rooms.find(r => r.id == throughDoor.roomId);
-				const door = state.room.doors.find(d => d.wall == 'w' && d.roomId == prevRoom.id);
+				goThroughDoor();
+				const door = state.room.doors.find(d => d.wall == 'w' && d.room == prevRoom);
 				state.player.x = (1 - state.room.width + state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
 				// console.log(state.player.y)
@@ -280,13 +318,13 @@ function drawGame() {
 
 			const prevRoom = state.room;
 			if (throughDoor.wall == 'n' && state.player.y < (1 - state.room.height - wallWidth) / 2 - doorThreshold) {
-				state.room = rooms.find(r => r.id == throughDoor.roomId);
-				const door = state.room.doors.find(d => d.wall == 's' && d.roomId == prevRoom.id);
+				goThroughDoor();
+				const door = state.room.doors.find(d => d.wall == 's' && d.room == prevRoom);
 				state.player.y = (1 + state.room.height - state.player.height) / 2;
 				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
 			} else if (throughDoor.wall == 's' && state.player.y > (1 + state.room.height + wallWidth) / 2 + doorThreshold) {
-				state.room = rooms.find(r => r.id == throughDoor.roomId);
-				const door = state.room.doors.find(d => d.wall == 'n' && d.roomId == prevRoom.id);
+				goThroughDoor();
+				const door = state.room.doors.find(d => d.wall == 'n' && d.room == prevRoom);
 				state.player.y = (1 - state.room.height + state.player.height) / 2;
 				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
 			}
@@ -301,53 +339,88 @@ function drawMap() {
 		ctx.fillRect(canvas.width * mapMargin, canvas.height * mapMargin, canvas.width * (1 - 2 * mapMargin), canvas.height * (1 - 2 * mapMargin));
 	}
 	{
-		// wall
-		{
-			ctx.strokeStyle = state.room.wallColor || wallColor;
-			ctx.lineWidth = wallWidth * mapScale * canvas.width;
-			ctx.beginPath();
-			const width = state.room.width * mapScale * canvas.width;
-			const height = state.room.height * mapScale * canvas.height;
-			const x = (canvas.width - width) / 2;
-			const y = (canvas.height - height) / 2;
-			ctx.rect(x, y, width, height);
-			ctx.stroke();
-			ctx.fillStyle = mapRoomColor;
-			ctx.fillRect(x, y, width, height);
-		}
+		const mapped = [];
+		function mapRoom(room, offset) {
+			if (mapped.includes(room)) {
+				return;
+			}
+			mapped.push(room);
+			{
+				ctx.strokeStyle = room.wallColor || wallColor;
+				ctx.lineWidth = wallWidth * mapScale * canvas.width;
+				const width = room.width * mapScale * canvas.width;
+				const height = room.height * mapScale * canvas.height;
+				const x = - width / 2;
+				const y = - height / 2;
+				ctx.beginPath();
+				ctx.rect(x + offset.x, y + offset.y, width, height);
+				ctx.stroke();
+				ctx.fillStyle = mapRoomColor;
+				ctx.fillRect(x + offset.x, y + offset.y, width, height);
+			}
 
-		ctx.fillStyle = mapPassageColor;
-		for (const door of state.room.doors) {
-			const adjoiningRoom = rooms.find(r => r.id == door.roomId);
-			let x, y, width, height;
-			if (['e', 'w'].includes(door.wall)) {
-				width = (2 - state.room.width - adjoiningRoom.width) * mapScale * canvas.width / 2;
-				height = doorSize * mapScale * canvas.height;
-				y = (door.location - state.room.height / 2) * mapScale * canvas.width;
-				if (door.wall == 'e') {
-					x = state.room.width * mapScale * canvas.width / 2;
+			ctx.fillStyle = mapPassageColor;
+			for (const door of room.doors) {
+				let x, y, width, height;
+				if (['e', 'w'].includes(door.wall)) {
+					width = (1 - room.width) * mapScale * canvas.width / 2;
+					height = doorSize * mapScale * canvas.height;
+					y = (door.location - room.height / 2) * mapScale * canvas.width;
+					if (door.wall == 'e') {
+						x = room.width * mapScale * canvas.width / 2;
+					} else {
+						x = - room.width * mapScale * canvas.width / 2 - width;
+					}
 				} else {
-					x = - state.room.width * mapScale * canvas.width / 2 - width;
+					height = (1 - room.height) * mapScale * canvas.height / 2;
+					width = doorSize * mapScale * canvas.height;
+					x = (door.location - room.width / 2) * mapScale * canvas.height;
+					if (door.wall == 's') {
+						y = room.height * mapScale * canvas.height / 2;
+					} else {
+						y = - room.height * mapScale * canvas.height / 2 - height;
+					}
 				}
-			} else {
-				height = (2 - state.room.height - adjoiningRoom.height) * mapScale * canvas.height / 2;
-				width = doorSize * mapScale * canvas.height;
-				x = (door.location - state.room.width / 2) * mapScale * canvas.height;
-				if (door.wall == 's') {
-					y = state.room.height * mapScale * canvas.height / 2;
-				} else {
-					y = - state.room.height * mapScale * canvas.height / 2 - height;
+				ctx.fillRect(x + offset.x, y + offset.y, width, height);
+			}
+
+			for (const door of room.doors) {
+				if (mappedRooms.includes(door.room)) {
+					let x, y;
+					if (door.wall == 'n') {
+						x = offset.x;
+						y = offset.y - canvas.height * mapScale;
+					} else if (door.wall == 's') {
+						x = offset.x;
+						y = offset.y + canvas.height * mapScale;
+					} else if (door.wall == 'w') {
+						x = offset.x - canvas.width * mapScale;
+						y = offset.y;
+					} else if (door.wall == 'e') {
+						x = offset.x + canvas.width * mapScale;
+						y = offset.y;
+					}
+					mapRoom(door.room, {
+						x,
+						y
+					});
 				}
 			}
-			ctx.fillRect(x + canvas.width / 2, y + canvas.height / 2, width, height);
 		}
+	}
+
+	mapRoom(state.room, {
+		x: canvas.width / 2,
+		y: canvas.height / 2
+	});
+
+	{
+		// you are here
 		ctx.fillStyle = '#f00';
 		ctx.beginPath();
 		ctx.arc(canvas.width / 2, canvas.height / 2, 8, 0, Math.PI * 2);
 		ctx.fill();
 
-	}
-	{
 		// player
 		const width = state.player.width * mapScale * canvas.width;
 		const height = state.player.height * mapScale * canvas.height;

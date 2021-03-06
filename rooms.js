@@ -34,11 +34,6 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
-			{
-				roomId: 0,
-				wall: 'e',
-				location: 0.2,
-			},
 		]
 	}, {
 		id: 2,
@@ -47,11 +42,6 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
-			{
-				roomId: 0,
-				wall: 'w',
-				location: 0.2,
-			},
 		]
 	}, {
 		id: 3,
@@ -60,11 +50,6 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
-			{
-				roomId: 0,
-				wall: 's',
-				location: 0.2,
-			},
 		]
 	}, {
 		id: 4,
@@ -73,11 +58,6 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
-			{
-				roomId: 0,
-				wall: 'n',
-				location: 0.2,
-			},
 		]
 	},
 ];
