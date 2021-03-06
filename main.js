@@ -26,6 +26,8 @@ const mapMargin = 0.02;
 const mapScale = 0.24;
 const mappedRooms = [rooms[0]];
 
+const itemSize = 0.08;
+
 let drawFunc = drawGame;
 const playerImageStanding = new Image();
 const playerImageLeft = new Image();
@@ -47,6 +49,11 @@ function load() {
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
 
+	for (const item of items) {
+		const image = new Image();
+		image.src = `img/items/${item.image}`;
+		item.image = image;
+	}
 	for (const room of rooms) {
 		for (const door of room.doors) {
 			door.room = rooms.find(r => r.id == door.roomId);
@@ -105,6 +112,15 @@ function drawGame() {
 		const y = (1 - state.room.height) * canvas.height / 2;
 		ctx.rect(x, y, state.room.width * canvas.width, state.room.height * canvas.height);
 		ctx.stroke();
+	}
+	{
+		// items
+		for (const roomItem of state.room.items || []) {
+			const item = items.find(i => i.id == roomItem.id);
+			const x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
+			const y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
+			ctx.drawImage(item.image, x, y, itemSize * canvas.width, itemSize * canvas.height);
+		}
 	}
 	{
 		// doors
@@ -254,6 +270,18 @@ function drawGame() {
 				state.player.y = edge;
 			}
 		}
+	}
+
+	let i = 0;
+	for (const item of state.room.items) {
+		const x = (1 - state.room.width) / 2 + (item.location.x * state.room.width);
+		const y = (1 - state.room.height) / 2 + (item.location.y * state.room.height);
+
+		if (state.player.x < x + itemSize && state.player.x > x - itemSize &&
+			state.player.y < y + itemSize && state.player.y > y - itemSize) {
+			state.room.items.splice(i, 1);
+		}
+		i++;
 	}
 
 	if (throughDoor) {

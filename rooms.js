@@ -26,6 +26,15 @@ rooms = [
 				wall: 's',
 				location: 0.4,
 			}
+		],
+		items: [
+			{
+				id: 0,
+				location: {
+					x: 0.2,
+					y: 0.4
+				}
+			}
 		]
 	}, {
 		id: 1,
