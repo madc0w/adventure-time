@@ -361,27 +361,60 @@ function drawMap() {
 
 			ctx.fillStyle = mapPassageColor;
 			for (const door of room.doors) {
-				let x, y, width, height;
+				const p1 = {}, p2 = {}, p3 = {}, p4 = {};
 				if (['e', 'w'].includes(door.wall)) {
-					width = (1 - room.width) * mapScale * canvas.width / 2;
-					height = doorSize * mapScale * canvas.height;
-					y = (door.location - room.height / 2) * mapScale * canvas.width;
+					p1.y = (door.location - room.height / 2) * mapScale * canvas.width;
+					p2.y = p1.y + doorSize * mapScale * canvas.height;
+					p4.y = (door.oppositeDoor.location - door.room.height / 2) * mapScale * canvas.width;
+					p3.y = p4.y + doorSize * mapScale * canvas.height;
 					if (door.wall == 'e') {
-						x = room.width * mapScale * canvas.width / 2;
+						p1.x = p2.x = room.width * mapScale * canvas.width;
 					} else {
-						x = - room.width * mapScale * canvas.width / 2 - width;
+						p1.x = p2.x = -room.width * mapScale * canvas.width / 2;
 					}
+					p3.x = p4.x = p1.x - (2 - room.width - door.room.width) * mapScale * canvas.width / 2;
 				} else {
-					height = (1 - room.height) * mapScale * canvas.height / 2;
-					width = doorSize * mapScale * canvas.height;
-					x = (door.location - room.width / 2) * mapScale * canvas.height;
+					p1.x = (door.location - room.width / 2) * mapScale * canvas.height;
+					p2.x = p1.x + doorSize * mapScale * canvas.width;
+					p4.x = (door.oppositeDoor.location - door.room.width / 2) * mapScale * canvas.height;
+					p3.x = p4.x + doorSize * mapScale * canvas.width;
 					if (door.wall == 's') {
-						y = room.height * mapScale * canvas.height / 2;
+						p1.y = p2.y = room.height * mapScale * canvas.height / 2;
 					} else {
-						y = - room.height * mapScale * canvas.height / 2 - height;
+						p1.y = p2.y = -room.height * mapScale * canvas.height / 2;
 					}
+					p3.y = p4.y = p1.y - (2 - room.height - door.room.height) * mapScale * canvas.height / 2;
 				}
-				ctx.fillRect(x + offset.x, y + offset.y, width, height);
+				if (!isNaN(p2.x)) {
+					for (const p of [p1, p2, p3, p4]) {
+						p.x += offset.x;
+						p.y += offset.y;
+					}
+					// if (isNaN(p3.x) || isNaN(p3.y)) {
+					// 	console.log(p3);
+					// }
+					// console.log('offset', offset);
+					// console.log('p1', p1);
+					// console.log('p2', p2);
+					// console.log('p3', p3);
+					// console.log('p4', p4);
+					ctx.fillStyle = room.id == 0 ? '#f00' : '#0f0';
+					ctx.beginPath();
+					ctx.moveTo(p1.x, p1.y);
+					ctx.lineTo(p2.x, p2.y);
+					ctx.lineTo(p3.x, p3.y);
+					ctx.lineTo(p4.x, p4.y);
+					ctx.closePath();
+					ctx.fill();
+
+					ctx.font = '10px Arial';
+					ctx.fillStyle = '#000';
+					ctx.fillText(1, p1.x, p1.y);
+					ctx.fillText(2, p2.x, p2.y);
+					ctx.fillText(3, p3.x, p3.y);
+					ctx.fillText(4, p4.x, p4.y);
+				}
+				// ctx.fillRect(x + offset.x, y + offset.y, width, height);
 			}
 
 			for (const door of room.doors) {
