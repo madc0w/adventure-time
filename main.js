@@ -21,9 +21,9 @@ const moveIncrement = 0.006;
 
 const mapBackgroundColor = '#e2e2b1';
 const mapRoomColor = '#a5a5a4';
-const mapPassageColor = '#aaa';
-const mapMargin = 0.04;
-const mapScale = 0.3;
+const mapPassageColor = '#ccd';
+const mapMargin = 0.02;
+const mapScale = 0.24;
 const mappedRooms = [rooms[0]];
 
 let drawFunc = drawGame;
@@ -338,9 +338,9 @@ function drawMap() {
 		ctx.fillStyle = mapBackgroundColor;
 		ctx.fillRect(canvas.width * mapMargin, canvas.height * mapMargin, canvas.width * (1 - 2 * mapMargin), canvas.height * (1 - 2 * mapMargin));
 	}
+	const mapped = [];
 	{
-		const mapped = [];
-		function mapRoom(room, offset) {
+		function drawRoom(room, offset) {
 			if (mapped.includes(room)) {
 				return;
 			}
@@ -359,85 +359,93 @@ function drawMap() {
 				ctx.fillRect(x + offset.x, y + offset.y, width, height);
 			}
 
-			ctx.fillStyle = mapPassageColor;
 			for (const door of room.doors) {
-				const p1 = {}, p2 = {}, p3 = {}, p4 = {};
+				door.p1 = {};
+				door.p2 = {};
 				if (['e', 'w'].includes(door.wall)) {
-					p1.y = (door.location - room.height / 2) * mapScale * canvas.width;
-					p2.y = p1.y + doorSize * mapScale * canvas.height;
-					p4.y = (door.oppositeDoor.location - door.room.height / 2) * mapScale * canvas.width;
-					p3.y = p4.y + doorSize * mapScale * canvas.height;
-					if (door.wall == 'e') {
-						p1.x = p2.x = room.width * mapScale * canvas.width;
-					} else {
-						p1.x = p2.x = -room.width * mapScale * canvas.width / 2;
+					door.p1.y = (door.location - room.height / 2) * mapScale * canvas.width;
+					door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
+					door.p1.x = door.p2.x = room.width * mapScale * canvas.width / 2;
+					if (door.wall == 'w') {
+						door.p1.x *= -1;
+						door.p2.x *= -1;
 					}
-					p3.x = p4.x = p1.x - (2 - room.width - door.room.width) * mapScale * canvas.width / 2;
 				} else {
-					p1.x = (door.location - room.width / 2) * mapScale * canvas.height;
-					p2.x = p1.x + doorSize * mapScale * canvas.width;
-					p4.x = (door.oppositeDoor.location - door.room.width / 2) * mapScale * canvas.height;
-					p3.x = p4.x + doorSize * mapScale * canvas.width;
-					if (door.wall == 's') {
-						p1.y = p2.y = room.height * mapScale * canvas.height / 2;
-					} else {
-						p1.y = p2.y = -room.height * mapScale * canvas.height / 2;
+					door.p1.x = (door.location - room.width / 2) * mapScale * canvas.height;
+					door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
+					door.p1.y = door.p2.y = room.height * mapScale * canvas.height / 2;
+					if (door.wall == 'n') {
+						door.p1.y *= -1;
+						door.p2.y *= -1;
 					}
-					p3.y = p4.y = p1.y - (2 - room.height - door.room.height) * mapScale * canvas.height / 2;
 				}
-				if (!isNaN(p2.x)) {
-					for (const p of [p1, p2, p3, p4]) {
-						p.x += offset.x;
-						p.y += offset.y;
-					}
-					// if (isNaN(p3.x) || isNaN(p3.y)) {
-					// 	console.log(p3);
-					// }
-					// console.log('offset', offset);
-					// console.log('p1', p1);
-					// console.log('p2', p2);
-					// console.log('p3', p3);
-					// console.log('p4', p4);
-					ctx.fillStyle = room.id == 0 ? '#f00' : '#0f0';
-					ctx.beginPath();
-					ctx.moveTo(p1.x, p1.y);
-					ctx.lineTo(p2.x, p2.y);
-					ctx.lineTo(p3.x, p3.y);
-					ctx.lineTo(p4.x, p4.y);
-					ctx.closePath();
-					ctx.fill();
+				for (const p of [door.p1, door.p2]) {
+					p.x += offset.x;
+					p.y += offset.y;
+				}
 
-					ctx.font = '10px Arial';
-					ctx.fillStyle = '#000';
-					ctx.fillText(1, p1.x, p1.y);
-					ctx.fillText(2, p2.x, p2.y);
-					ctx.fillText(3, p3.x, p3.y);
-					ctx.fillText(4, p4.x, p4.y);
-				}
-				// ctx.fillRect(x + offset.x, y + offset.y, width, height);
+				// ctx.font = '10px Arial';
+				// ctx.fillStyle = '#000';
+				// ctx.fillText(1, door.p1.x, door.p1.y);
+				// ctx.fillText(2, door.p2.x, door.p2.y);
 			}
 
 			for (const door of room.doors) {
 				if (mappedRooms.includes(door.room)) {
+					let x = offset.x, y = offset.y;
 					if (door.wall == 'n') {
-						offset.y -= canvas.height * mapScale;
+						y -= canvas.height * mapScale;
 					} else if (door.wall == 's') {
-						offset.y += canvas.height * mapScale;
+						y += canvas.height * mapScale;
 					} else if (door.wall == 'w') {
-						offset.x -= canvas.width * mapScale;
+						x -= canvas.width * mapScale;
 					} else if (door.wall == 'e') {
-						offset.x += canvas.width * mapScale;
+						x += canvas.width * mapScale;
 					}
-					mapRoom(door.room, offset);
+					drawRoom(door.room, {
+						x, y
+					});
 				}
 			}
 		}
 	}
 
-	mapRoom(state.room, {
+	drawRoom(state.room, {
 		x: canvas.width / 2,
 		y: canvas.height / 2
 	});
+
+	// now draw all doors
+	for (const room of mapped) {
+		for (const door of room.doors) {
+			if (door.p1) {
+				ctx.fillStyle = mapPassageColor;
+				if (door.oppositeDoor.p1) {
+					ctx.beginPath();
+					ctx.moveTo(door.p1.x, door.p1.y);
+					ctx.lineTo(door.p2.x, door.p2.y);
+					ctx.lineTo(door.oppositeDoor.p2.x, door.oppositeDoor.p2.y);
+					ctx.lineTo(door.oppositeDoor.p1.x, door.oppositeDoor.p1.y);
+					ctx.closePath();
+					ctx.fill();
+				} else {
+					let width, height;
+					let x = door.p1.x;
+					let y = door.p1.y;
+					if (['e', 'w'].includes(door.wall)) {
+						height = doorSize * mapScale * canvas.height;
+						width = 2 * wallWidth * mapScale * canvas.width;
+						x -= wallWidth * mapScale * canvas.width;
+					} else {
+						height = 2 * wallWidth * mapScale * canvas.height;
+						width = doorSize * mapScale * canvas.width;
+						y -= wallWidth * mapScale * canvas.width;
+					}
+					ctx.fillRect(x, y, width, height);
+				}
+			}
+		}
+	}
 
 	{
 		// you are here
