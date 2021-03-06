@@ -4,8 +4,8 @@ const state = {
 		y: 0.5,
 		width: 0.05,
 		height: 0.1,
-		orientation: 0,
 	},
+	inventory: {},
 	room: rooms[0],
 };
 const wallColor = '#3f2f0c';
@@ -273,13 +273,18 @@ function drawGame() {
 	}
 
 	let i = 0;
-	for (const item of state.room.items) {
-		const x = (1 - state.room.width) / 2 + (item.location.x * state.room.width);
-		const y = (1 - state.room.height) / 2 + (item.location.y * state.room.height);
+	for (const roomItem of state.room.items) {
+		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
+		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
 
 		if (state.player.x < x + itemSize && state.player.x > x - itemSize &&
 			state.player.y < y + itemSize && state.player.y > y - itemSize) {
 			state.room.items.splice(i, 1);
+			if (!state.inventory[roomItem.id]) {
+				state.inventory[roomItem.id] = 0;
+			}
+			const item = items.find(i => i.id == roomItem.id);
+			state.inventory[item.id] += item.value;
 		}
 		i++;
 	}
@@ -489,9 +494,15 @@ function drawMap() {
 		const y = (canvas.height - height) / 2;
 		ctx.drawImage(playerImageStanding, x, y, width, height);
 	}
-
 }
 
+
+function drawInventory() {
+	for (const itemId in state.inventory) {
+		const item = items.find(i => i.id == itemId);
+		console.log(item, state.inventory[itemId]);
+	}
+}
 
 function onKeyUp(e) {
 	delete keysDown[e.code];
@@ -501,6 +512,8 @@ function onKeyUp(e) {
 
 	if (e.key.toUpperCase() == 'M') {
 		drawFunc = drawMap;
+	} else if (e.key.toUpperCase() == 'I') {
+		drawFunc = drawInventory;
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
 	}
