@@ -542,7 +542,7 @@ function drawMap() {
 function drawInventory() {
 	const lineHeight = 0.08;
 	const fontSize = lineHeight * 0.8 * canvas.height;
-	ctx.font = `${fontSize * 1.2}px MedievalSharp`;
+	ctx.font = `${fontSize * 1.2}px Jura`;
 	ctx.fillStyle = '#000';
 
 	let y = 0.08 * canvas.height;
@@ -551,7 +551,7 @@ function drawInventory() {
 	ctx.fillText(header, x, y);
 	y += lineHeight * canvas.height;
 
-	ctx.font = `${fontSize}px MedievalSharp`;
+	ctx.font = `${fontSize}px Jura`;
 	const imageSize = itemSize * canvas.width;
 	const x1 = 0.12 * canvas.width;
 	const x2 = 0.8 * canvas.width;
