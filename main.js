@@ -65,10 +65,10 @@ function load() {
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
 
-	for (const item of items) {
+	for (const itemKey in items) {
 		const image = new Image();
-		image.src = `img/items/${item.image}`;
-		item.image = image;
+		image.src = `img/items/${items[itemKey].image}`;
+		items[itemKey].image = image;
 	}
 	for (const room of rooms) {
 		for (const door of room.doors) {
@@ -132,7 +132,7 @@ function drawGame() {
 	{
 		// items
 		for (const roomItem of state.room.items || []) {
-			const item = items.find(i => i.id == roomItem.id);
+			const item = items[roomItem.id];
 			const x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
 			const y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
 			ctx.drawImage(item.image, x, y, itemSize * canvas.width, itemSize * canvas.height);
@@ -288,6 +288,7 @@ function drawGame() {
 		}
 	}
 
+	// pick up an item
 	let i = 0;
 	for (const roomItem of state.room.items || []) {
 		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
@@ -299,8 +300,8 @@ function drawGame() {
 			if (!state.inventory[roomItem.id]) {
 				state.inventory[roomItem.id] = 0;
 			}
-			const item = items.find(i => i.id == roomItem.id);
-			state.inventory[item.id] += item.value;
+			const item = items[roomItem.id];
+			state.inventory[roomItem.id] += item.value;
 		}
 		i++;
 	}
@@ -515,7 +516,7 @@ function drawMap() {
 
 function drawInventory() {
 	for (const itemId in state.inventory) {
-		const item = items.find(i => i.id == itemId);
+		const item = items[itemId];
 		console.log(item, state.inventory[itemId]);
 	}
 }

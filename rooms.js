@@ -29,7 +29,7 @@ rooms = [
 		],
 		items: [
 			{
-				id: 0,
+				id: 'treasure',
 				location: {
 					x: 0.2,
 					y: 0.4
@@ -54,7 +54,7 @@ rooms = [
 		],
 		items: [
 			{
-				id: 0,
+				id: 'treasure',
 				location: {
 					x: 0.1,
 					y: 0.7
