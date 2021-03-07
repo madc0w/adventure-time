@@ -51,6 +51,15 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
+		],
+		items: [
+			{
+				id: 0,
+				location: {
+					x: 0.1,
+					y: 0.7
+				}
+			}
 		]
 	}, {
 		id: 3,
@@ -62,6 +71,19 @@ rooms = [
 		]
 	}, {
 		id: 4,
+		width: 0.6,
+		height: 0.7,
+		backgroundImage: 'room_02.jpg',
+		// wallColor: '#3f2',
+		doors: [
+			{
+				roomId: 5,
+				wall: 'e',
+				location: 0.2,
+			},
+		]
+	}, {
+		id: 5,
 		width: 0.6,
 		height: 0.7,
 		backgroundImage: 'room_02.jpg',

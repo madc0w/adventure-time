@@ -29,11 +29,12 @@ const mappedRooms = [rooms[0]];
 const itemSize = 0.08;
 
 let drawFunc = drawGame;
-const playerImageStanding = new Image();
-const playerImageLeft = new Image();
-const playerImageRight = new Image();
+const characterFrames = {};
 const keysDown = {};
-let throughDoor, playerImage, canvas, ctx;
+const animIntervalIds = {};
+const animFrameNums = {};
+const characterImages = {};
+let throughDoor, canvas, ctx;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -41,10 +42,25 @@ function load() {
 	canvas.height = canvas.width;
 	ctx = canvas.getContext('2d');
 
-	playerImageStanding.src = 'img/player standing.png';
-	playerImageLeft.src = 'img/player left.png';
-	playerImageRight.src = 'img/player right.png';
-	playerImage = playerImageStanding;
+	for (const character in characters) {
+		characterFrames[character] = {
+			standing: [],
+			left: [],
+			right: [],
+			up: [],
+			down: [],
+		};
+
+		for (const key in characterFrames[character]) {
+			for (const fileName of characters[character][key]) {
+				const img = new Image();
+				img.src = `img/charactes/${fileName}`;
+				characterFrames[character][key].push(img);
+			}
+		}
+	}
+
+	characterImages.player = characterFrames.player.standing[0];
 
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
@@ -184,7 +200,7 @@ function drawGame() {
 		// player
 		const x = (state.player.x - state.player.width / 2) * canvas.width;
 		const y = (state.player.y - state.player.height / 2) * canvas.height;
-		ctx.drawImage(playerImage, x, y, state.player.width * canvas.width, state.player.height * canvas.height);
+		ctx.drawImage(characterImages.player, x, y, state.player.width * canvas.width, state.player.height * canvas.height);
 	}
 
 	let numKeysDown = 0;
@@ -273,7 +289,7 @@ function drawGame() {
 	}
 
 	let i = 0;
-	for (const roomItem of state.room.items) {
+	for (const roomItem of state.room.items || []) {
 		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
 		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
 
@@ -492,7 +508,7 @@ function drawMap() {
 		const height = state.player.height * mapScale * canvas.height;
 		const x = (canvas.width - width) / 2;
 		const y = (canvas.height - height) / 2;
-		ctx.drawImage(playerImageStanding, x, y, width, height);
+		ctx.drawImage(characterFrames.player.standing[0], x, y, width, height);
 	}
 }
 
@@ -507,13 +523,16 @@ function drawInventory() {
 function onKeyUp(e) {
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
-		playerImage = playerImageStanding;
+		animate({
+			id: 'player',
+			motion: 'standing'
+		});
 	}
 
 	if (e.key.toUpperCase() == 'M') {
-		drawFunc = drawMap;
+		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 	} else if (e.key.toUpperCase() == 'I') {
-		drawFunc = drawInventory;
+		drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
 	}
@@ -524,10 +543,34 @@ function onKeyDown(e) {
 	// 	init();
 	// } else {
 	// }
-	keysDown[e.code] = true;
-	if (keysDown.ArrowLeft) {
-		playerImage = playerImageLeft;
-	} else if (keysDown.ArrowRight) {
-		playerImage = playerImageRight;
+	if (!keysDown[e.code]) {
+		if (e.code == 'ArrowLeft') {
+			animate({
+				id: 'player',
+				motion: 'left'
+			});
+		} else if (e.code == 'ArrowRight') {
+			animate({
+				id: 'player',
+				motion: 'right'
+			});
+		}
 	}
+	keysDown[e.code] = true;
+}
+
+function animate(character) {
+	clearInterval(animIntervalIds[character.id]);
+	animFrameNums[character.id] = 0;
+	const motion = character.motion;
+	// console.log('starting anim', motion);
+	function f() {
+		characterImages[character.id] = characterFrames[character.id][motion][animFrameNums[character.id] % characterFrames[character.id][motion].length];
+		animFrameNums[character.id]++;
+		// console.log('anim', motion);
+		// console.log(characterImages[character.id]);
+	}
+
+	f();
+	animIntervalIds[character.id] = setInterval(f, characters[character.id].animInterval);
 }
