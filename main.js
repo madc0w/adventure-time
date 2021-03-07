@@ -143,8 +143,9 @@ function drawGame() {
 				y += (itemSize - size) * canvas.height / 2;
 				ctx.globalAlpha = (12 - roomItem.animStep) / 12;
 			}
+			// console.log(item.image.width / item.image.height);
 			if (size > 0) {
-				ctx.drawImage(item.image, x, y, size * canvas.width, size * canvas.height);
+				ctx.drawImage(item.image, x, y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
 			}
 			ctx.globalAlpha = 1;
 		}
@@ -588,25 +589,16 @@ function onKeyDown(e) {
 	// } else {
 	// }
 	if (!keysDown[e.code]) {
-		if (e.code == 'ArrowLeft') {
+		const motion = {
+			ArrowLeft: 'left',
+			ArrowRight: 'right',
+			ArrowUp: 'up',
+			ArrowDown: 'down'
+		}[e.code];
+		if (motion) {
 			animate({
 				id: 'player',
-				motion: 'left'
-			});
-		} else if (e.code == 'ArrowRight') {
-			animate({
-				id: 'player',
-				motion: 'right'
-			});
-		} else if (e.code == 'ArrowUp') {
-			animate({
-				id: 'player',
-				motion: 'up'
-			});
-		} else if (e.code == 'ArrowDown') {
-			animate({
-				id: 'player',
-				motion: 'down'
+				motion
 			});
 		}
 	}
