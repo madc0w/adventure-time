@@ -4,6 +4,7 @@ const state = {
 		y: 0.5,
 		width: 0.05,
 		height: 0.1,
+		health: 1,
 	},
 	inventory: {},
 	room: rooms[0],
@@ -133,9 +134,19 @@ function drawGame() {
 		// items
 		for (const roomItem of state.room.items || []) {
 			const item = items[roomItem.id];
-			const x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
-			const y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
-			ctx.drawImage(item.image, x, y, itemSize * canvas.width, itemSize * canvas.height);
+			let x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
+			let y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
+			let size = itemSize;
+			if (roomItem.animStep) {
+				size -= roomItem.animStep * itemSize / 16;
+				x += (itemSize - size) * canvas.width / 2;
+				y += (itemSize - size) * canvas.height / 2;
+				ctx.globalAlpha = (12 - roomItem.animStep) / 12;
+			}
+			if (size > 0) {
+				ctx.drawImage(item.image, x, y, size * canvas.width, size * canvas.height);
+			}
+			ctx.globalAlpha = 1;
 		}
 	}
 	{
@@ -294,9 +305,23 @@ function drawGame() {
 		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
 		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
 
-		if (state.player.x < x + itemSize && state.player.x > x - itemSize &&
+		if (!roomItem.takeAnimIntervalId &&
+			state.player.x < x + itemSize && state.player.x > x - itemSize &&
 			state.player.y < y + itemSize && state.player.y > y - itemSize) {
-			state.room.items.splice(i, 1);
+
+			const interval = 24;
+			const numSteps = 12;
+			roomItem.animStep = 0;
+			roomItem.takeAnimIntervalId = setInterval(() => {
+				roomItem.animStep++;
+			}, interval);
+			const n = i;
+			setTimeout(() => {
+				// console.log('before state.room.items', state.room.items);
+				clearInterval(roomItem.takeAnimIntervalId);
+				state.room.items.splice(n, 1);
+				// console.log('after state.room.items', state.room.items);
+			}, interval * numSteps);
 			if (!state.inventory[roomItem.id]) {
 				state.inventory[roomItem.id] = 0;
 			}
@@ -515,9 +540,20 @@ function drawMap() {
 
 
 function drawInventory() {
+	const lineHeight = 0.08;
+	const fontSize = lineHeight * 0.8 * canvas.height;
+	ctx.font = `${fontSize}px MedievalSharp`;
+	ctx.fillStyle = '#000';
+	const imageSize = itemSize * canvas.width;
+	const x1 = 0.12 * canvas.width;
+	const x2 = 0.7 * canvas.width;
+	let y = 0.1 * canvas.height;
 	for (const itemId in state.inventory) {
 		const item = items[itemId];
-		console.log(item, state.inventory[itemId]);
+		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);
+		ctx.fillText(item.label, x1, y);
+		ctx.fillText(state.inventory[itemId], x2, y);
+		y += lineHeight * canvas.height;
 	}
 }
 
