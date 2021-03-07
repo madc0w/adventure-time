@@ -598,6 +598,16 @@ function onKeyDown(e) {
 				id: 'player',
 				motion: 'right'
 			});
+		} else if (e.code == 'ArrowUp') {
+			animate({
+				id: 'player',
+				motion: 'up'
+			});
+		} else if (e.code == 'ArrowDown') {
+			animate({
+				id: 'player',
+				motion: 'down'
+			});
 		}
 	}
 	keysDown[e.code] = true;

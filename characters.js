@@ -6,10 +6,11 @@ characters = {
 			'player standing.png',
 		],
 		up: [
-			'player standing.png',
+			'player up.png',
 		],
 		down: [
-			'player standing.png',
+			'player down 01.png',
+			'player down 02.png',
 		],
 		left: [
 			'player left 01.png',
