@@ -542,12 +542,19 @@ function drawMap() {
 function drawInventory() {
 	const lineHeight = 0.08;
 	const fontSize = lineHeight * 0.8 * canvas.height;
-	ctx.font = `${fontSize}px MedievalSharp`;
+	ctx.font = `${fontSize * 1.2}px MedievalSharp`;
 	ctx.fillStyle = '#000';
+
+	let y = 0.08 * canvas.height;
+	const header = 'Inventory';
+	const x = (canvas.width - ctx.measureText(header).width) / 2;
+	ctx.fillText(header, x, y);
+	y += lineHeight * canvas.height;
+
+	ctx.font = `${fontSize}px MedievalSharp`;
 	const imageSize = itemSize * canvas.width;
 	const x1 = 0.12 * canvas.width;
-	const x2 = 0.7 * canvas.width;
-	let y = 0.1 * canvas.height;
+	const x2 = 0.8 * canvas.width;
 	for (const itemId in state.inventory) {
 		const item = items[itemId];
 		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);
