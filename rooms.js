@@ -89,6 +89,15 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
+		],
+		items: [
+			{
+				id: 'sword_1',
+				location: {
+					x: 0.4,
+					y: 0.5
+				}
+			}
 		]
 	},
 ];
