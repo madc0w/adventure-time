@@ -2,6 +2,8 @@ characters = {
 
 	player: {
 		animInterval: 400,
+		width: 0.05,
+		height: 0.1,
 		standing: [
 			'player standing.png',
 		],
@@ -20,5 +22,14 @@ characters = {
 			'player right 01.png',
 			'player right 02.png',
 		],
+	},
+	blueScreen: {
+		animInterval: 400,
+		width: 0.1,
+		height: 0.1,
+		standing: [
+			'monster 01 01.png',
+		],
+
 	}
 };

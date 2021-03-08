@@ -33,6 +33,8 @@ const portalSize = 0.12;
 const portalAnimInterval = 60;
 const numPortalFrames = 38;
 
+const fontFamily = 'Jura';
+
 let drawFunc = drawGame;
 const characterFrames = {};
 const keysDown = {};
@@ -40,13 +42,17 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, portalImage;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
-	canvas.width = Math.min(innerWidth * 0.9, innerHeight * 0.9);
+	statusCanvas = document.getElementById('status-canvas');
+	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
 	canvas.height = canvas.width;
+	statusCanvas.width = canvas.width;
+	statusCanvas.height = innerHeight * 0.12;
 	ctx = canvas.getContext('2d');
+	statusCtx = statusCanvas.getContext('2d');
 
 	for (const character in characters) {
 		characterFrames[character] = {
@@ -58,7 +64,7 @@ function load() {
 		};
 
 		for (const key in characterFrames[character]) {
-			for (const fileName of characters[character][key]) {
+			for (const fileName of characters[character][key] || []) {
 				const img = new Image();
 				img.src = `img/charactes/${fileName}`;
 				characterFrames[character][key].push(img);
@@ -130,7 +136,23 @@ function draw() {
 	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	drawFunc();
+	drawStatus();
 	requestAnimationFrame(draw);
+}
+
+function drawStatus() {
+	statusCtx.fillStyle = backgroundColor;
+	statusCtx.fillRect(0, 0, statusCanvas.width, statusCanvas.height);
+	const fontSize = 0.2 * statusCanvas.height;
+	statusCtx.font = `${fontSize}px ${fontFamily}`;
+	statusCtx.fillStyle = '#000';
+	statusCtx.fillText('Health', 0.1 * statusCanvas.width, 0.24 * statusCanvas.height);
+
+	statusCtx.fillStyle = '#444';
+	statusCtx.fillRect(0.3 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * statusCanvas.width, 0.1 * statusCanvas.height);
+	statusCtx.fillStyle = '#a44';
+	statusCtx.fillRect(0.3 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
+
 }
 
 function drawGame() {
@@ -599,7 +621,7 @@ function drawMap() {
 function drawInventory() {
 	const lineHeight = 0.08;
 	const fontSize = lineHeight * 0.8 * canvas.height;
-	ctx.font = `${fontSize * 1.2}px Jura`;
+	ctx.font = `${fontSize * 1.2}px ${fontFamily}`;
 	ctx.fillStyle = '#000';
 
 	let y = 0.08 * canvas.height;
@@ -608,7 +630,7 @@ function drawInventory() {
 	ctx.fillText(header, x, y);
 	y += lineHeight * canvas.height;
 
-	ctx.font = `${fontSize}px Jura`;
+	ctx.font = `${fontSize}px ${fontFamily}`;
 	const imageSize = itemSize * canvas.width;
 	const x1 = 0.12 * canvas.width;
 	const x2 = 0.8 * canvas.width;

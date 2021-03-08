@@ -40,6 +40,21 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
+		],
+		characters: [
+			{
+				id: 'blueScreen',
+				location: {
+					x: 0.2,
+					y: 0.2
+				}
+			}, {
+				id: 'blueScreen',
+				location: {
+					x: 0.6,
+					y: 0.2
+				}
+			},
 		]
 	}, {
 		id: 2,
