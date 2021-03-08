@@ -105,13 +105,13 @@ rooms = [
 	}, {
 		id: 6,
 		width: 1,
-		height: 0.2,
+		height: 0.3,
 		backgroundImage: 'room_02.jpg',
 		portals: [
 			{
 				location: {
 					x: 0.8,
-					y: 0.5
+					y: 0.2
 				},
 				roomId: 0
 			}

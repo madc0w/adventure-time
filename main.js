@@ -330,6 +330,25 @@ function drawGame() {
 		}
 	}
 
+	// go through portal
+	for (const portal of state.room.portals || []) {
+		const x = (1 - state.room.width) / 2 + (portal.location.x * state.room.width) + (portalSize * 0.1);
+		const y = (1 - state.room.height) / 2 + (portal.location.y * state.room.height) + (portalSize * 0.1);
+		// ctx.strokeStyle = '#000';
+		// ctx.lineWidth = 2;
+		// ctx.beginPath();
+		// ctx.rect(x * canvas.width, y * canvas.height, portalSize * 0.8 * canvas.width, portalSize * 0.8 * canvas.height);
+		// ctx.stroke();
+
+		// ctx.fillStyle = '#f00';
+		// ctx.fillRect(state.player.x * canvas.width, state.player.y * canvas.height, 2, 2);
+		if (state.player.x > x && state.player.x < x + portalSize * 0.8 &&
+			state.player.y > y && state.player.y < y + portalSize * 0.8) {
+			state.room = rooms.find(r => r.id == portal.roomId);
+			state.player.x = state.player.y = 0.5;
+		}
+	}
+
 	// pick up an item
 	let i = 0;
 	for (const roomItem of state.room.items || []) {
@@ -404,13 +423,20 @@ function drawGame() {
 				state.player.x = (1 + state.room.width - state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - state.player.height) / 2) * state.room.height);
 				// console.log(state.player.y)
+				if (state.player.x + state.player.width > (1 + state.room.width) / 2) {
+					state.player.x = (1 + state.room.width) / 2 - state.player.width;
+				}
 			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
 				goThroughDoor();
 				const door = (state.room.doors || []).find(d => d.wall == 'w' && d.room == prevRoom);
 				state.player.x = (1 - state.room.width + state.player.width) / 2;
 				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - state.player.height) / 2) * state.room.height);
 				// console.log(state.player.y)
+				if (state.player.y + state.player.height > (1 + state.room.height) / 2) {
+					state.player.y = (1 + state.room.height) / 2 - state.player.height;
+				}
 			}
+
 		} else {
 			const minX = (1 - state.room.width) / 2 + (throughDoor.location * state.room.width);
 			const maxX = minX + doorSize;
