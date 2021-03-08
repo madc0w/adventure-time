@@ -10,18 +10,15 @@ rooms = [
 				roomId: 1,
 				wall: 'w',
 				location: 0,
-			},
-			{
+			}, {
 				roomId: 2,
 				wall: 'e',
 				location: 0.2,
-			},
-			{
+			}, {
 				roomId: 3,
 				wall: 'n',
 				location: 0.4,
-			},
-			{
+			}, {
 				roomId: 4,
 				wall: 's',
 				location: 0.4,
@@ -89,6 +86,12 @@ rooms = [
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
+			{
+				roomId: 6,
+				wall: 'e',
+				location: 0.5,
+				isOneWay: true,
+			}
 		],
 		items: [
 			{
@@ -97,6 +100,20 @@ rooms = [
 					x: 0.4,
 					y: 0.5
 				}
+			}
+		]
+	}, {
+		id: 6,
+		width: 1,
+		height: 0.2,
+		backgroundImage: 'room_02.jpg',
+		portals: [
+			{
+				location: {
+					x: 0.8,
+					y: 0.5
+				},
+				roomId: 0
 			}
 		]
 	},

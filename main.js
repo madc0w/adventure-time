@@ -29,13 +29,18 @@ const mappedRooms = [rooms[0]];
 
 const itemSize = 0.08;
 
+const portalSize = 0.12;
+const portalAnimInterval = 60;
+const numPortalFrames = 38;
+
 let drawFunc = drawGame;
 const characterFrames = {};
 const keysDown = {};
 const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
-let throughDoor, canvas, ctx;
+const portalFrames = [];
+let throughDoor, canvas, ctx, portalImage;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -71,29 +76,46 @@ function load() {
 		image.src = `img/items/${items[itemKey].image}`;
 		items[itemKey].image = image;
 	}
+
+	for (let i = 1; i <= numPortalFrames; i++) {
+		const image = new Image();
+		image.src = `img/rooms/portal-frames/portal-${(i < 10 ? '0' : '') + i}.png`;
+		portalFrames.push(image);
+	}
+	let portalFrameNum = 0;
+	setInterval(() => {
+		portalImage = portalFrames[portalFrameNum];
+		portalFrameNum++;
+		if (portalFrameNum >= portalFrames.length) {
+			portalFrameNum = 0;
+		}
+	}, portalAnimInterval);
+
 	for (const room of rooms) {
-		for (const door of room.doors) {
+		for (const door of room.doors || []) {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
 	}
 
 	for (const room of rooms) {
-		for (const door of room.doors) {
-			if (!door.isOneWay) {
-				const wall = {
-					n: 's',
-					s: 'n',
-					e: 'w',
-					w: 'e'
-				}[door.wall];
-				const location = door.location;
+		for (const door of room.doors || []) {
+			const wall = {
+				n: 's',
+				s: 'n',
+				e: 'w',
+				w: 'e'
+			}[door.wall];
+			const location = door.location;
 
-				const oppositeDoor = {
-					room,
-					wall,
-					location,
-					oppositeDoor: door,
-				};
+			const oppositeDoor = {
+				room,
+				wall,
+				location,
+				oppositeDoor: door,
+			};
+			if (door.isOneWay) {
+				// TODO add a special hidden door for map
+			} else {
 				door.room.doors.push(oppositeDoor);
 				door.oppositeDoor = oppositeDoor;
 			}
@@ -131,6 +153,14 @@ function drawGame() {
 		ctx.stroke();
 	}
 	{
+		// portals
+		for (const portal of state.room.portals || []) {
+			const x = ((1 - state.room.width) / 2 + (portal.location.x * state.room.width)) * canvas.width;
+			const y = ((1 - state.room.height) / 2 + (portal.location.y * state.room.height)) * canvas.height;
+			ctx.drawImage(portalImage, x, y, portalSize * canvas.width, portalSize * canvas.height);
+		}
+	}
+	{
 		// items
 		for (const roomItem of state.room.items || []) {
 			const item = items[roomItem.id];
@@ -152,7 +182,7 @@ function drawGame() {
 	}
 	{
 		// doors
-		for (const door of state.room.doors) {
+		for (const door of state.room.doors || []) {
 			ctx.fillStyle = backgroundColor;
 			let x, y;
 			if (door.wall == 'w') {
@@ -232,7 +262,7 @@ function drawGame() {
 		if (state.player.x <= edge) {
 			const playerPos = state.player.y - state.player.height / 2;
 			let y1, y2;
-			for (const door of state.room.doors.filter(d => d.wall == 'w')) {
+			for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
 				y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
 				y2 = y1 + doorSize - state.player.height;
 				if (playerPos >= y1 && playerPos <= y2) {
@@ -250,7 +280,7 @@ function drawGame() {
 		state.player.x = state.player.x + inc;
 		if (state.player.x >= edge) {
 			const playerPos = state.player.y - state.player.height / 2;
-			for (const door of state.room.doors.filter(d => d.wall == 'e')) {
+			for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
 				const y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
 				const y2 = y1 + doorSize - state.player.height;
 				if (playerPos >= y1 && playerPos <= y2) {
@@ -268,7 +298,7 @@ function drawGame() {
 		state.player.y = state.player.y - inc;
 		if (state.player.y <= edge) {
 			const playerPos = state.player.x - state.player.width / 2;
-			for (const door of state.room.doors.filter(d => d.wall == 'n')) {
+			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
 				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
 				const x2 = x1 + doorSize - state.player.width;
 				if (playerPos >= x1 && playerPos <= x2) {
@@ -286,7 +316,7 @@ function drawGame() {
 		state.player.y = state.player.y + inc;
 		if (state.player.y >= edge) {
 			const playerPos = state.player.x - state.player.width / 2;
-			for (const door of state.room.doors.filter(d => d.wall == 's')) {
+			for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
 				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
 				const x2 = x1 + doorSize - state.player.width;
 				if (playerPos >= x1 && playerPos <= x2) {
@@ -370,15 +400,15 @@ function drawGame() {
 			const prevRoom = state.room;
 			if (throughDoor.wall == 'w' && state.player.x < (1 - state.room.width - wallWidth) / 2 - doorThreshold) {
 				goThroughDoor();
-				const door = state.room.doors.find(d => d.wall == 'e' && d.room == prevRoom);
+				const door = (state.room.doors || []).find(d => d.wall == 'e' && d.room == prevRoom);
 				state.player.x = (1 + state.room.width - state.player.width) / 2;
-				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
+				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - state.player.height) / 2) * state.room.height);
 				// console.log(state.player.y)
 			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
 				goThroughDoor();
-				const door = state.room.doors.find(d => d.wall == 'w' && d.room == prevRoom);
+				const door = (state.room.doors || []).find(d => d.wall == 'w' && d.room == prevRoom);
 				state.player.x = (1 - state.room.width + state.player.width) / 2;
-				state.player.y = (1 - state.room.height + doorSize) / 2 + (door.location * state.room.height);
+				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - state.player.height) / 2) * state.room.height);
 				// console.log(state.player.y)
 			}
 		} else {
@@ -397,12 +427,12 @@ function drawGame() {
 				goThroughDoor();
 				const door = state.room.doors.find(d => d.wall == 's' && d.room == prevRoom);
 				state.player.y = (1 + state.room.height - state.player.height) / 2;
-				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
+				state.player.x = (1 - state.room.width + doorSize) / 2 + ((door ? door.location : (1 - state.player.width) / 2) * state.room.width);
 			} else if (throughDoor.wall == 's' && state.player.y > (1 + state.room.height + wallWidth) / 2 + doorThreshold) {
 				goThroughDoor();
 				const door = state.room.doors.find(d => d.wall == 'n' && d.room == prevRoom);
 				state.player.y = (1 - state.room.height + state.player.height) / 2;
-				state.player.x = (1 - state.room.width + doorSize) / 2 + (door.location * state.room.width);
+				state.player.x = (1 - state.room.width + doorSize) / 2 + ((door ? door.location : (1 - state.player.width) / 2) * state.room.width);
 			}
 		}
 	}
@@ -435,7 +465,7 @@ function drawMap() {
 				ctx.fillRect(x + offset.x, y + offset.y, width, height);
 			}
 
-			for (const door of room.doors) {
+			for (const door of room.doors || []) {
 				door.p1 = {};
 				door.p2 = {};
 				if (['e', 'w'].includes(door.wall)) {
@@ -466,7 +496,7 @@ function drawMap() {
 				// ctx.fillText(2, door.p2.x, door.p2.y);
 			}
 
-			for (const door of room.doors) {
+			for (const door of room.doors || []) {
 				if (mappedRooms.includes(door.room)) {
 					let x = offset.x, y = offset.y;
 					if (door.wall == 'n') {
@@ -493,10 +523,10 @@ function drawMap() {
 
 	// now draw all doors
 	for (const room of mapped) {
-		for (const door of room.doors) {
+		for (const door of room.doors || []) {
 			if (door.p1) {
 				ctx.fillStyle = mapPassageColor;
-				if (door.oppositeDoor.p1) {
+				if (door.oppositeDoor && door.oppositeDoor.p1) {
 					ctx.beginPath();
 					ctx.moveTo(door.p1.x, door.p1.y);
 					ctx.lineTo(door.p2.x, door.p2.y);
