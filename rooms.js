@@ -43,13 +43,13 @@ rooms = [
 		],
 		characters: [
 			{
-				id: 'blueScreen',
+				id: 'doomScreen',
 				location: {
 					x: 0.2,
 					y: 0.2
 				}
 			}, {
-				id: 'blueScreen',
+				id: 'doomScreen',
 				location: {
 					x: 0.6,
 					y: 0.2

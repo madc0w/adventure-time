@@ -99,6 +99,10 @@ function load() {
 		for (const door of room.doors || []) {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
+		for (const character of room.characters || []) {
+			character.motion = 'standing';
+			animate(character);
+		}
 	}
 
 	for (const room of rooms) {
@@ -125,7 +129,7 @@ function load() {
 			}
 		}
 	}
-	console.log(rooms);
+	// console.log(rooms);
 
 	requestAnimationFrame(draw);
 }
@@ -198,6 +202,21 @@ function drawGame() {
 				ctx.drawImage(item.image, x, y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
 			}
 			ctx.globalAlpha = 1;
+		}
+	}
+	{
+		// characters
+		for (const roomCharacter of state.room.characters || []) {
+			const character = characters[roomCharacter.id];
+			const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
+			const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
+			ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
+
+			character.move(roomCharacter);
+			roomCharacter.location.x = Math.min(state.room.width + character.width, roomCharacter.location.x);
+			roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
+			roomCharacter.location.y = Math.min(state.room.height + character.height, roomCharacter.location.y);
+			roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
 		}
 	}
 	{
