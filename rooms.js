@@ -72,6 +72,15 @@ rooms = [
 					y: 0.7
 				}
 			}
+		],
+		characters: [
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.2,
+					y: 0.2
+				}
+			},
 		]
 	}, {
 		id: 3,

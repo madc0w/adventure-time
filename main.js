@@ -208,15 +208,17 @@ function drawGame() {
 		// characters
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
+
+			character.move(roomCharacter);
+			// console.log(roomCharacter.width * state.room.width);
+			roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
+			roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
+			roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
+			roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
+
 			const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
 			const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
 			ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
-
-			character.move(roomCharacter);
-			roomCharacter.location.x = Math.min(state.room.width + character.width, roomCharacter.location.x);
-			roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
-			roomCharacter.location.y = Math.min(state.room.height + character.height, roomCharacter.location.y);
-			roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
 		}
 	}
 	{

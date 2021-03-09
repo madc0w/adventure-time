@@ -45,7 +45,7 @@ characters = {
 		],
 	},
 	doomScreen: {
-		animInterval: 120,
+		animInterval: 400,
 		width: 0.12,
 		height: 0.12,
 		standing: [
@@ -55,6 +55,14 @@ characters = {
 			'doom screen standing 04.png',
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
+		],
+		move: moveFuncs.random
+	},
+	zlakik: {
+		width: 0.1,
+		height: 0.06,
+		standing: [
+			'zlakik 01.png'
 		],
 		move: moveFuncs.random
 	}
