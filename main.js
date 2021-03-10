@@ -260,9 +260,9 @@ function drawGame() {
 			// roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
 			// roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
 
-			// const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
-			// const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
-			// ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
+			const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
+			const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
+			ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
 			// ctx.fillStyle = '#f00';
 			// ctx.fillRect(x, y, 4, 4);
 		}
