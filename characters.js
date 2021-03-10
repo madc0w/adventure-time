@@ -8,7 +8,7 @@ const moveFuncs = {
 			};
 		}
 		const velFactor = 0.0022;
-		const maxVal = 0.02;
+		const maxVal = 0.012;
 		character.vel.x += (Math.random() - 0.5) * velFactor;
 		character.vel.x = Math.max(Math.min(character.vel.x, maxVal), -maxVal)
 		character.vel.y += (Math.random() - 0.5) * velFactor;
