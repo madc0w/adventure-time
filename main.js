@@ -43,6 +43,14 @@ const portalFrames = [];
 let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
 
 function load() {
+	// Object.prototype.originalValueOf = Object.prototype.valueOf;
+	// Object.prototype.valueOf = function () {
+	// 	if (typeof this !== 'number') {
+	// 		throw new Error('Object is not a Number');
+	// 	}
+	// 	return this.originalValueOf();
+	// };
+
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
 	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
@@ -206,54 +214,25 @@ function drawGame() {
 	}
 	{
 		// characters
-		const now = new Date();
 		for (const roomCharacter of state.room.characters || []) {
 			roomCharacter.velInversionTime = roomCharacter.velInversionTime || {};
-			const character = characters[roomCharacter.id];
 
+			const character = characters[roomCharacter.id];
 			character.move(roomCharacter);
 			// console.log(roomCharacter.width * state.room.width);
-			const radius = (character.width + character.height) / 2;
-			const x1 = roomCharacter.location.x + character.width / 2;
-			const y1 = roomCharacter.location.y + character.height / 2;
 			for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
 				if (roomCharacter != roomCharacter2) {
-					const character2 = characters[roomCharacter2.id] || characters.player;
-					let x2, y2;
-					if (characters.player == character2) {
-						x2 = (roomCharacter2.x - (1 - state.room.width) / 2) / state.room.width;
-						y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
-					} else {
-						x2 = roomCharacter2.location.x + character2.width / 2;
-						y2 = roomCharacter2.location.y + character2.height / 2;
-					}
-					const radius2 = (character2.width + character2.height) / 2;
-					const dx = x1 - x2;
-					const dy = y1 - y2;
-					const dist = Math.sqrt(dx * dx + dy * dy);
-					if (dist < 0.8 * (radius + radius2)) {
-						// console.log('inersection', characters.player == character2);
-						if (now - (roomCharacter.velInversionTime.x || 0) > 200) {
-							roomCharacter.vel.x *= -1;
-							roomCharacter.velInversionTime.x = now;
-						}
-						if (now - (roomCharacter.velInversionTime.y || 0) > 200) {
-							roomCharacter.vel.y *= -1;
-							roomCharacter.velInversionTime.y = now;
-						}
-					}
+					character.interact(roomCharacter, roomCharacter2);
 				}
 			}
 
-			if ((roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) &&
-				now - (roomCharacter.velInversionTime.x || 0) > 200) {
+			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
 				roomCharacter.vel.x *= -1;
-				roomCharacter.velInversionTime.x = now;
+				// roomCharacter.velInversionTime.x = now;
 			}
-			if ((roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) &&
-				now - (roomCharacter.velInversionTime.y || 0) > 200) {
+			if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
 				roomCharacter.vel.y *= -1;
-				roomCharacter.velInversionTime.y = now;
+				// roomCharacter.velInversionTime.y = now;
 			}
 			// roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
 			// roomCharacter.location.x = Math.max(0, roomCharacter.location.x);

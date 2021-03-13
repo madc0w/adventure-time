@@ -15,8 +15,44 @@ const moveFuncs = {
 		character.vel.y = Math.max(Math.min(character.vel.y, maxVal), -maxVal)
 		character.location.x += character.vel.x;
 		character.location.y += character.vel.y;
-	}
+	},
 
+};
+
+const interactionFuncs = {
+	magnetic(roomCharacter, roomCharacter2) {
+		const character = characters[roomCharacter.id];
+		const radius1 = (character.width + character.height) / 2;
+		const x1 = roomCharacter.location.x + character.width / 2;
+		const y1 = roomCharacter.location.y + character.height / 2;
+		const character2 = characters[roomCharacter2.id] || characters.player;
+		let x2, y2;
+		if (characters.player == character2) {
+			x2 = (roomCharacter2.x - (1 - state.room.width) / 2) / state.room.width;
+			y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
+		} else {
+			x2 = roomCharacter2.location.x + character2.width / 2;
+			y2 = roomCharacter2.location.y + character2.height / 2;
+		}
+		const radius2 = (character2.width + character2.height) / 2;
+		const dx = x1 - x2;
+		const dy = y1 - y2;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+		if (!roomCharacter2.vel) {
+			roomCharacter2.vel = {
+				x: 0,
+				y: 0
+			};
+		}
+		const r = radius1 + radius2;
+		if (dist < 0.8 * r) {
+			// console.log('inersection', characters.player == character2);
+			roomCharacter.vel.x += 1 / r;
+			roomCharacter2.vel.x -= 1 / r;
+			roomCharacter.vel.y += 1 / r;
+			roomCharacter2.vel.y -= 1 / r;
+		}
+	}
 };
 
 characters = {
@@ -56,7 +92,8 @@ characters = {
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
 		],
-		move: moveFuncs.random
+		move: moveFuncs.random,
+		interact: interactionFuncs.magnetic,
 	},
 	zlakik: {
 		width: 0.1,
@@ -64,6 +101,7 @@ characters = {
 		standing: [
 			'zlakik 01.png'
 		],
-		move: moveFuncs.random
+		move: moveFuncs.random,
+		interact: interactionFuncs.magnetic,
 	}
 };
