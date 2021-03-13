@@ -25,8 +25,6 @@ const mapMargin = 0.02;
 const mapScale = 0.24;
 const mappedRooms = [rooms[0]];
 
-const itemSize = 0.08;
-
 const portalSize = 0.12;
 const portalAnimInterval = 60;
 const numPortalFrames = 38;
@@ -163,6 +161,14 @@ function drawStatus() {
 	statusCtx.fillStyle = '#a44';
 	statusCtx.fillRect(0.3 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
 
+	let i = 0;
+	for (const id in state.inventory) {
+		if (items[id].type == 'weapon') {
+			const size = 0.08;
+			statusCtx.drawImage(items[id].image, (0.04 + i * 0.1) * statusCanvas.width, 0.5 * statusCanvas.height, size * statusCanvas.width, size * statusCanvas.width);
+			i++;
+		}
+	}
 }
 
 function drawGame() {
@@ -198,11 +204,11 @@ function drawGame() {
 			const item = items[roomItem.id];
 			let x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
 			let y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
-			let size = itemSize;
+			let size = item.size;
 			if (roomItem.animStep) {
-				size -= roomItem.animStep * itemSize / 16;
-				x += (itemSize - size) * canvas.width / 2;
-				y += (itemSize - size) * canvas.height / 2;
+				size -= roomItem.animStep * item.size / 16;
+				x += (item.size - size) * canvas.width / 2;
+				y += (item.size - size) * canvas.height / 2;
 				ctx.globalAlpha = (12 - roomItem.animStep) / 12;
 			}
 			// console.log(item.image.width / item.image.height);
@@ -421,6 +427,7 @@ function drawGame() {
 		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
 		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
 
+		const itemSize = items[roomItem.id].size;
 		if (!roomItem.takeAnimIntervalId &&
 			state.player.x < x + itemSize && state.player.x > x - itemSize &&
 			state.player.y < y + itemSize && state.player.y > y - itemSize) {
@@ -675,9 +682,9 @@ function drawInventory() {
 	y += lineHeight * canvas.height;
 
 	ctx.font = `${fontSize}px ${fontFamily}`;
-	const imageSize = itemSize * canvas.width;
 	const x1 = 0.12 * canvas.width;
 	const x2 = 0.8 * canvas.width;
+	const imageSize = 0.08 * canvas.width;
 	for (const itemId in state.inventory) {
 		const item = items[itemId];
 		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);

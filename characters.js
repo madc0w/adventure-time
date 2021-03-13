@@ -62,7 +62,8 @@ characters = {
 		width: 0.05,
 		height: 0.1,
 		standing: [
-			'player standing.png',
+			'player standing 01.png',
+			'player standing 02.png',
 		],
 		up: [
 			'player up.png',
