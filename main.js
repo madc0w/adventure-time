@@ -165,7 +165,18 @@ function drawStatus() {
 	for (const id in state.inventory) {
 		if (items[id].type == 'weapon') {
 			const size = 0.08;
-			statusCtx.drawImage(items[id].image, (0.04 + i * 0.1) * statusCanvas.width, 0.5 * statusCanvas.height, size * statusCanvas.width, size * statusCanvas.width);
+			const x = (0.04 + i * 0.1) * statusCanvas.width;
+			const y = 0.4 * statusCanvas.height;
+			const width = size * statusCanvas.width;
+			const height = size * statusCanvas.width;
+			if (state.player.selectedWeapon == id) {
+				statusCtx.strokeStyle = '#f00';
+				statusCtx.lineWidth = 2;
+				statusCtx.beginPath();
+				statusCtx.rect(x - 8, y - 8, width + 16, height + 16);
+				statusCtx.stroke();
+			}
+			statusCtx.drawImage(items[id].image, x, y, width, width);
 			i++;
 		}
 	}
@@ -707,6 +718,25 @@ function onKeyUp(e) {
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 	} else if (e.key.toUpperCase() == 'I') {
 		drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
+	} else if (e.key.toUpperCase() == 'C') {
+		let next, didSelect;
+		if (state.player.selectedWeapon) {
+			for (const id in state.inventory) {
+				if (next) {
+					state.player.selectedWeapon = id;
+					didSelect = true;
+					break;
+				}
+				if (state.player.selectedWeapon == id) {
+					next = true;
+				}
+			}
+			if (!didSelect) {
+				state.player.selectedWeapon = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
+			}
+		} else if (Object.keys(state.inventory).length > 0) {
+			state.player.selectedWeapon = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
+		}
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
 	}
