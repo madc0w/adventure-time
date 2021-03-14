@@ -172,18 +172,19 @@ function drawStatus() {
 	const fontSize = 0.2 * statusCanvas.height;
 	statusCtx.font = `${fontSize}px ${fontFamily}`;
 	statusCtx.fillStyle = '#000';
-	statusCtx.fillText('Health', 0.1 * statusCanvas.width, 0.24 * statusCanvas.height);
+	statusCtx.fillText('Health', 0.04 * statusCanvas.width, 0.24 * statusCanvas.height);
+	statusCtx.fillText('Weapon', 0.04 * statusCanvas.width, 0.58 * statusCanvas.height);
 
 	statusCtx.fillStyle = '#444';
-	statusCtx.fillRect(0.3 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * statusCanvas.width, 0.1 * statusCanvas.height);
-	statusCtx.fillStyle = '#a44';
-	statusCtx.fillRect(0.3 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
+	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * statusCanvas.width, 0.1 * statusCanvas.height);
+	statusCtx.fillStyle = '#b44';
+	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
 
 	let i = 0;
 	for (const id in state.inventory) {
 		if (items[id].type == 'weapon') {
 			const size = 0.08;
-			const x = (0.04 + i * 0.1) * statusCanvas.width;
+			const x = (0.22 + i * 0.1) * statusCanvas.width;
 			const y = 0.4 * statusCanvas.height;
 			const width = size * statusCanvas.width;
 			const height = size * statusCanvas.width;

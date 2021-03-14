@@ -88,6 +88,15 @@ characters = {
 				right: [
 					'player right wielding sword_01.png',
 				],
+				standing: [
+					'player standing wielding sword_01.png',
+				],
+				up: [
+					'player standing wielding sword_01.png',
+				],
+				down: [
+					'player standing wielding sword_01.png',
+				],
 			},
 			sword_2: {
 				left: [
@@ -95,6 +104,15 @@ characters = {
 				],
 				right: [
 					'player right wielding sword_02.png',
+				],
+				standing: [
+					'player standing wielding sword_02.png',
+				],
+				up: [
+					'player standing wielding sword_02.png',
+				],
+				down: [
+					'player standing wielding sword_02.png',
 				],
 			}
 		},
