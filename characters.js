@@ -80,6 +80,36 @@ characters = {
 			'player right 01.png',
 			'player right 02.png',
 		],
+		wielding: {
+			sword_1: {
+				left: [
+					'player left wielding sword_01.png',
+				],
+				right: [
+					'player right wielding sword_01.png',
+				],
+			},
+			sword_2: {
+				left: [
+					'player left wielding sword_02.png',
+				],
+				right: [
+					'player right wielding sword_02.png',
+				],
+			}
+		},
+		strike: {
+			sword_1: {
+				left: [
+					'player left strike sword_01.png',
+				]
+			},
+			sword_2: {
+				left: [
+					'player left strike sword_02.png',
+				]
+			},
+		}
 	},
 	doomScreen: {
 		animInterval: 400,

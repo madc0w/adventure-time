@@ -1,8 +1,10 @@
 const state = {
 	player: {
+		id: 'player',
 		x: 0.5,
 		y: 0.5,
 		health: 1,
+		motion: 'standing',
 	},
 	inventory: {},
 	room: rooms[0],
@@ -54,24 +56,40 @@ function load() {
 	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
 	canvas.height = canvas.width;
 	statusCanvas.width = canvas.width;
-	statusCanvas.height = innerHeight * 0.12;
+	statusCanvas.height = innerHeight * 0.14;
 	ctx = canvas.getContext('2d');
 	statusCtx = statusCanvas.getContext('2d');
 
-	for (const character in characters) {
-		characterFrames[character] = {
+	for (const characterId in characters) {
+		characterFrames[characterId] = {
 			standing: [],
 			left: [],
 			right: [],
 			up: [],
 			down: [],
+			wielding: {},
+			strike: {},
 		};
 
-		for (const key in characterFrames[character]) {
-			for (const fileName of characters[character][key] || []) {
-				const img = new Image();
-				img.src = `img/charactes/${fileName}`;
-				characterFrames[character][key].push(img);
+		for (const key in characterFrames[characterId]) {
+			if (['wielding', 'strike'].includes(key)) {
+				for (const weaponName in characters[characterId][key] || {}) {
+					characterFrames[characterId][key][weaponName] = {};
+					for (const direction in characters[characterId][key][weaponName] || {}) {
+						characterFrames[characterId][key][weaponName][direction] = [];
+						for (const fileName of characters[characterId][key][weaponName][direction] || []) {
+							const img = new Image();
+							img.src = `img/charactes/${fileName}`;
+							characterFrames[characterId][key][weaponName][direction].push(img);
+						}
+					}
+				}
+			} else {
+				for (const fileName of characters[characterId][key] || []) {
+					const img = new Image();
+					img.src = `img/charactes/${fileName}`;
+					characterFrames[characterId][key].push(img);
+				}
 			}
 		}
 	}
@@ -169,7 +187,7 @@ function drawStatus() {
 			const y = 0.4 * statusCanvas.height;
 			const width = size * statusCanvas.width;
 			const height = size * statusCanvas.width;
-			if (state.player.selectedWeapon == id) {
+			if (state.player.wielding == id) {
 				statusCtx.strokeStyle = '#f00';
 				statusCtx.lineWidth = 2;
 				statusCtx.beginPath();
@@ -438,10 +456,15 @@ function drawGame() {
 		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
 		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
 
-		const itemSize = items[roomItem.id].size;
+		const item = items[roomItem.id];
+		// const itemSize = item.size;
+		// ctx.strokeStyle = '#f00';
+		// ctx.beginPath();
+		// ctx.rect(x * canvas.width, y * canvas.height, itemSize * (item.image.width / item.image.height) * canvas.width, itemSize * canvas.height);
+		// ctx.stroke();
 		if (!roomItem.takeAnimIntervalId &&
-			state.player.x < x + itemSize && state.player.x > x - itemSize &&
-			state.player.y < y + itemSize && state.player.y > y - itemSize) {
+			state.player.x < x + item.size * (item.image.width / item.image.height) && state.player.x > x &&
+			state.player.y < y + item.size && state.player.y > y) {
 
 			const interval = 24;
 			const numSteps = 12;
@@ -708,10 +731,8 @@ function drawInventory() {
 function onKeyUp(e) {
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
-		animate({
-			id: 'player',
-			motion: 'standing'
-		});
+		state.player.motion = 'standing';
+		animate(state.player);
 	}
 
 	if (e.key.toUpperCase() == 'M') {
@@ -720,23 +741,24 @@ function onKeyUp(e) {
 		drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 	} else if (e.key.toUpperCase() == 'C') {
 		let next, didSelect;
-		if (state.player.selectedWeapon) {
+		if (state.player.wielding) {
 			for (const id in state.inventory) {
 				if (next) {
-					state.player.selectedWeapon = id;
+					state.player.wielding = id;
 					didSelect = true;
 					break;
 				}
-				if (state.player.selectedWeapon == id) {
+				if (state.player.wielding == id) {
 					next = true;
 				}
 			}
 			if (!didSelect) {
-				state.player.selectedWeapon = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
+				state.player.wielding = null;
 			}
 		} else if (Object.keys(state.inventory).length > 0) {
-			state.player.selectedWeapon = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
+			state.player.wielding = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
 		}
+		animate(state.player);
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
 	}
@@ -755,10 +777,8 @@ function onKeyDown(e) {
 			ArrowDown: 'down'
 		}[e.code];
 		if (motion) {
-			animate({
-				id: 'player',
-				motion
-			});
+			state.player.motion = motion;
+			animate(state.player);
 		}
 	}
 	keysDown[e.code] = true;
@@ -767,10 +787,19 @@ function onKeyDown(e) {
 function animate(character) {
 	clearInterval(animIntervalIds[character.id]);
 	animFrameNums[character.id] = 0;
-	const motion = character.motion;
+	let motion = character.motion;
 	// console.log('starting anim', motion);
 	function f() {
-		characterImages[character.id] = characterFrames[character.id][motion][animFrameNums[character.id] % characterFrames[character.id][motion].length];
+		let frames;
+		if (state.player.wielding && character.id == 'player') {
+			if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
+				motion = 'left';
+			}
+			frames = characterFrames[character.id].wielding[state.player.wielding][motion];
+		} else {
+			frames = characterFrames[character.id][motion];
+		}
+		characterImages[character.id] = frames[animFrameNums[character.id] % frames.length];
 		animFrameNums[character.id]++;
 		// console.log('anim', motion);
 		// console.log(characterImages[character.id]);
