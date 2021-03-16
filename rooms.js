@@ -25,28 +25,44 @@ rooms = [
 			}
 		],
 		items: [
+			// {
+			// 	id: 'treasure',
+			// 	location: {
+			// 		x: 0.2,
+			// 		y: 0.4
+			// 	}
+			// },
+			// {
+			// 	id: 'sword_1',
+			// 	location: {
+			// 		x: 0.8,
+			// 		y: 0.5
+			// 	}
+			// },
+			// {
+			// 	id: 'sword_2',
+			// 	location: {
+			// 		x: 0.7,
+			// 		y: 0.8
+			// 	}
+			// }
+		],
+		characters: [
 			{
-				id: 'treasure',
+				id: 'doomScreen',
 				location: {
 					x: 0.2,
-					y: 0.4
+					y: 0.2
+				}
+			}, {
+				id: 'doomScreen',
+				location: {
+					x: 0.6,
+					y: 0.2
 				}
 			},
-			{
-				id: 'sword_1',
-				location: {
-					x: 0.8,
-					y: 0.5
-				}
-			},
-			{
-				id: 'sword_2',
-				location: {
-					x: 0.7,
-					y: 0.8
-				}
-			}
 		]
+
 	}, {
 		id: 1,
 		width: 0.6,

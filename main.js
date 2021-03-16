@@ -43,14 +43,6 @@ const portalFrames = [];
 let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
 
 function load() {
-	// Object.prototype.originalValueOf = Object.prototype.valueOf;
-	// Object.prototype.valueOf = function () {
-	// 	if (typeof this !== 'number') {
-	// 		throw new Error('Object is not a Number');
-	// 	}
-	// 	return this.originalValueOf();
-	// };
-
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
 	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
@@ -172,8 +164,8 @@ function drawStatus() {
 	const fontSize = 0.2 * statusCanvas.height;
 	statusCtx.font = `${fontSize}px ${fontFamily}`;
 	statusCtx.fillStyle = '#000';
-	statusCtx.fillText('Health', 0.04 * statusCanvas.width, 0.24 * statusCanvas.height);
-	statusCtx.fillText('Weapon', 0.04 * statusCanvas.width, 0.58 * statusCanvas.height);
+	statusCtx.fillText('Health', 0.02 * statusCanvas.width, 0.24 * statusCanvas.height);
+	statusCtx.fillText('Weapons', 0.02 * statusCanvas.width, 0.58 * statusCanvas.height);
 
 	statusCtx.fillStyle = '#444';
 	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * statusCanvas.width, 0.1 * statusCanvas.height);
@@ -184,7 +176,7 @@ function drawStatus() {
 	for (const id in state.inventory) {
 		if (items[id].type == 'weapon') {
 			const size = 0.08;
-			const x = (0.22 + i * 0.1) * statusCanvas.width;
+			const x = (0.24 + i * 0.1) * statusCanvas.width;
 			const y = 0.4 * statusCanvas.height;
 			const width = size * statusCanvas.width;
 			const height = size * statusCanvas.width;

@@ -8,11 +8,11 @@ const moveFuncs = {
 			};
 		}
 		const velFactor = 0.0022;
-		const maxVal = 0.012;
+		const maxVel = 0.012;
 		character.vel.x += (Math.random() - 0.5) * velFactor;
-		character.vel.x = Math.max(Math.min(character.vel.x, maxVal), -maxVal)
+		character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
 		character.vel.y += (Math.random() - 0.5) * velFactor;
-		character.vel.y = Math.max(Math.min(character.vel.y, maxVal), -maxVal)
+		character.vel.y = Math.max(Math.min(character.vel.y, maxVel), -maxVel)
 		character.location.x += character.vel.x;
 		character.location.y += character.vel.y;
 	},
@@ -25,6 +25,10 @@ const interactionFuncs = {
 		const radius1 = (character.width + character.height) / 2;
 		const x1 = roomCharacter.location.x + character.width / 2;
 		const y1 = roomCharacter.location.y + character.height / 2;
+		// if (isNaN(roomCharacter.location.y)) {
+		// 	console.log('roomCharacter', roomCharacter);
+		// 	console.log('character', character);
+		// }
 		const character2 = characters[roomCharacter2.id] || characters.player;
 		let x2, y2;
 		if (characters.player == character2) {
@@ -37,6 +41,7 @@ const interactionFuncs = {
 		const radius2 = (character2.width + character2.height) / 2;
 		const dx = x1 - x2;
 		const dy = y1 - y2;
+		// console.log(y1, y2, dy);
 		const dist = Math.sqrt(dx * dx + dy * dy);
 		if (!roomCharacter2.vel) {
 			roomCharacter2.vel = {
@@ -44,13 +49,14 @@ const interactionFuncs = {
 				y: 0
 			};
 		}
-		const r = radius1 + radius2;
-		if (dist < 0.8 * r) {
+		if (characters.player == character2) {
+			roomCharacter.vel.x += 0.0001 * dx / (radius2 - dist);
+			roomCharacter.vel.y += 0.0001 * dy / (radius2 - dist);
+		} else if (dist < 0.4) {
 			// console.log('inersection', characters.player == character2);
-			roomCharacter.vel.x += 1 / r;
-			roomCharacter2.vel.x -= 1 / r;
-			roomCharacter.vel.y += 1 / r;
-			roomCharacter2.vel.y -= 1 / r;
+			roomCharacter.vel.x += 0.0001 * dx / dist;
+			roomCharacter.vel.y += 0.0001 * dy / dist;
+			// console.log(roomCharacter.vel);
 		}
 	}
 };
