@@ -20,9 +20,25 @@ const moveFuncs = {
 };
 
 const interactionFuncs = {
+	moveTowardPlayer(roomCharacter, roomCharacter2) {
+		const character2 = characters[roomCharacter2.id] || characters.player;
+		if (characters.player == character2) {
+			const character = characters[roomCharacter.id];
+			const x1 = roomCharacter.location.x + character.width / 2;
+			const y1 = roomCharacter.location.y + character.height / 2;
+
+			const x2 = (roomCharacter2.x - (1 - state.room.width) / 2) / state.room.width;
+			const y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
+			const dx = x1 - x2;
+			const dy = y1 - y2;
+			roomCharacter.location.x -= 0.04 * dx;
+			roomCharacter.location.y -= 0.04 * dy;
+		}
+	},
+
 	magnetic(roomCharacter, roomCharacter2) {
 		const character = characters[roomCharacter.id];
-		const radius1 = (character.width + character.height) / 2;
+		// const radius1 = (character.width + character.height) / 2;
 		const x1 = roomCharacter.location.x + character.width / 2;
 		const y1 = roomCharacter.location.y + character.height / 2;
 		// if (isNaN(roomCharacter.location.y)) {
@@ -147,8 +163,8 @@ characters = {
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
 		],
-		move: moveFuncs.random,
-		interact: interactionFuncs.magnetic,
+		// move: moveFuncs.moveTowardPlayer,
+		interact: interactionFuncs.moveTowardPlayer,
 	},
 	zlakik: {
 		width: 0.1,
@@ -156,7 +172,7 @@ characters = {
 		standing: [
 			'zlakik 01.png'
 		],
-		move: moveFuncs.random,
-		interact: interactionFuncs.magnetic,
+		// move: moveFuncs.moveTowardPlayer,
+		interact: interactionFuncs.moveTowardPlayer,
 	}
 };

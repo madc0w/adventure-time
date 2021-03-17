@@ -43,6 +43,14 @@ const portalFrames = [];
 let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
 
 function load() {
+	const originalValueOf = Object.prototype.valueOf;
+	Object.prototype.valueOf = function () {
+		if (typeof this !== 'number') {
+			throw new Error('Object is not a Number');
+		}
+		return originalValueOf.bind(this)();
+	}
+
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
 	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
@@ -246,20 +254,30 @@ function drawGame() {
 			roomCharacter.velInversionTime = roomCharacter.velInversionTime || {};
 
 			const character = characters[roomCharacter.id];
-			character.move(roomCharacter);
+			character.move && character.move(roomCharacter);
 			// console.log(roomCharacter.width * state.room.width);
 			for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
 				if (roomCharacter != roomCharacter2) {
-					character.interact(roomCharacter, roomCharacter2);
+					character.interact && character.interact(roomCharacter, roomCharacter2);
 				}
 			}
 
 			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
-				roomCharacter.vel.x *= -1;
+				if (roomCharacter.vel) {
+					roomCharacter.vel.x *= -1;
+				} else {
+					roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
+					roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
+				}
 				// roomCharacter.velInversionTime.x = now;
 			}
 			if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
-				roomCharacter.vel.y *= -1;
+				if (roomCharacter.vel) {
+					roomCharacter.vel.y *= -1;
+				} else {
+					roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
+					roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
+				}
 				// roomCharacter.velInversionTime.y = now;
 			}
 			// roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
