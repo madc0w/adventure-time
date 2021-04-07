@@ -171,6 +171,9 @@ characters = {
 		],
 		move: moveFuncs.random,
 		interact: interactionFuncs.moveTowardPlayer,
+		resilience: 4,
+		strength: 0.8,
+		resetTime: 200,
 	},
 	zlakik: {
 		width: 0.1,

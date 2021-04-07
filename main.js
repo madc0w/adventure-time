@@ -296,6 +296,13 @@ function drawGame() {
 				ctx.beginPath();
 				ctx.arc(x + (character.width * canvas.width / 2), y - canvas.width * r, canvas.width * r, 0, 2 * Math.PI);
 				ctx.fill();
+
+				ctx.fillStyle = '#f00';
+				ctx.beginPath();
+				ctx.moveTo(x + (character.width * canvas.width / 2), y - canvas.width * r);
+				ctx.arc(x + (character.width * canvas.width / 2), y - canvas.width * r, canvas.width * r, 0, roomCharacter.health * Math.PI * 2, false);
+				ctx.lineTo(x + (character.width * canvas.width / 2), y - canvas.width * r);
+				ctx.fill();
 			}
 
 			// ctx.fillStyle = '#f00';
@@ -504,7 +511,7 @@ function drawGame() {
 				state.inventory[roomItem.id] = 0;
 			}
 			const item = items[roomItem.id];
-			state.inventory[roomItem.id] += item.value;
+			state.inventory[roomItem.id] += item.value || 0;
 		}
 		i++;
 	}
@@ -743,11 +750,42 @@ function drawInventory() {
 	for (const itemId in state.inventory) {
 		const item = items[itemId];
 		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);
-		ctx.fillText(item.label, x1, y);
-		ctx.fillText(state.inventory[itemId], x2, y);
+		ctx.fillText(item.label, x1 + (0.04 * canvas.width), y);
+		if (state.inventory[itemId]) {
+			ctx.fillText(state.inventory[itemId], x2, y);
+		}
 		y += lineHeight * canvas.height;
 	}
 }
+
+function attack() {
+	if (state.player.wielding) {
+		let minDist = 1;
+		let closestCharacter;
+		const weapon = items[state.player.wielding];
+		// console.log(weapon);
+		for (const roomCharacter of state.room.characters) {
+			const dx = state.player.x - roomCharacter.location.x;
+			const dy = state.player.y - roomCharacter.location.y;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+			// console.log(dist);
+			if (dist < minDist && dist <= weapon.range) {
+				minDist = dist;
+				closestCharacter = roomCharacter;
+			}
+		}
+		console.log(closestCharacter);
+		if (closestCharacter) {
+			const character = characters[closestCharacter.id];
+			closestCharacter.health -= weapon.damage / character.resilience;
+			if (closestCharacter.health <= 0) {
+				state.room.characters = state.room.characters.filter(c => c != closestCharacter);
+			}
+		}
+	}
+
+}
+
 
 function onKeyUp(e) {
 	delete keysDown[e.code];
@@ -760,6 +798,8 @@ function onKeyUp(e) {
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 	} else if (e.key.toUpperCase() == 'I') {
 		drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
+	} else if (e.key.toUpperCase() == 'A') {
+		attack();
 	} else if (e.key.toUpperCase() == 'C') {
 		let next, didSelect;
 		if (state.player.wielding) {
