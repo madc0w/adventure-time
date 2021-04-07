@@ -7,8 +7,8 @@ const moveFuncs = {
 				y: 0
 			};
 		}
-		const velFactor = 0.0022;
-		const maxVel = 0.012;
+		const velFactor = 0.0008;
+		const maxVel = 0.008;
 		character.vel.x += (Math.random() - 0.5) * velFactor;
 		character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
 		character.vel.y += (Math.random() - 0.5) * velFactor;
@@ -31,8 +31,14 @@ const interactionFuncs = {
 			const y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
 			const dx = x1 - x2;
 			const dy = y1 - y2;
-			roomCharacter.location.x -= 0.04 * dx;
-			roomCharacter.location.y -= 0.04 * dy;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+			// console.log(dist);
+			const minDist = 0.12;
+			if (dist < minDist || dist > minDist * 1.1) {
+				const factor = 0.04 * (dist > minDist ? -1 : 1)
+				roomCharacter.location.x += factor * dx;
+				roomCharacter.location.y += factor * dy;
+			}
 		}
 	},
 
@@ -153,7 +159,7 @@ characters = {
 	},
 	doomScreen: {
 		animInterval: 400,
-		width: 0.12,
+		width: 0.18,
 		height: 0.12,
 		standing: [
 			'doom screen standing 01.png',
@@ -163,7 +169,7 @@ characters = {
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
 		],
-		// move: moveFuncs.moveTowardPlayer,
+		move: moveFuncs.random,
 		interact: interactionFuncs.moveTowardPlayer,
 	},
 	zlakik: {

@@ -39,22 +39,22 @@ rooms = [
 			// 		y: 0.5
 			// 	}
 			// },
-			// {
-			// 	id: 'sword_2',
-			// 	location: {
-			// 		x: 0.7,
-			// 		y: 0.8
-			// 	}
-			// }
+			{
+				id: 'sword_2',
+				location: {
+					x: 0.7,
+					y: 0.8
+				}
+			}
 		],
 		characters: [
 			{
-				id: 'doomScreen',
-				location: {
-					x: 0.2,
-					y: 0.2
-				}
-			}, {
+				// 	id: 'doomScreen',
+				// 	location: {
+				// 		x: 0.2,
+				// 		y: 0.2
+				// 	}
+				// }, {
 				id: 'doomScreen',
 				location: {
 					x: 0.6,
@@ -90,7 +90,7 @@ rooms = [
 		id: 2,
 		width: 0.6,
 		height: 0.7,
-		backgroundImage: 'room_02.jpg',
+		backgroundImage: 'outside_01.jpg',
 		// wallColor: '#3f2',
 		doors: [
 		],
@@ -159,7 +159,7 @@ rooms = [
 	}, {
 		id: 6,
 		width: 1,
-		height: 0.3,
+		height: 0.2,
 		backgroundImage: 'room_02.jpg',
 		portals: [
 			{

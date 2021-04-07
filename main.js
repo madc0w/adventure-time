@@ -43,13 +43,13 @@ const portalFrames = [];
 let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
 
 function load() {
-	const originalValueOf = Object.prototype.valueOf;
-	Object.prototype.valueOf = function () {
-		if (typeof this !== 'number') {
-			throw new Error('Object is not a Number');
-		}
-		return originalValueOf.bind(this)();
-	}
+	// const originalValueOf = Object.prototype.valueOf;
+	// Object.prototype.valueOf = function () {
+	// 	if (typeof this !== 'number') {
+	// 		throw new Error('Object is not a Number');
+	// 	}
+	// 	return originalValueOf.bind(this)();
+	// }
 
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
@@ -251,7 +251,7 @@ function drawGame() {
 	{
 		// characters
 		for (const roomCharacter of state.room.characters || []) {
-			roomCharacter.velInversionTime = roomCharacter.velInversionTime || {};
+			// roomCharacter.velInversionTime = roomCharacter.velInversionTime || {};
 
 			const character = characters[roomCharacter.id];
 			character.move && character.move(roomCharacter);
@@ -261,6 +261,7 @@ function drawGame() {
 					character.interact && character.interact(roomCharacter, roomCharacter2);
 				}
 			}
+			roomCharacter.health = roomCharacter.health || 1;
 
 			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
 				if (roomCharacter.vel) {
@@ -288,6 +289,15 @@ function drawGame() {
 			const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
 			const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
 			ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
+
+			{
+				const r = 0.02;
+				ctx.fillStyle = '#444';
+				ctx.beginPath();
+				ctx.arc(x + (character.width * canvas.width / 2), y - canvas.width * r, canvas.width * r, 0, 2 * Math.PI);
+				ctx.fill();
+			}
+
 			// ctx.fillStyle = '#f00';
 			// ctx.fillRect(x, y, 4, 4);
 		}
