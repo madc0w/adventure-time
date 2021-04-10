@@ -261,52 +261,60 @@ function drawGame() {
 					character.interact && character.interact(roomCharacter, roomCharacter2);
 				}
 			}
-			roomCharacter.health = roomCharacter.health || 1;
 
 			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
 				if (roomCharacter.vel) {
 					roomCharacter.vel.x *= -1;
-				} else {
-					roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
-					roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
+					// } else {
+					// 	roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
+					// 	roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
 				}
 				// roomCharacter.velInversionTime.x = now;
 			}
 			if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
 				if (roomCharacter.vel) {
 					roomCharacter.vel.y *= -1;
-				} else {
-					roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
-					roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
+					// } else {
+					// 	roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
+					// 	roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
 				}
 				// roomCharacter.velInversionTime.y = now;
 			}
-			// roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
-			// roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
-			// roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
-			// roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
+			// roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / 2, roomCharacter.location.x);
+			// roomCharacter.location.x = Math.max(character.width / 2, roomCharacter.location.x);
+			roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / 2, roomCharacter.location.y);
+			roomCharacter.location.y = Math.max(character.height / 2, roomCharacter.location.y);
+			roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / 2, roomCharacter.location.x);
+			roomCharacter.location.x = Math.max(character.width / 2, roomCharacter.location.x);
 
-			const x = ((1 - state.room.width) / 2 + (roomCharacter.location.x * state.room.width)) * canvas.width;
-			const y = ((1 - state.room.height) / 2 + (roomCharacter.location.y * state.room.height)) * canvas.height;
-			ctx.drawImage(characterImages[roomCharacter.id], x, y, character.width * canvas.width, character.height * canvas.height);
+			const imageLoc = toScreen(roomCharacter.location, character);
+			ctx.drawImage(
+				characterImages[roomCharacter.id],
+				imageLoc.x,
+				imageLoc.y,
+				character.width * canvas.width,
+				character.height * canvas.height
+			);
 
+			roomCharacter.health = roomCharacter.health || 1;
 			{
-				const r = 0.02;
+				// health circle
+				const r = 0.014;
 				ctx.fillStyle = '#444';
 				ctx.beginPath();
-				ctx.arc(x + (character.width * canvas.width / 2), y - canvas.width * r, canvas.width * r, 0, 2 * Math.PI);
+				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r, canvas.width * r, 0, 2 * Math.PI);
 				ctx.fill();
 
 				ctx.fillStyle = '#f00';
 				ctx.beginPath();
-				ctx.moveTo(x + (character.width * canvas.width / 2), y - canvas.width * r);
-				ctx.arc(x + (character.width * canvas.width / 2), y - canvas.width * r, canvas.width * r, 0, roomCharacter.health * Math.PI * 2, false);
-				ctx.lineTo(x + (character.width * canvas.width / 2), y - canvas.width * r);
+				ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
+				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r, canvas.width * r, 0, roomCharacter.health * Math.PI * 2, false);
+				ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
 				ctx.fill();
 			}
 
 			// ctx.fillStyle = '#f00';
-			// ctx.fillRect(x, y, 4, 4);
+			// ctx.fillRect(imageLoc.x, imageLoc.y, 4, 4);
 		}
 	}
 	{
@@ -369,9 +377,14 @@ function drawGame() {
 	}
 	{
 		// player
-		const x = (state.player.x - characters.player.width / 2) * canvas.width;
-		const y = (state.player.y - characters.player.height / 2) * canvas.height;
-		ctx.drawImage(characterImages.player, x, y, characters.player.width * canvas.width, characters.player.height * canvas.height);
+		// console.log('state.player.x ', state.player.x);
+		const loc = toScreen(state.player, characters.player);
+		// const x = (state.player.x - characters.player.width / 2) * canvas.width;
+		// const y = (state.player.y - characters.player.height / 2) * canvas.height;
+		ctx.drawImage(characterImages.player, loc.x, loc.y, characters.player.width * canvas.width, characters.player.height * canvas.height);
+
+		// ctx.fillStyle = '#f00';
+		// ctx.fillRect(x, y, 4, 4);
 	}
 
 	let numKeysDown = 0;
@@ -826,10 +839,6 @@ function onKeyUp(e) {
 }
 
 function onKeyDown(e) {
-	// if (gameEndTime && new Date() - gameEndTime > gameEndDelay) {
-	// 	init();
-	// } else {
-	// }
 	if (!keysDown[e.code]) {
 		const motion = {
 			ArrowLeft: 'left',
@@ -868,4 +877,10 @@ function animate(character) {
 
 	f();
 	animIntervalIds[character.id] = setInterval(f, characters[character.id].animInterval);
+}
+
+function toScreen(loc, character) {
+	const x = (((loc.x - character.width / 2) * state.room.width) + (1 - state.room.width) / 2) * canvas.width;
+	const y = (((loc.y - character.height / 2) * state.room.height) + (1 - state.room.height) / 2) * canvas.height;
+	return { x, y };
 }

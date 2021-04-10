@@ -20,6 +20,20 @@ const moveFuncs = {
 };
 
 const interactionFuncs = {
+	moveAround(roomCharacter, roomCharacter2) {
+		const character = characters[roomCharacter.id];
+		const motion = new Date().getSeconds() % 4;
+		if (motion == 0) {
+			roomCharacter.location.y += 0.02;
+		} else if (motion == 1) {
+			roomCharacter.location.y -= 0.02;
+		} else if (motion == 2) {
+			roomCharacter.location.x += 0.02;
+		} else if (motion == 3) {
+			roomCharacter.location.x -= 0.02;
+		}
+	},
+
 	moveTowardPlayer(roomCharacter, roomCharacter2) {
 		const character2 = characters[roomCharacter2.id] || characters.player;
 		if (characters.player == character2) {
@@ -162,15 +176,17 @@ characters = {
 		width: 0.18,
 		height: 0.12,
 		standing: [
-			'doom screen standing 01.png',
-			'doom screen standing 02.png',
-			'doom screen standing 03.png',
-			'doom screen standing 04.png',
-			'doom screen standing 03.png',
-			'doom screen standing 02.png',
+			'test.png',
+			// 'doom screen standing 01.png',
+			// 'doom screen standing 02.png',
+			// 'doom screen standing 03.png',
+			// 'doom screen standing 04.png',
+			// 'doom screen standing 03.png',
+			// 'doom screen standing 02.png',
 		],
-		move: moveFuncs.random,
-		interact: interactionFuncs.moveTowardPlayer,
+		// move: moveFuncs.random,
+		// interact: interactionFuncs.moveTowardPlayer,
+		interact: interactionFuncs.moveAround,
 		resilience: 4,
 		strength: 0.8,
 		resetTime: 200,
