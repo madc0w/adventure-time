@@ -1,7 +1,7 @@
 rooms = [
 	{
 		id: 0,
-		width: 0.7,
+		width: 0.12,
 		height: 0.9,
 		backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',
@@ -48,19 +48,19 @@ rooms = [
 			}
 		],
 		characters: [
-			{
-				// 	id: 'doomScreen',
-				// 	location: {
-				// 		x: 0.2,
-				// 		y: 0.2
-				// 	}
-				// }, {
-				id: 'doomScreen',
-				location: {
-					x: 0.6,
-					y: 0.2
-				}
-			},
+			// {
+			// 	// 	id: 'doomScreen',
+			// 	// 	location: {
+			// 	// 		x: 0.2,
+			// 	// 		y: 0.2
+			// 	// 	}
+			// 	// }, {
+			// 	id: 'doomScreen',
+			// 	location: {
+			// 		x: 0.6,
+			// 		y: 0.2
+			// 	}
+			// },
 		]
 
 	}, {
