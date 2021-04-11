@@ -389,8 +389,8 @@ function drawGame() {
 		// const y = (state.player.y - characters.player.height / 2) * canvas.height;
 		ctx.drawImage(characterImages.player, loc.x, loc.y, characters.player.width * canvas.width, characters.player.height * canvas.height);
 
-		ctx.fillStyle = '#f00';
-		ctx.fillRect(loc.x, loc.y, 4, 4);
+		// ctx.fillStyle = '#f00';
+		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
 	let numKeysDown = 0;
@@ -405,14 +405,13 @@ function drawGame() {
 	}
 
 	if (keysDown.ArrowLeft) {
-		const edge = characters.player.width / 2;
-		state.player.x = state.player.x - inc / state.room.width;
+		const edge = characters.player.width / (2 * state.room.width);
+		state.player.x -= inc / state.room.width;
 		if (state.player.x <= edge) {
-			const playerPos = state.player.y - characters.player.height / 2;
-			let y1, y2;
+			const playerPos = state.player.y - state.room.height * characters.player.height / 2;
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
-				y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
-				y2 = y1 + doorSize - characters.player.height;
+				const y1 = door.location;
+				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
 				if (playerPos >= y1 && playerPos <= y2) {
 					throughDoor = door;
 					break;
@@ -425,16 +424,43 @@ function drawGame() {
 	}
 	if (keysDown.ArrowRight) {
 		const x = state.player.x;
-		state.player.x = state.player.x + inc / state.room.width;
-		const playerEdge = (state.player.x - characters.player.width / 2) * state.room.width + (1 - state.room.width) / 2 + characters.player.width;
+		state.player.x += inc / state.room.width;
+		const playerEdge = state.player.x * state.room.width - characters.player.width / 2 + (1 - state.room.width) / 2 + characters.player.width;
 		const edge = (1 + state.room.width) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.y - characters.player.height / 2;
+			const playerPos = state.player.y;
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
-				const y1 = ((1 - state.room.height) / 2 + (door.location * state.room.height));
-				const y2 = y1 + doorSize - characters.player.height;
+				const y1 = door.location;
+				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
+
+				{
+					const loc = toScreen({
+						x: 1,
+						y: y1
+					});
+					ctx.fillStyle = '#f00';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
+				{
+					const loc = toScreen({
+						x: 1,
+						y: y2
+					});
+					ctx.fillStyle = '#f00';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
+				{
+					const loc = toScreen({
+						x: 1,
+						y: playerPos
+					});
+					ctx.fillStyle = '#0f0';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
+
 				if (playerPos >= y1 && playerPos <= y2) {
-					throughDoor = door;
+					console.log('go through');
+					// throughDoor = door;
 					break;
 				}
 			}
@@ -444,13 +470,13 @@ function drawGame() {
 		}
 	}
 	if (keysDown.ArrowUp) {
-		const edge = characters.player.height / 2;
-		state.player.y = state.player.y - inc / state.room.height;
+		const edge = characters.player.height / (2 * state.room.height);
+		state.player.y -= inc / state.room.height;
 		if (state.player.y <= edge) {
-			const playerPos = state.player.x - characters.player.width / 2;
+			const playerPos = state.player.x;
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
-				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
-				const x2 = x1 + doorSize - characters.player.width;
+				const x1 = door.location;
+				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
 				if (playerPos >= x1 && playerPos <= x2) {
 					throughDoor = door;
 					break;
@@ -463,14 +489,14 @@ function drawGame() {
 	}
 	if (keysDown.ArrowDown) {
 		const y = state.player.y;
-		state.player.y = state.player.y + inc / state.room.height;
-		const playerEdge = (state.player.y - characters.player.height / 2) * state.room.height + (1 - state.room.height) / 2 + characters.player.height;
+		state.player.y += inc / state.room.height;
+		const playerEdge = state.player.y * state.room.height - characters.player.height / 2 + (1 - state.room.height) / 2 + characters.player.height;
 		const edge = (1 + state.room.height) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.x - characters.player.width / 2;
+			const playerPos = state.player.x;
 			for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
-				const x1 = ((1 - state.room.width) / 2 + (door.location * state.room.width));
-				const x2 = x1 + doorSize - characters.player.width;
+				const x1 = door.location;
+				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
 				if (playerPos >= x1 && playerPos <= x2) {
 					throughDoor = door;
 					break;
@@ -539,85 +565,50 @@ function drawGame() {
 		i++;
 	}
 
-	if (throughDoor) {
-		const playerX1 = state.player.x - characters.player.width / 2;
-		const playerY1 = state.player.y - characters.player.height / 2;
-		const playerX2 = state.player.x + characters.player.width / 2;
-		const playerY2 = state.player.y + characters.player.height / 2;
-		const roomX1 = (1 - state.room.width + wallWidth) / 2;
-		const roomY1 = (1 - state.room.height + wallWidth) / 2;
-		const roomX2 = (1 + state.room.width + wallWidth) / 2;
-		const roomY2 = (1 + state.room.height + wallWidth) / 2;
-		if (playerX2 < roomX2 && playerX1 > roomX1 && playerY2 < roomY2 && playerY1 > roomY1) {
-			throughDoor = null;
-		}
-	}
 	// console.log('throughDoor', throughDoor);
 	if (throughDoor) {
-		function goThroughDoor() {
-			state.room = throughDoor.room;
-			if (!mappedRooms.includes(state.room)) {
-				mappedRooms.push(state.room);
-				// console.log(mappedRooms);
-			}
+		const oppositeWall = {
+			n: 's',
+			s: 'n',
+			e: 'w',
+			w: 'e'
+		}[throughDoor.wall];
+		const prevRoom = state.room;
+		state.room = throughDoor.room;
+		if (!mappedRooms.includes(state.room)) {
+			mappedRooms.push(state.room);
+			// console.log(mappedRooms);
 		}
-
-		if (['w', 'e'].includes(throughDoor.wall)) {
-			const minY = (1 - state.room.height) / 2 + (throughDoor.location * state.room.height);
-			const maxY = minY + doorSize;
-			const playerY1 = state.player.y - characters.player.height / 2;
-			const playerY2 = state.player.y + characters.player.height / 2;
-			if (playerY2 > maxY) {
-				state.player.y = maxY - characters.player.height / 2;
-			} else if (playerY1 < minY) {
-				state.player.y = minY + characters.player.height / 2;
+		throughDoor = null;
+		if (oppositeWall) {
+			if (oppositeWall == 's') {
+				state.player.y = 1 - characters.player.height / (2 * state.room.height);
+			} else if (oppositeWall == 'n') {
+				state.player.y = characters.player.height / (2 * state.room.height);;
+			} else if (oppositeWall == 'e') {
+				state.player.x = 1 - characters.player.width / (2 * state.room.width);
+			} else {
+				state.player.x = characters.player.width / (2 * state.room.height);;
 			}
 
-			const prevRoom = state.room;
-			if (throughDoor.wall == 'w' && state.player.x < (1 - state.room.width - wallWidth) / 2 - doorThreshold) {
-				goThroughDoor();
-				const door = (state.room.doors || []).find(d => d.wall == 'e' && d.room == prevRoom);
-				state.player.x = 1 - characters.player.width / 2;
-				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - characters.player.height) / 2) * state.room.height);
-				// console.log(state.player.y)
-				// if (state.player.x + characters.player.width > (1 + state.room.width) / 2) {
-				// 	state.player.x = (1 + state.room.width) / 2 - characters.player.width;
-				// }
-			} else if (throughDoor.wall == 'e' && state.player.x > (1 + state.room.width + wallWidth) / 2 + doorThreshold) {
-				goThroughDoor();
-				const door = (state.room.doors || []).find(d => d.wall == 'w' && d.room == prevRoom);
-				state.player.x = 0;
-				state.player.y = (1 - state.room.height + doorSize) / 2 + ((door ? door.location : (1 - characters.player.height) / 2) * state.room.height);
-				// console.log(state.player.y)
-				if (state.player.y + characters.player.height > (1 + state.room.height) / 2) {
-					state.player.y = (1 + state.room.height) / 2 - characters.player.height;
+			const door = state.room.doors.find(d => d.wall == oppositeWall && d.room == prevRoom);
+			if (['n', 's'].includes(oppositeWall)) {
+				if (door) {
+					state.player.x = door.location + (characters.player.width / state.room.width) / 2;
+				} else {
+					state.player.x = (1 - state.room.width * characters.player.width) / 2;
+				}
+			} else {
+				if (door) {
+					state.player.y = door.location + (characters.player.height / state.room.height) / 2;
+				} else {
+					state.player.y = (1 - state.room.height * characters.player.height) / 2;
 				}
 			}
-
-		} else {
-			const minX = (1 - state.room.width) / 2 + (throughDoor.location * state.room.width);
-			const maxX = minX + doorSize;
-			const playerX1 = state.player.x - characters.player.width / 2;
-			const playerX2 = state.player.x + characters.player.width / 2;
-			if (playerX2 > maxX) {
-				state.player.x = maxX - characters.player.width / 2;
-			} else if (playerX1 < minX) {
-				state.player.x = minX + characters.player.width / 2;
-			}
-
-			const prevRoom = state.room;
-			if (throughDoor.wall == 'n' && state.player.y < (1 - state.room.height - wallWidth) / 2 - doorThreshold) {
-				goThroughDoor();
-				const door = state.room.doors.find(d => d.wall == 's' && d.room == prevRoom);
-				state.player.y = 1 - characters.player.height;
-				state.player.x = (1 - state.room.width + doorSize) / 2 + ((door ? door.location : (1 - characters.player.width) / 2) * state.room.width);
-			} else if (throughDoor.wall == 's' && state.player.y > (1 + state.room.height + wallWidth) / 2 + doorThreshold) {
-				goThroughDoor();
-				const door = state.room.doors.find(d => d.wall == 'n' && d.room == prevRoom);
-				state.player.y = 0;
-				state.player.x = (1 - state.room.width + doorSize) / 2 + ((door ? door.location : (1 - characters.player.width) / 2) * state.room.width);
-			}
 		}
+		console.log('oppositeWall', oppositeWall);
+		console.log('x', state.player.x);
+		console.log('y', state.player.y);
 	}
 }
 
@@ -889,10 +880,14 @@ function animate(character) {
 }
 
 function toScreen(loc, character) {
+	character = character || {
+		width: 0,
+		height: 0
+	};
 	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
 		console.log('bad!', loc, character);
 	}
-	const x = (((loc.x - character.width / 2) * state.room.width) + (1 - state.room.width) / 2) * canvas.width;
-	const y = (((loc.y - character.height / 2) * state.room.height) + (1 - state.room.height) / 2) * canvas.height;
+	const x = ((loc.x * state.room.width) - character.width / 2 + (1 - state.room.width) / 2) * canvas.width;
+	const y = ((loc.y * state.room.height) - character.height / 2 + (1 - state.room.height) / 2) * canvas.height;
 	return { x, y };
 }
