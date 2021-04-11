@@ -522,8 +522,8 @@ function drawGame() {
 
 	// go through portal
 	for (const portal of state.room.portals || []) {
-		const x = (1 - state.room.width) / 2 + (portal.location.x * state.room.width) + (portalSize * 0.1);
-		const y = (1 - state.room.height) / 2 + (portal.location.y * state.room.height) + (portalSize * 0.1);
+		// const x = (1 - state.room.width) / 2 + (portal.location.x * state.room.width) + (portalSize * 0.1);
+		// const y = (1 - state.room.height) / 2 + (portal.location.y * state.room.height) + (portalSize * 0.1);
 		// ctx.strokeStyle = '#000';
 		// ctx.lineWidth = 2;
 		// ctx.beginPath();
@@ -532,8 +532,11 @@ function drawGame() {
 
 		// ctx.fillStyle = '#f00';
 		// ctx.fillRect(state.player.x * canvas.width, state.player.y * canvas.height, 2, 2);
-		if (state.player.x > x && state.player.x < x + portalSize * 0.8 &&
-			state.player.y > y && state.player.y < y + portalSize * 0.8) {
+		if (state.player.x > portal.location.x - portalSize / 2 &&
+			state.player.x < portal.location.x + portalSize / 2 &&
+			state.player.y > portal.location.y - portalSize / 2 &&
+			state.player.y < portal.location.y + portalSize / 2
+		) {
 			state.room = rooms.find(r => r.id == portal.roomId);
 			state.player.x = state.player.y = 0.5;
 		}
@@ -618,9 +621,9 @@ function drawGame() {
 				}
 			}
 		}
-		console.log('oppositeWall', oppositeWall);
-		console.log('x', state.player.x);
-		console.log('y', state.player.y);
+		// console.log('oppositeWall', oppositeWall);
+		// console.log('x', state.player.x);
+		// console.log('y', state.player.y);
 	}
 }
 

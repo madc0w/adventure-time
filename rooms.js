@@ -165,7 +165,7 @@ rooms = [
 			{
 				location: {
 					x: 0.8,
-					y: 0.2
+					y: 0.5
 				},
 				roomId: 0
 			}
