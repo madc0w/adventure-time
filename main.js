@@ -257,8 +257,6 @@ function drawGame() {
 	{
 		// characters
 		for (const roomCharacter of state.room.characters || []) {
-			// roomCharacter.velInversionTime = roomCharacter.velInversionTime || {};
-
 			const character = characters[roomCharacter.id];
 			character.move && character.move(roomCharacter);
 			// console.log(roomCharacter.width * state.room.width);
@@ -271,27 +269,18 @@ function drawGame() {
 			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
 				if (roomCharacter.vel) {
 					roomCharacter.vel.x *= -1;
-					// } else {
-					// 	roomCharacter.location.x = Math.max(0, roomCharacter.location.x);
-					// 	roomCharacter.location.x = Math.min(1 - (character.width / state.room.width), roomCharacter.location.x);
 				}
 				// roomCharacter.velInversionTime.x = now;
 			}
 			if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
 				if (roomCharacter.vel) {
 					roomCharacter.vel.y *= -1;
-					// } else {
-					// 	roomCharacter.location.y = Math.max(0, roomCharacter.location.y);
-					// 	roomCharacter.location.y = Math.min(1 - (character.height / state.room.height), roomCharacter.location.y);
 				}
-				// roomCharacter.velInversionTime.y = now;
 			}
-			// roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / 2, roomCharacter.location.x);
-			// roomCharacter.location.x = Math.max(character.width / 2, roomCharacter.location.x);
-			roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / 2, roomCharacter.location.y);
-			roomCharacter.location.y = Math.max(character.height / 2, roomCharacter.location.y);
-			roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / 2, roomCharacter.location.x);
-			roomCharacter.location.x = Math.max(character.width / 2, roomCharacter.location.x);
+			roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / (2 * state.room.height), roomCharacter.location.y);
+			roomCharacter.location.y = Math.max(character.height / (2 * state.room.height), roomCharacter.location.y);
+			roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
+			roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
 
 			const imageLoc = toScreen(roomCharacter.location, character);
 			ctx.drawImage(
@@ -408,7 +397,7 @@ function drawGame() {
 		const edge = characters.player.width / (2 * state.room.width);
 		state.player.x -= inc / state.room.width;
 		if (state.player.x <= edge) {
-			const playerPos = state.player.y - state.room.height * characters.player.height / 2;
+			const playerPos = state.player.y - characters.player.height / (2 * state.room.height);
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
 				const y1 = door.location;
 				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
@@ -428,7 +417,7 @@ function drawGame() {
 		const playerEdge = state.player.x * state.room.width - characters.player.width / 2 + (1 - state.room.width) / 2 + characters.player.width;
 		const edge = (1 + state.room.width) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.y;
+			const playerPos = state.player.y - characters.player.height / (2 * state.room.height);
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
 				const y1 = door.location;
 				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
@@ -459,8 +448,7 @@ function drawGame() {
 				}
 
 				if (playerPos >= y1 && playerPos <= y2) {
-					console.log('go through');
-					// throughDoor = door;
+					throughDoor = door;
 					break;
 				}
 			}
@@ -473,10 +461,34 @@ function drawGame() {
 		const edge = characters.player.height / (2 * state.room.height);
 		state.player.y -= inc / state.room.height;
 		if (state.player.y <= edge) {
-			const playerPos = state.player.x;
+			const playerPos = state.player.x - characters.player.width / (2 * state.room.width);
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
 				const x1 = door.location;
 				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
+				{
+					const loc = toScreen({
+						x: x1,
+						y: 0
+					});
+					ctx.fillStyle = '#f00';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
+				{
+					const loc = toScreen({
+						x: x2,
+						y: 0
+					});
+					ctx.fillStyle = '#f00';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
+				{
+					const loc = toScreen({
+						x: playerPos,
+						y: 0
+					});
+					ctx.fillStyle = '#0f0';
+					ctx.fillRect(loc.x, loc.y, 4, 4);
+				}
 				if (playerPos >= x1 && playerPos <= x2) {
 					throughDoor = door;
 					break;
@@ -591,7 +603,7 @@ function drawGame() {
 				state.player.x = characters.player.width / (2 * state.room.height);;
 			}
 
-			const door = state.room.doors.find(d => d.wall == oppositeWall && d.room == prevRoom);
+			const door = (state.room.doors || []).find(d => d.wall == oppositeWall && d.room == prevRoom);
 			if (['n', 's'].includes(oppositeWall)) {
 				if (door) {
 					state.player.x = door.location + (characters.player.width / state.room.width) / 2;
