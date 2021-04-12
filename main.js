@@ -19,6 +19,7 @@ const doorwaySize = {
 };
 const wallWidth = 0.01;
 const moveIncrement = 0.006;
+const itemTakeDistance = 32;
 
 const mapBackgroundColor = '#e2e2b1';
 const mapRoomColor = '#a5a5a4';
@@ -235,23 +236,25 @@ function drawGame() {
 		for (const roomItem of state.room.items || []) {
 			const item = items[roomItem.id];
 			let size = item.size;
-			const loc = toScreen(roomItem.location, {
-				width: size,
-				height: size
-			});
+			if (item.image.height != 0) {
+				const loc = toScreen(roomItem.location, {
+					width: size * item.image.width / item.image.height,
+					height: size
+				});
+				if (roomItem.animStep) {
+					size -= roomItem.animStep * item.size / 16;
+					loc.x += (item.size - size) * canvas.width / 2;
+					loc.y += (item.size - size) * canvas.height / 2;
+					ctx.globalAlpha = (12 - roomItem.animStep) / 12;
+				}
+				// console.log(item.image.width / item.image.height);
+				if (size > 0) {
+					ctx.drawImage(item.image, loc.x, loc.y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
+				}
+				ctx.globalAlpha = 1;
+			}
 			// let x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
 			// let y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
-			if (roomItem.animStep) {
-				size -= roomItem.animStep * item.size / 16;
-				loc.x += (item.size - size) * canvas.width / 2;
-				loc.y += (item.size - size) * canvas.height / 2;
-				ctx.globalAlpha = (12 - roomItem.animStep) / 12;
-			}
-			// console.log(item.image.width / item.image.height);
-			if (size > 0) {
-				ctx.drawImage(item.image, loc.x, loc.y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
-			}
-			ctx.globalAlpha = 1;
 		}
 	}
 	{
@@ -422,30 +425,30 @@ function drawGame() {
 				const y1 = door.location;
 				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
 
-				{
-					const loc = toScreen({
-						x: 1,
-						y: y1
-					});
-					ctx.fillStyle = '#f00';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
-				{
-					const loc = toScreen({
-						x: 1,
-						y: y2
-					});
-					ctx.fillStyle = '#f00';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
-				{
-					const loc = toScreen({
-						x: 1,
-						y: playerPos
-					});
-					ctx.fillStyle = '#0f0';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
+				// {
+				// 	const loc = toScreen({
+				// 		x: 1,
+				// 		y: y1
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: 1,
+				// 		y: y2
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: 1,
+				// 		y: playerPos
+				// 	});
+				// 	ctx.fillStyle = '#0f0';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
 
 				if (playerPos >= y1 && playerPos <= y2) {
 					throughDoor = door;
@@ -465,30 +468,30 @@ function drawGame() {
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
 				const x1 = door.location;
 				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
-				{
-					const loc = toScreen({
-						x: x1,
-						y: 0
-					});
-					ctx.fillStyle = '#f00';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
-				{
-					const loc = toScreen({
-						x: x2,
-						y: 0
-					});
-					ctx.fillStyle = '#f00';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
-				{
-					const loc = toScreen({
-						x: playerPos,
-						y: 0
-					});
-					ctx.fillStyle = '#0f0';
-					ctx.fillRect(loc.x, loc.y, 4, 4);
-				}
+				// {
+				// 	const loc = toScreen({
+				// 		x: x1,
+				// 		y: 0
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: x2,
+				// 		y: 0
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: playerPos,
+				// 		y: 0
+				// 	});
+				// 	ctx.fillStyle = '#0f0';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
 				if (playerPos >= x1 && playerPos <= x2) {
 					throughDoor = door;
 					break;
@@ -545,38 +548,45 @@ function drawGame() {
 	// pick up an item
 	let i = 0;
 	for (const roomItem of state.room.items || []) {
-		const x = (1 - state.room.width) / 2 + (roomItem.location.x * state.room.width);
-		const y = (1 - state.room.height) / 2 + (roomItem.location.y * state.room.height);
-
 		const item = items[roomItem.id];
-		// const itemSize = item.size;
-		// ctx.strokeStyle = '#f00';
-		// ctx.beginPath();
-		// ctx.rect(x * canvas.width, y * canvas.height, itemSize * (item.image.width / item.image.height) * canvas.width, itemSize * canvas.height);
-		// ctx.stroke();
-		if (!roomItem.takeAnimIntervalId &&
-			state.player.x < x + item.size * (item.image.width / item.image.height) && state.player.x > x &&
-			state.player.y < y + item.size && state.player.y > y) {
+		if (item.image.height > 0) {
+			const itemLoc = toScreen(roomItem.location, {
+				width: item.size * (item.image.width / item.image.height),
+				height: item.size
+			});
+			itemLoc.x += item.size * (item.image.width / item.image.height) * canvas.width / 2;
+			itemLoc.y += item.size * canvas.height / 2;
 
-			const interval = 24;
-			const numSteps = 12;
-			roomItem.animStep = 0;
-			roomItem.takeAnimIntervalId = setInterval(() => {
-				roomItem.animStep++;
-			}, interval);
-			const n = i;
-			setTimeout(() => {
-				// console.log('before state.room.items', state.room.items);
-				clearInterval(roomItem.takeAnimIntervalId);
-				state.room.items.splice(n, 1);
-				// console.log('after state.room.items', state.room.items);
-			}, interval * numSteps);
-			if (!state.inventory[roomItem.id]) {
-				state.inventory[roomItem.id] = 0;
+			const playerLoc = toScreen(state.player, characters.player);
+			playerLoc.x += characters.player.width * canvas.width / 2;
+			playerLoc.y += characters.player.height * canvas.height / 2;
+
+			const dx = playerLoc.x - itemLoc.x;
+			const dy = playerLoc.y - itemLoc.y;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+
+			if (!roomItem.takeAnimIntervalId && dist < itemTakeDistance) {
+				const interval = 24;
+				const numSteps = 12;
+				roomItem.animStep = 0;
+				roomItem.takeAnimIntervalId = setInterval(() => {
+					roomItem.animStep++;
+				}, interval);
+				const n = i;
+				setTimeout(() => {
+					// console.log('before state.room.items', state.room.items);
+					clearInterval(roomItem.takeAnimIntervalId);
+					state.room.items.splice(n, 1);
+					// console.log('after state.room.items', state.room.items);
+				}, interval * numSteps);
+				if (!state.inventory[roomItem.id]) {
+					state.inventory[roomItem.id] = 0;
+				}
+				const item = items[roomItem.id];
+				state.inventory[roomItem.id] += item.value || 0;
 			}
-			const item = items[roomItem.id];
-			state.inventory[roomItem.id] += item.value || 0;
 		}
+
 		i++;
 	}
 
