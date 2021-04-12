@@ -798,21 +798,30 @@ function drawInventory() {
 
 function attack() {
 	if (state.player.wielding) {
-		let minDist = 1;
+		let minDist;
 		let closestCharacter;
 		const weapon = items[state.player.wielding];
 		// console.log(weapon);
 		for (const roomCharacter of state.room.characters) {
-			const dx = state.player.x - roomCharacter.location.x;
-			const dy = state.player.y - roomCharacter.location.y;
+			const character = characters[roomCharacter.id];
+			const characterLoc = toScreen(roomCharacter.location, character);
+			characterLoc.x += character.width * canvas.width / 2;
+			characterLoc.y += character.height * canvas.height / 2;
+
+			const playerLoc = toScreen(state.player, characters.player);
+			playerLoc.x += characters.player.width * canvas.width / 2;
+			playerLoc.y += characters.player.height * canvas.height / 2;
+
+			const dx = playerLoc.x - characterLoc.x;
+			const dy = playerLoc.y - characterLoc.y;
 			const dist = Math.sqrt(dx * dx + dy * dy);
 			// console.log(dist);
-			if (dist < minDist && dist <= weapon.range) {
+			if ((!minDist || dist < minDist) && dist <= weapon.range) {
 				minDist = dist;
 				closestCharacter = roomCharacter;
 			}
 		}
-		console.log(closestCharacter);
+		// console.log(closestCharacter);
 		if (closestCharacter) {
 			const character = characters[closestCharacter.id];
 			closestCharacter.health -= weapon.damage / character.resilience;

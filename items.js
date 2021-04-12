@@ -11,7 +11,7 @@ items = {
 		label: 'Enchanted Sword',
 		// value: 0.2,
 		size: 0.15,
-		range: 0.32,
+		range: 80, // pixels
 		damage: 0.32,
 		resetTime: 120,
 	},
@@ -21,7 +21,7 @@ items = {
 		label: 'Venom Dagger',
 		// value: 0.05,
 		size: 0.09,
-		range: 0.22,
+		range: 64, // pixels
 		damage: 0.2,
 		resetTime: 80,
 	},
