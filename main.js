@@ -668,7 +668,7 @@ function drawMap() {
 				door.p1 = {};
 				door.p2 = {};
 				if (['e', 'w'].includes(door.wall)) {
-					door.p1.y = (door.location - room.height / 2) * mapScale * canvas.width;
+					door.p1.y = (door.location - 1) * room.height / 2 * mapScale * canvas.height;
 					door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
 					door.p1.x = door.p2.x = room.width * mapScale * canvas.width / 2;
 					if (door.wall == 'w') {
@@ -676,12 +676,13 @@ function drawMap() {
 						door.p2.x *= -1;
 					}
 				} else {
-					door.p1.x = (door.location - room.width / 2) * mapScale * canvas.height;
+					door.p1.x = (door.location - 1) * room.width / 2 * mapScale * canvas.width;
 					door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
 					door.p1.y = door.p2.y = room.height * mapScale * canvas.height / 2;
 					if (door.wall == 'n') {
 						door.p1.y *= -1;
 						door.p2.y *= -1;
+						// console.log(door.p1);
 					}
 				}
 				for (const p of [door.p1, door.p2]) {
