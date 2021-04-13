@@ -13,7 +13,7 @@ items = {
 		size: 0.15,
 		range: 80, // pixels
 		damage: 0.32,
-		resetTime: 120,
+		resetTime: 480,
 	},
 	sword_2: {
 		type: 'weapon',
@@ -23,6 +23,6 @@ items = {
 		size: 0.09,
 		range: 64, // pixels
 		damage: 0.2,
-		resetTime: 80,
+		resetTime: 300,
 	},
 };

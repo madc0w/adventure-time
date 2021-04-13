@@ -1,7 +1,7 @@
 rooms = [
 	{
 		id: 0,
-		width: 0.12,
+		width: 0.44,
 		height: 0.9,
 		backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',

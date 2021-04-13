@@ -49,7 +49,7 @@ const interactionFuncs = {
 			// console.log(dist);
 			const minDist = 0.12;
 			if (dist < minDist || dist > minDist * 1.1) {
-				const factor = 0.04 * (dist > minDist ? -1 : 1)
+				const factor = 0.02 * (dist > minDist ? -1 : 1)
 				roomCharacter.location.x += factor * dx;
 				roomCharacter.location.y += factor * dy;
 			}
@@ -158,20 +158,27 @@ characters = {
 				],
 			}
 		},
-		strike: {
+		attack: {
 			sword_1: {
 				left: [
 					'player left strike sword_01.png',
+				],
+				right: [
+					'player right strike sword_01.png',
 				]
 			},
 			sword_2: {
 				left: [
 					'player left strike sword_02.png',
+				],
+				right: [
+					'player right strike sword_02.png',
 				]
 			},
 		}
 	},
 	doomScreen: {
+		type: 'enemy',
 		animInterval: 400,
 		width: 0.18,
 		height: 0.12,
@@ -191,6 +198,7 @@ characters = {
 		resetTime: 200,
 	},
 	zlakik: {
+		type: 'enemy',
 		width: 0.1,
 		height: 0.06,
 		standing: [

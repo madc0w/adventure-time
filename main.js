@@ -41,7 +41,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -69,11 +69,11 @@ function load() {
 			up: [],
 			down: [],
 			wielding: {},
-			strike: {},
+			attack: {},
 		};
 
 		for (const key in characterFrames[characterId]) {
-			if (['wielding', 'strike'].includes(key)) {
+			if (['wielding', 'attack'].includes(key)) {
 				for (const weaponName in characters[characterId][key] || {}) {
 					characterFrames[characterId][key][weaponName] = {};
 					for (const direction in characters[characterId][key][weaponName] || {}) {
@@ -156,10 +156,12 @@ function load() {
 	}
 	// console.log(rooms);
 
+	t = 0;
 	requestAnimationFrame(draw);
 }
 
 function draw() {
+	t++;
 	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	drawFunc();
@@ -259,6 +261,25 @@ function drawGame() {
 	}
 	{
 		// characters
+		const healthIndicatorRadius = 0.014;
+		const targetedCharacter = getTargetedCharacter();
+		if (targetedCharacter) {
+			const character = characters[targetedCharacter.id];
+			const imageLoc = toScreen(targetedCharacter.location, character);
+			const r = 0.02;
+			const alpha = Math.floor(127 * (Math.sin(t / 22) + 1));
+			let alphaHex = alpha.toString(16);
+			if (alphaHex.length < 2) {
+				alphaHex = '0' + alphaHex;
+			}
+			ctx.fillStyle = '#0000dd' + alphaHex;
+			ctx.beginPath();
+			ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
+			ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * r, 0, 2 * Math.PI * 2, false);
+			ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
+			ctx.fill();
+		}
+
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
 			character.move && character.move(roomCharacter);
@@ -297,17 +318,16 @@ function drawGame() {
 			roomCharacter.health = roomCharacter.health || 1;
 			{
 				// health circle
-				const r = 0.014;
 				ctx.fillStyle = '#444';
 				ctx.beginPath();
-				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r, canvas.width * r, 0, 2 * Math.PI);
+				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * healthIndicatorRadius, 0, 2 * Math.PI);
 				ctx.fill();
 
 				ctx.fillStyle = '#f00';
 				ctx.beginPath();
-				ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
-				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r, canvas.width * r, 0, roomCharacter.health * Math.PI * 2, false);
-				ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
+				ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
+				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * healthIndicatorRadius, 0, roomCharacter.health * Math.PI * 2, false);
+				ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
 				ctx.fill();
 			}
 
@@ -467,7 +487,7 @@ function drawGame() {
 			const playerPos = state.player.x - characters.player.width / (2 * state.room.width);
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
 				const x1 = door.location;
-				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
+				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / state.room.width;
 				// {
 				// 	const loc = toScreen({
 				// 		x: x1,
@@ -508,10 +528,34 @@ function drawGame() {
 		const playerEdge = state.player.y * state.room.height - characters.player.height / 2 + (1 - state.room.height) / 2 + characters.player.height;
 		const edge = (1 + state.room.height) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.x;
+			const playerPos = state.player.x - characters.player.width / (2 * state.room.width);
 			for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
 				const x1 = door.location;
-				const x2 = door.location + (doorSize - characters.player.width) / state.room.width;
+				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / state.room.width;
+				// {
+				// 	const loc = toScreen({
+				// 		x: x1,
+				// 		y: 1
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: x2,
+				// 		y: 1
+				// 	});
+				// 	ctx.fillStyle = '#f00';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
+				// {
+				// 	const loc = toScreen({
+				// 		x: playerPos,
+				// 		y: 1
+				// 	});
+				// 	ctx.fillStyle = '#0f0';
+				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
+				// }
 				if (playerPos >= x1 && playerPos <= x2) {
 					throughDoor = door;
 					break;
@@ -798,13 +842,34 @@ function drawInventory() {
 }
 
 function attack() {
-	if (state.player.wielding) {
-		let minDist;
-		let closestCharacter;
+	const targetedCharacter = getTargetedCharacter();
+	if (targetedCharacter) {
+		attackMotion = targetedCharacter.location.x < state.player.x ? 'left' : 'right';
+		animate(state.player);
 		const weapon = items[state.player.wielding];
-		// console.log(weapon);
-		for (const roomCharacter of state.room.characters) {
-			const character = characters[roomCharacter.id];
+		setTimeout(() => {
+			attackMotion = null;
+		}, weapon.resetTime);
+		const character = characters[targetedCharacter.id];
+		targetedCharacter.health -= weapon.damage / character.resilience;
+		if (targetedCharacter.health <= 0) {
+			// die
+			state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+		}
+	}
+}
+
+function getTargetedCharacter() {
+	if (attackMotion || !state.player.wielding) {
+		return;
+	}
+	const weapon = items[state.player.wielding];
+	let minDist;
+	let closestCharacter;
+	// console.log(weapon);
+	for (const roomCharacter of state.room.characters) {
+		const character = characters[roomCharacter.id];
+		if (character.type == 'enemy') {
 			const characterLoc = toScreen(roomCharacter.location, character);
 			characterLoc.x += character.width * canvas.width / 2;
 			characterLoc.y += character.height * canvas.height / 2;
@@ -822,16 +887,8 @@ function attack() {
 				closestCharacter = roomCharacter;
 			}
 		}
-		// console.log(closestCharacter);
-		if (closestCharacter) {
-			const character = characters[closestCharacter.id];
-			closestCharacter.health -= weapon.damage / character.resilience;
-			if (closestCharacter.health <= 0) {
-				state.room.characters = state.room.characters.filter(c => c != closestCharacter);
-			}
-		}
 	}
-
+	return closestCharacter;
 }
 
 
@@ -897,10 +954,14 @@ function animate(character) {
 	function f() {
 		let frames;
 		if (state.player.wielding && character.id == 'player') {
-			if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
-				motion = 'left';
+			if (attackMotion) {
+				frames = characterFrames[character.id].attack[state.player.wielding][attackMotion];
+			} else {
+				if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
+					motion = 'left';
+				}
+				frames = characterFrames[character.id].wielding[state.player.wielding][motion];
 			}
-			frames = characterFrames[character.id].wielding[state.player.wielding][motion];
 		} else {
 			frames = characterFrames[character.id][motion];
 		}
