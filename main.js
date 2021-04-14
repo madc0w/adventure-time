@@ -867,7 +867,7 @@ function getTargetedCharacter() {
 	let minDist;
 	let closestCharacter;
 	// console.log(weapon);
-	for (const roomCharacter of state.room.characters) {
+	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
 		if (character.type == 'enemy') {
 			const characterLoc = toScreen(roomCharacter.location, character);
