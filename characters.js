@@ -1,27 +1,27 @@
 const moveFuncs = {
 
 	random(character) {
-		if (!character.vel) {
-			character.vel = {
-				x: 0,
-				y: 0
-			};
-		}
-		const velFactor = 0.0008;
-		const maxVel = 0.008;
-		character.vel.x += (Math.random() - 0.5) * velFactor;
-		character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
-		character.vel.y += (Math.random() - 0.5) * velFactor;
-		character.vel.y = Math.max(Math.min(character.vel.y, maxVel), -maxVel)
-		character.location.x += character.vel.x;
-		character.location.y += character.vel.y;
+		// if (!character.vel) {
+		// 	character.vel = {
+		// 		x: 0,
+		// 		y: 0
+		// 	};
+		// }
+		// const velFactor = 0.0008;
+		// const maxVel = 0.004;
+		// character.vel.x += (Math.random() - 0.5) * velFactor;
+		// character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
+		// character.vel.y += (Math.random() - 0.5) * velFactor;
+		// character.vel.y = Math.max(Math.min(character.vel.y, maxVel), -maxVel)
+		// character.location.x += character.vel.x;
+		// character.location.y += character.vel.y;
 	},
 
 };
 
 const interactionFuncs = {
 	moveAround(roomCharacter, roomCharacter2) {
-		const character = characters[roomCharacter.id];
+		// const character = characters[roomCharacter.id];
 		const motion = new Date().getSeconds() % 4;
 		if (motion == 0) {
 			roomCharacter.location.y += 0.02;
@@ -37,22 +37,19 @@ const interactionFuncs = {
 	moveTowardPlayer(roomCharacter, roomCharacter2) {
 		const character2 = characters[roomCharacter2.id] || characters.player;
 		if (characters.player == character2) {
-			const character = characters[roomCharacter.id];
-			const x1 = roomCharacter.location.x + character.width / 2;
-			const y1 = roomCharacter.location.y + character.height / 2;
-
-			const x2 = (roomCharacter2.x - (1 - state.room.width) / 2) / state.room.width;
-			const y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
+			const x1 = roomCharacter.location.x / state.room.width;
+			const y1 = roomCharacter.location.y / state.room.height;
+			const x2 = roomCharacter2.x / state.room.width;
+			const y2 = roomCharacter2.y / state.room.height;
 			const dx = x1 - x2;
 			const dy = y1 - y2;
 			const dist = Math.sqrt(dx * dx + dy * dy);
 			// console.log(dist);
-			const minDist = 0.12;
-			if (dist < minDist || dist > minDist * 1.1) {
-				const factor = 0.02 * (dist > minDist ? -1 : 1)
-				roomCharacter.location.x += factor * dx;
-				roomCharacter.location.y += factor * dy;
-			}
+			const targetDist = 0.22;
+			const factor = 0.006 * (dist > targetDist ? -dist / targetDist : targetDist / dist);
+			roomCharacter.location.x += factor * dx;
+			roomCharacter.location.y += factor * dy;
+			// console.log(roomCharacter.location);
 		}
 	},
 
