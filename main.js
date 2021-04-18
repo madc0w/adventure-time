@@ -282,11 +282,16 @@ function drawGame() {
 
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
-			character.move && character.move(roomCharacter);
+			for (const move of character.move || []) {
+				move(roomCharacter);
+			}
+
 			// console.log(roomCharacter.width * state.room.width);
 			for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
 				if (roomCharacter != roomCharacter2) {
-					character.interact && character.interact(roomCharacter, roomCharacter2);
+					for (const interact of character.interact || []) {
+						interact(roomCharacter, roomCharacter2);
+					}
 				}
 			}
 
@@ -906,11 +911,13 @@ function onKeyUp(e) {
 	} else if (e.key.toUpperCase() == 'A') {
 		attack();
 	} else if (e.key.toUpperCase() == 'C') {
+		const weaponIds = Object.keys(state.inventory).filter(id => items[id].type == 'weapon');
 		let next, didSelect;
 		if (state.player.wielding) {
-			for (const id in state.inventory) {
+			for (const id of weaponIds) {
 				if (next) {
 					state.player.wielding = id;
+					// console.log('state.player.wielding', state.player.wielding);
 					didSelect = true;
 					break;
 				}
@@ -922,7 +929,7 @@ function onKeyUp(e) {
 				state.player.wielding = null;
 			}
 		} else if (Object.keys(state.inventory).length > 0) {
-			state.player.wielding = Object.keys(state.inventory).filter(id => items[id].type == 'weapon')[0];
+			state.player.wielding = weaponIds[0];
 		}
 		animate(state.player);
 	} else if (e.key == 'Escape') {

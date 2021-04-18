@@ -1,20 +1,20 @@
 const moveFuncs = {
 
 	random(character) {
-		// if (!character.vel) {
-		// 	character.vel = {
-		// 		x: 0,
-		// 		y: 0
-		// 	};
-		// }
-		// const velFactor = 0.0008;
-		// const maxVel = 0.004;
-		// character.vel.x += (Math.random() - 0.5) * velFactor;
-		// character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
-		// character.vel.y += (Math.random() - 0.5) * velFactor;
-		// character.vel.y = Math.max(Math.min(character.vel.y, maxVel), -maxVel)
-		// character.location.x += character.vel.x;
-		// character.location.y += character.vel.y;
+		if (!character.vel) {
+			character.vel = {
+				x: 0,
+				y: 0
+			};
+		}
+		const velFactor = 0.0008;
+		const maxVel = 0.004;
+		character.vel.x += (Math.random() - 0.5) * velFactor;
+		character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
+		character.vel.y += (Math.random() - 0.5) * velFactor;
+		character.vel.y = Math.max(Math.min(character.vel.y, maxVel), -maxVel)
+		character.location.x += character.vel.x;
+		character.location.y += character.vel.y;
 	},
 
 };
@@ -139,10 +139,12 @@ characters = {
 			},
 			sword_2: {
 				left: [
-					'player left wielding sword_02.png',
+					'player left wielding sword_02 01.png',
+					'player left wielding sword_02 02.png',
 				],
 				right: [
-					'player right wielding sword_02.png',
+					'player right wielding sword_02 01.png',
+					'player right wielding sword_02 02.png',
 				],
 				standing: [
 					'player standing wielding sword_02.png',
@@ -176,23 +178,35 @@ characters = {
 	},
 	doomScreen: {
 		type: 'enemy',
-		animInterval: 400,
+		animInterval: 140,
 		width: 0.18,
 		height: 0.12,
 		standing: [
 			// 'test.png',
-			'doom screen standing 01.png',
+			// 'doom screen standing 01.png',
 			'doom screen standing 02.png',
 			'doom screen standing 03.png',
+			'doom screen standing 04.png',
+			'doom screen standing 05.png',
+			'doom screen standing 06.png',
+			'doom screen standing 05.png',
 			'doom screen standing 04.png',
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
 		],
-		move: moveFuncs.random,
-		interact: interactionFuncs.moveTowardPlayer,
+		move: [
+			moveFuncs.random,
+		],
+		interact: [
+			interactionFuncs.moveTowardPlayer,
+		],
 		resilience: 4,
-		strength: 0.8,
-		resetTime: 200,
+		attack: {
+			prob: 0.02,
+			range: 0.4,
+			strength: 0.8,
+			resetTime: 200,
+		}
 	},
 	zlakik: {
 		type: 'enemy',
@@ -201,7 +215,13 @@ characters = {
 		standing: [
 			'zlakik 01.png'
 		],
-		// move: moveFuncs.moveTowardPlayer,
-		interact: interactionFuncs.moveTowardPlayer,
+		// move: [
+		// 	moveFuncs.random,
+		// ],
+		interact: [
+			interactionFuncs.moveTowardPlayer,
+		],
+		attack: {
+		}
 	}
 };
