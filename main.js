@@ -41,7 +41,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -282,34 +282,55 @@ function drawGame() {
 
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
-			for (const move of character.move || []) {
-				move(roomCharacter);
-			}
 
-			// console.log(roomCharacter.width * state.room.width);
-			for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
-				if (roomCharacter != roomCharacter2) {
-					for (const interact of character.interact || []) {
-						interact(roomCharacter, roomCharacter2);
+			if (!isGameOver) {
+				if (character.attack && Math.random() < character.attack.prob) {
+					const x1 = roomCharacter.location.x / state.room.width;
+					const y1 = roomCharacter.location.y / state.room.height;
+					const x2 = state.player.x / state.room.width;
+					const y2 = state.player.y / state.room.height;
+					const dx = x1 - x2;
+					const dy = y1 - y2;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist < character.attack.range) {
+						state.player.health -= character.attack.strength;
+						// console.log('state.player.health ', state.player.health);
+						if (state.player.health <= 0) {
+							state.player.health = 0;
+							isGameOver = true;
+						}
 					}
 				}
-			}
 
-			if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
-				if (roomCharacter.vel) {
-					roomCharacter.vel.x *= -1;
+				for (const move of character.move || []) {
+					move(roomCharacter);
 				}
-				// roomCharacter.velInversionTime.x = now;
-			}
-			if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
-				if (roomCharacter.vel) {
-					roomCharacter.vel.y *= -1;
+
+				// console.log(roomCharacter.width * state.room.width);
+				for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
+					if (roomCharacter != roomCharacter2) {
+						for (const interact of character.interact || []) {
+							interact(roomCharacter, roomCharacter2);
+						}
+					}
 				}
+
+				if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
+					if (roomCharacter.vel) {
+						roomCharacter.vel.x *= -1;
+					}
+					// roomCharacter.velInversionTime.x = now;
+				}
+				if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
+					if (roomCharacter.vel) {
+						roomCharacter.vel.y *= -1;
+					}
+				}
+				roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / (2 * state.room.height), roomCharacter.location.y);
+				roomCharacter.location.y = Math.max(character.height / (2 * state.room.height), roomCharacter.location.y);
+				roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
+				roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
 			}
-			roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / (2 * state.room.height), roomCharacter.location.y);
-			roomCharacter.location.y = Math.max(character.height / (2 * state.room.height), roomCharacter.location.y);
-			roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
-			roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
 
 			const imageLoc = toScreen(roomCharacter.location, character);
 			ctx.drawImage(
@@ -409,6 +430,17 @@ function drawGame() {
 		// ctx.fillStyle = '#f00';
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
+
+	if (isGameOver) {
+		const text = 'GAME OVER';
+		const lineHeight = Math.floor(0.16 * canvas.height);
+		ctx.font = `${lineHeight}px ${fontFamily}`;
+		ctx.fillStyle = '#f00';
+		const x = (canvas.width - ctx.measureText(text).width) / 2;
+		ctx.fillText(text, x, 0.4 * canvas.height);
+		return;
+	}
+
 
 	let numKeysDown = 0;
 	for (const key in keysDown) {

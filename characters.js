@@ -204,7 +204,7 @@ characters = {
 		attack: {
 			prob: 0.02,
 			range: 0.4,
-			strength: 0.8,
+			strength: 0.16,
 			resetTime: 200,
 		}
 	},
