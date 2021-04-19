@@ -202,6 +202,7 @@ characters = {
 		],
 		die: [
 			'doom screen dead 01.png',
+			'doom screen dead 02.png',
 		],
 		resilience: 2.4,
 		attack: {

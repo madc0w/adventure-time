@@ -21,7 +21,7 @@ const wallWidth = 0.01;
 const moveIncrement = 0.006;
 const itemTakeDistance = 32;
 const numTakeItemAnimSteps = 12;
-const numCharacterDieAnimSteps = 48;
+const numCharacterDieAnimSteps = 148;
 
 const mapBackgroundColor = '#e2e2b1';
 const mapRoomColor = '#a5a5a4';
@@ -347,7 +347,8 @@ function drawGame() {
 				roomCharacter.location.x = roomCharacter.baseLoc.x + character.width * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.width);
 				roomCharacter.location.y = roomCharacter.baseLoc.y + character.height * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.height);
 				ctx.globalAlpha = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
-				size = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
+				size = 1 - roomCharacter.animStep / numCharacterDieAnimSteps;
+				// console.log('size ', size);
 			}
 
 			const imageLoc = toScreen(roomCharacter.location, character);
@@ -916,11 +917,11 @@ function attack() {
 			targetedCharacter.animStep = 0;
 			targetedCharacter.deathAnimIntervalId = setInterval(() => {
 				targetedCharacter.animStep++;
+				if (targetedCharacter.animStep >= numCharacterDieAnimSteps) {
+					clearInterval(targetedCharacter.deathAnimIntervalId);
+					state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+				}
 			}, interval);
-			setTimeout(() => {
-				clearInterval(targetedCharacter.deathAnimIntervalId);
-				state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
-			}, interval * numCharacterDieAnimSteps);
 		}
 	}
 }
