@@ -20,6 +20,8 @@ const doorwaySize = {
 const wallWidth = 0.01;
 const moveIncrement = 0.006;
 const itemTakeDistance = 32;
+const numTakeItemAnimSteps = 12;
+const numCharacterDieAnimSteps = 48;
 
 const mapBackgroundColor = '#e2e2b1';
 const mapRoomColor = '#a5a5a4';
@@ -68,6 +70,7 @@ function load() {
 			right: [],
 			up: [],
 			down: [],
+			die: [],
 			wielding: {},
 			attack: {},
 		};
@@ -247,7 +250,7 @@ function drawGame() {
 					size -= roomItem.animStep * item.size / 16;
 					loc.x += (item.size - size) * canvas.width / 2;
 					loc.y += (item.size - size) * canvas.height / 2;
-					ctx.globalAlpha = (12 - roomItem.animStep) / 12;
+					ctx.globalAlpha = (numTakeItemAnimSteps - roomItem.animStep) / numTakeItemAnimSteps;
 				}
 				// console.log(item.image.width / item.image.height);
 				if (size > 0) {
@@ -263,7 +266,7 @@ function drawGame() {
 		// characters
 		const healthIndicatorRadius = 0.014;
 		const targetedCharacter = getTargetedCharacter();
-		if (targetedCharacter) {
+		if (targetedCharacter && !targetedCharacter.animStep) {
 			const character = characters[targetedCharacter.id];
 			const imageLoc = toScreen(targetedCharacter.location, character);
 			const r = 0.02;
@@ -332,17 +335,33 @@ function drawGame() {
 				roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
 			}
 
+			let size = 1;
+			if (roomCharacter.animStep) {
+				if (!roomCharacter.baseLoc) {
+					roomCharacter.baseLoc = {
+						x: roomCharacter.location.x,
+						y: roomCharacter.location.y
+					};
+				}
+				// console.log('roomCharacter.baseLoc', roomCharacter.baseLoc);
+				roomCharacter.location.x = roomCharacter.baseLoc.x + character.width * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.width);
+				roomCharacter.location.y = roomCharacter.baseLoc.y + character.height * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.height);
+				ctx.globalAlpha = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
+				size = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
+			}
+
 			const imageLoc = toScreen(roomCharacter.location, character);
 			ctx.drawImage(
 				characterImages[roomCharacter.id],
 				imageLoc.x,
 				imageLoc.y,
-				character.width * canvas.width,
-				character.height * canvas.height
+				size * character.width * canvas.width,
+				size * character.height * canvas.height
 			);
+			ctx.globalAlpha = 1;
 
 			roomCharacter.health = roomCharacter.health || 1;
-			{
+			if (!roomCharacter.animStep) {
 				// health circle
 				ctx.fillStyle = '#444';
 				ctx.beginPath();
@@ -648,7 +667,6 @@ function drawGame() {
 
 			if (!roomItem.takeAnimIntervalId && dist < itemTakeDistance) {
 				const interval = 24;
-				const numSteps = 12;
 				roomItem.animStep = 0;
 				roomItem.takeAnimIntervalId = setInterval(() => {
 					roomItem.animStep++;
@@ -659,7 +677,7 @@ function drawGame() {
 					clearInterval(roomItem.takeAnimIntervalId);
 					state.room.items.splice(n, 1);
 					// console.log('after state.room.items', state.room.items);
-				}, interval * numSteps);
+				}, interval * numTakeItemAnimSteps);
 				if (!state.inventory[roomItem.id]) {
 					state.inventory[roomItem.id] = 0;
 				}
@@ -891,7 +909,18 @@ function attack() {
 		targetedCharacter.health -= weapon.damage / character.resilience;
 		if (targetedCharacter.health <= 0) {
 			// die
-			state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+			targetedCharacter.motion = 'die';
+			animate(targetedCharacter);
+
+			const interval = 24;
+			targetedCharacter.animStep = 0;
+			targetedCharacter.deathAnimIntervalId = setInterval(() => {
+				targetedCharacter.animStep++;
+			}, interval);
+			setTimeout(() => {
+				clearInterval(targetedCharacter.deathAnimIntervalId);
+				state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+			}, interval * numCharacterDieAnimSteps);
 		}
 	}
 }

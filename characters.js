@@ -200,11 +200,14 @@ characters = {
 		interact: [
 			interactionFuncs.moveTowardPlayer,
 		],
-		resilience: 4,
+		die: [
+			'doom screen dead 01.png',
+		],
+		resilience: 2.4,
 		attack: {
 			prob: 0.02,
 			range: 0.4,
-			strength: 0.16,
+			strength: 0.02,
 			resetTime: 200,
 		}
 	},

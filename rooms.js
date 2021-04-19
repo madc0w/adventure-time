@@ -101,6 +101,13 @@ rooms = [
 					x: 0.1,
 					y: 0.7
 				}
+			},
+			{
+				id: 'treasure',
+				location: {
+					x: 0.4,
+					y: 0.2
+				}
 			}
 		],
 		characters: [
