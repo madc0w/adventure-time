@@ -70,7 +70,9 @@ function load() {
 			right: [],
 			up: [],
 			down: [],
-			die: [],
+			dieFrames: [],
+			attackPrepFrames: [],
+			attackFrames: [],
 			wielding: {},
 			attack: {},
 		};
@@ -167,6 +169,12 @@ function draw() {
 	t++;
 	ctx.fillStyle = backgroundColor;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	// console.log('state.player.health ', state.player.health);
+	if (state.player.health <= 0) {
+		state.player.health = 0;
+		isGameOver = true;
+	}
+
 	drawFunc();
 	drawStatus();
 	requestAnimationFrame(draw);
@@ -287,22 +295,27 @@ function drawGame() {
 			const character = characters[roomCharacter.id];
 
 			if (!isGameOver) {
-				if (character.attack && Math.random() < character.attack.prob) {
-					const x1 = roomCharacter.location.x / state.room.width;
-					const y1 = roomCharacter.location.y / state.room.height;
-					const x2 = state.player.x / state.room.width;
-					const y2 = state.player.y / state.room.height;
-					const dx = x1 - x2;
-					const dy = y1 - y2;
-					const dist = Math.sqrt(dx * dx + dy * dy);
-					if (dist < character.attack.range) {
-						state.player.health -= character.attack.strength;
-						// console.log('state.player.health ', state.player.health);
-						if (state.player.health <= 0) {
-							state.player.health = 0;
-							isGameOver = true;
+				if (roomCharacter.motion != 'attackFrames' && character.attackMetrics && Math.random() < character.attackMetrics.prob) {
+					roomCharacter.motion = 'attackPrepFrames';
+					animate(roomCharacter);
+					setTimeout(() => {
+						const x1 = roomCharacter.location.x / state.room.width;
+						const y1 = roomCharacter.location.y / state.room.height;
+						const x2 = state.player.x / state.room.width;
+						const y2 = state.player.y / state.room.height;
+						const dx = x1 - x2;
+						const dy = y1 - y2;
+						const dist = Math.sqrt(dx * dx + dy * dy);
+						if (dist < character.attackMetrics.range) {
+							roomCharacter.motion = 'attackFrames';
+							animate(roomCharacter);
+							state.player.health -= character.attackMetrics.strength;
+							setTimeout(() => {
+								roomCharacter.motion = 'standing';
+								animate(roomCharacter);
+							}, character.attackMetrics.resetTime);
 						}
-					}
+					}, character.attackMetrics.prepTime || 0);
 				}
 
 				for (const move of character.move || []) {
@@ -910,7 +923,7 @@ function attack() {
 		targetedCharacter.health -= weapon.damage / character.resilience;
 		if (targetedCharacter.health <= 0) {
 			// die
-			targetedCharacter.motion = 'die';
+			targetedCharacter.motion = 'dieFrames';
 			animate(targetedCharacter);
 
 			const interval = 24;

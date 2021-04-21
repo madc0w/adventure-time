@@ -194,22 +194,29 @@ characters = {
 			'doom screen standing 03.png',
 			'doom screen standing 02.png',
 		],
+		dieFrames: [
+			'doom screen dead 01.png',
+			'doom screen dead 02.png',
+		],
+		attackFrames: [
+			'doom screen attack 01.png',
+		],
+		attackPrepFrames: [
+			'doom screen attack-prep 01.png',
+		],
 		move: [
 			moveFuncs.random,
 		],
 		interact: [
 			interactionFuncs.moveTowardPlayer,
 		],
-		die: [
-			'doom screen dead 01.png',
-			'doom screen dead 02.png',
-		],
 		resilience: 2.4,
-		attack: {
-			prob: 0.02,
+		attackMetrics: {
+			prob: 0.012,
+			prepTime: 400,
 			range: 0.4,
 			strength: 0.02,
-			resetTime: 200,
+			resetTime: 600,
 		}
 	},
 	zlakik: {
@@ -225,7 +232,7 @@ characters = {
 		interact: [
 			interactionFuncs.moveTowardPlayer,
 		],
-		attack: {
+		attackMetrics: {
 		}
 	}
 };
