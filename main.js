@@ -295,18 +295,16 @@ function drawGame() {
 			const character = characters[roomCharacter.id];
 
 			if (!isGameOver) {
-				if (roomCharacter.motion != 'attackFrames' && character.attackMetrics && Math.random() < character.attackMetrics.prob) {
+				if (roomCharacter.motion != 'attackFrames' &&
+					character.attackMetrics &&
+					Math.random() < character.attackMetrics.prob &&
+					distance(roomCharacter) < character.attackMetrics.range &&
+					roomCharacter.motion != 'dieFrames'
+				) {
 					roomCharacter.motion = 'attackPrepFrames';
 					animate(roomCharacter);
 					setTimeout(() => {
-						const x1 = roomCharacter.location.x / state.room.width;
-						const y1 = roomCharacter.location.y / state.room.height;
-						const x2 = state.player.x / state.room.width;
-						const y2 = state.player.y / state.room.height;
-						const dx = x1 - x2;
-						const dy = y1 - y2;
-						const dist = Math.sqrt(dx * dx + dy * dy);
-						if (dist < character.attackMetrics.range) {
+						if (distance(roomCharacter) < character.attackMetrics.range && roomCharacter.motion != 'dieFrames') {
 							roomCharacter.motion = 'attackFrames';
 							animate(roomCharacter);
 							state.player.health -= character.attackMetrics.strength;
@@ -314,6 +312,9 @@ function drawGame() {
 								roomCharacter.motion = 'standing';
 								animate(roomCharacter);
 							}, character.attackMetrics.resetTime);
+						} else {
+							roomCharacter.motion = 'standing';
+							animate(roomCharacter);
 						}
 					}, character.attackMetrics.prepTime || 0);
 				}
@@ -1068,4 +1069,14 @@ function toScreen(loc, character) {
 	const x = ((loc.x * state.room.width) - character.width / 2 + (1 - state.room.width) / 2) * canvas.width;
 	const y = ((loc.y * state.room.height) - character.height / 2 + (1 - state.room.height) / 2) * canvas.height;
 	return { x, y };
+}
+
+function distance(roomCharacter) {
+	const x1 = roomCharacter.location.x / state.room.width;
+	const y1 = roomCharacter.location.y / state.room.height;
+	const x2 = state.player.x / state.room.width;
+	const y2 = state.player.y / state.room.height;
+	const dx = x1 - x2;
+	const dy = y1 - y2;
+	return Math.sqrt(dx * dx + dy * dy);
 }
