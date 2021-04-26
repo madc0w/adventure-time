@@ -17,10 +17,7 @@ const moveFuncs = {
 		character.location.y += character.vel.y;
 	},
 
-};
-
-const interactionFuncs = {
-	moveAround(roomCharacter, roomCharacter2) {
+	moveAround(roomCharacter) {
 		// const character = characters[roomCharacter.id];
 		const motion = new Date().getSeconds() % 4;
 		if (motion == 0) {
@@ -33,23 +30,52 @@ const interactionFuncs = {
 			roomCharacter.location.x -= 0.02;
 		}
 	},
+};
+
+const interactionFuncs = {
+
+	circlePlayer(roomCharacter, roomCharacter2) {
+		const character = characters[roomCharacter.id];
+		const character2 = characters[roomCharacter2.id];
+		if (characters.player == character2) {
+			const x1 = roomCharacter.location.x;
+			const y1 = roomCharacter.location.y;
+			const x2 = roomCharacter2.x;
+			const y2 = roomCharacter2.y;
+			const dx = x2 - x1;
+			const dy = y2 - y1;
+			roomCharacter.rotation = Math.atan2(dy, dx);
+			const dist = Math.sqrt(dx * dx + dy * dy);
+			if (dist > 0) {
+				// console.log(dx, dy);
+				const factor = (character.speed || 0.004) / dist;
+				roomCharacter.location.x += factor * dy;
+				roomCharacter.location.y += -factor * dx;
+			}
+		}
+	},
 
 	moveTowardPlayer(roomCharacter, roomCharacter2) {
-		const character2 = characters[roomCharacter2.id] || characters.player;
+		const character = characters[roomCharacter.id];
+		const character2 = characters[roomCharacter2.id];
 		if (characters.player == character2) {
-			const x1 = roomCharacter.location.x / state.room.width;
-			const y1 = roomCharacter.location.y / state.room.height;
-			const x2 = roomCharacter2.x / state.room.width;
-			const y2 = roomCharacter2.y / state.room.height;
+			const x1 = roomCharacter.location.x * state.room.width;
+			const y1 = roomCharacter.location.y * state.room.height;
+			const x2 = roomCharacter2.x * state.room.width;
+			const y2 = roomCharacter2.y * state.room.height;
 			const dx = x1 - x2;
 			const dy = y1 - y2;
 			const dist = Math.sqrt(dx * dx + dy * dy);
-			// console.log(dist);
-			const targetDist = 0.22;
-			const factor = 0.006 * (dist > targetDist ? -dist / targetDist : targetDist / dist);
+			// console.log(dx, dy, dist);
+			const targetDist = character.targetDist || 0.06;
+			const factor = (character.speed || 0.04) * (dist > targetDist ? -dist / targetDist : targetDist / dist);
+			// console.log(factor);
+			// const d = Math.sqrt((factor * dx) * (factor * dx) + (factor * dy) * (factor * dy));
+			// if (Math.abs(factor) > 0.1) {
 			roomCharacter.location.x += factor * dx;
 			roomCharacter.location.y += factor * dy;
 			// console.log(roomCharacter.location);
+			// }
 		}
 	},
 
@@ -217,7 +243,9 @@ characters = {
 			range: 0.4,
 			strength: 0.02,
 			resetTime: 600,
-		}
+		},
+		targetDist: 0.08,
+		speed: 0.012,
 	},
 	zlakik: {
 		type: 'enemy',
@@ -226,13 +254,29 @@ characters = {
 		standing: [
 			'zlakik 01.png'
 		],
+		dieFrames: [
+			'zlakik 01.png'
+		],
+		attackFrames: [
+			'zlakik 01.png'
+		],
+		attackPrepFrames: [
+			'zlakik 01.png'
+		],
 		// move: [
 		// 	moveFuncs.random,
 		// ],
 		interact: [
-			interactionFuncs.moveTowardPlayer,
+			interactionFuncs.circlePlayer,
 		],
 		attackMetrics: {
-		}
+			prob: 0.012,
+			prepTime: 400,
+			range: 0.4,
+			strength: 0.02,
+			resetTime: 600,
+		},
+		targetDist: 0.08,
+		speed: 0.008,
 	}
 };

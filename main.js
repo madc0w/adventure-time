@@ -365,14 +365,34 @@ function drawGame() {
 				// console.log('size ', size);
 			}
 
-			const imageLoc = toScreen(roomCharacter.location, character);
-			ctx.drawImage(
-				characterImages[roomCharacter.id],
-				imageLoc.x,
-				imageLoc.y,
-				size * character.width * canvas.width,
-				size * character.height * canvas.height
-			);
+			let imageLoc;
+			if (roomCharacter.rotation) {
+				// debug(roomCharacter.rotation);
+				imageLoc = toScreen({
+					x: roomCharacter.location.x + character.width / 2,
+					y: roomCharacter.location.y + character.height / 2
+				}, character);
+				ctx.save();
+				ctx.translate(imageLoc.x, imageLoc.y);
+				ctx.rotate(roomCharacter.rotation);
+				ctx.drawImage(
+					characterImages[roomCharacter.id],
+					-character.width * canvas.width / 2,
+					-character.height * canvas.height / 2,
+					size * character.width * canvas.width,
+					size * character.height * canvas.height
+				);
+				ctx.restore();
+			} else {
+				imageLoc = toScreen(roomCharacter.location, character);
+				ctx.drawImage(
+					characterImages[roomCharacter.id],
+					imageLoc.x,
+					imageLoc.y,
+					size * character.width * canvas.width,
+					size * character.height * canvas.height
+				);
+			}
 			ctx.globalAlpha = 1;
 
 			roomCharacter.health = roomCharacter.health || 1;
@@ -1079,4 +1099,10 @@ function distance(roomCharacter) {
 	const dx = x1 - x2;
 	const dy = y1 - y2;
 	return Math.sqrt(dx * dx + dy * dy);
+}
+
+function debug(text) {
+	ctx.font = `22px ${fontFamily}`;
+	ctx.fillStyle = '#00f';
+	ctx.fillText(text, 8, 22);
 }

@@ -48,6 +48,13 @@ rooms = [
 			}
 		],
 		characters: [
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.4,
+					y: 0.4
+				}
+			},
 			// {
 			// id: 'doomScreen',
 			// location: {
