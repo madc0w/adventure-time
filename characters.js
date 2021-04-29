@@ -38,10 +38,10 @@ const interactionFuncs = {
 		const character = characters[roomCharacter.id];
 		const character2 = characters[roomCharacter2.id];
 		if (characters.player == character2) {
-			const x1 = roomCharacter.location.x;
-			const y1 = roomCharacter.location.y;
-			const x2 = roomCharacter2.x;
-			const y2 = roomCharacter2.y;
+			const x1 = roomCharacter.location.x * state.room.width;
+			const y1 = roomCharacter.location.y * state.room.height;
+			const x2 = roomCharacter2.x * state.room.width;
+			const y2 = roomCharacter2.y * state.room.height;
 			const dx = x2 - x1;
 			const dy = y2 - y1;
 			roomCharacter.rotation = Math.atan2(dy, dx);

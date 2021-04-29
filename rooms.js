@@ -146,6 +146,15 @@ rooms = [
 				wall: 'e',
 				location: 0.2,
 			},
+		],
+		characters: [
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.4,
+					y: 0.4
+				}
+			},
 		]
 	}, {
 		id: 5,
