@@ -272,25 +272,6 @@ function drawGame() {
 	}
 	{
 		// characters
-		const healthIndicatorRadius = 0.014;
-		const targetedCharacter = getTargetedCharacter();
-		if (targetedCharacter && !targetedCharacter.animStep) {
-			const character = characters[targetedCharacter.id];
-			const imageLoc = toScreen(targetedCharacter.location, character);
-			const r = 0.02;
-			const alpha = Math.floor(127 * (Math.sin(t / 22) + 1));
-			let alphaHex = alpha.toString(16);
-			if (alphaHex.length < 2) {
-				alphaHex = '0' + alphaHex;
-			}
-			ctx.fillStyle = '#0000dd' + alphaHex;
-			ctx.beginPath();
-			ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
-			ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * r, 0, 2 * Math.PI * 2, false);
-			ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
-			ctx.fill();
-		}
-
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
 
@@ -397,6 +378,23 @@ function drawGame() {
 
 			roomCharacter.health = roomCharacter.health || 1;
 			if (!roomCharacter.animStep) {
+				const healthIndicatorRadius = 0.014;
+				const targetedCharacter = getTargetedCharacter();
+				if (targetedCharacter) {
+					const character = characters[targetedCharacter.id];
+					const r = 0.02;
+					const alpha = Math.floor(127 * (Math.sin(t / 22) + 1));
+					let alphaHex = alpha.toString(16);
+					if (alphaHex.length < 2) {
+						alphaHex = '0' + alphaHex;
+					}
+					ctx.fillStyle = '#0000dd' + alphaHex;
+					ctx.beginPath();
+					ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
+					ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * r, 0, 2 * Math.PI, false);
+					ctx.fill();
+				}
+
 				// health circle
 				ctx.fillStyle = '#444';
 				ctx.beginPath();

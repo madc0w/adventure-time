@@ -269,6 +269,7 @@ characters = {
 		interact: [
 			interactionFuncs.circlePlayer,
 		],
+		resilience: 1.4,
 		attackMetrics: {
 			prob: 0.012,
 			prepTime: 400,
