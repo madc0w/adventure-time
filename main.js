@@ -347,6 +347,7 @@ function drawGame() {
 			}
 
 			let imageLoc;
+			// console.log(characterImages[roomCharacter.id]);
 			if (roomCharacter.rotation) {
 				// debug(roomCharacter.rotation);
 				imageLoc = toScreen({

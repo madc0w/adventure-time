@@ -249,16 +249,20 @@ characters = {
 	},
 	zlakik: {
 		type: 'enemy',
+		animInterval: 120,
 		width: 0.1,
 		height: 0.06,
 		standing: [
-			'zlakik 01.png'
+			'zlakik 01.png',
+			'zlakik 02.png',
+			'zlakik 03.png',
+			'zlakik 02.png',
 		],
 		dieFrames: [
 			'zlakik 01.png'
 		],
 		attackFrames: [
-			'zlakik 01.png'
+			'zlakik attack 01.png'
 		],
 		attackPrepFrames: [
 			'zlakik 01.png'
