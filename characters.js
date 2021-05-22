@@ -38,19 +38,24 @@ const interactionFuncs = {
 		const character = characters[roomCharacter.id];
 		const character2 = characters[roomCharacter2.id];
 		if (characters.player == character2) {
-			const x1 = roomCharacter.location.x * state.room.width;
-			const y1 = roomCharacter.location.y * state.room.height;
-			const x2 = roomCharacter2.x * state.room.width;
-			const y2 = roomCharacter2.y * state.room.height;
-			const dx = x2 - x1;
-			const dy = y2 - y1;
+			const characterX = roomCharacter.location.x * state.room.width;
+			const characterY = roomCharacter.location.y * state.room.height;
+			const playerX = roomCharacter2.x * state.room.width;
+			const playerY = roomCharacter2.y * state.room.height;
+			const dx = playerX - characterX;
+			const dy = playerY - characterY;
 			roomCharacter.rotation = Math.atan2(dy, dx);
 			const dist = Math.sqrt(dx * dx + dy * dy);
+			// console.log(dist, dx, dy);
 			if (dist > 0) {
-				// console.log(dx, dy);
 				const factor = (character.speed || 0.004) / dist;
+				if (dist < character.targetDist) {
+					roomCharacter.location.x -= factor * dx / 2;
+					roomCharacter.location.y -= factor * dy / 2;
+				}
+				// console.log(dx, dy);
 				roomCharacter.location.x += factor * dy;
-				roomCharacter.location.y += -factor * dx;
+				roomCharacter.location.y -= factor * dx;
 			}
 		}
 	},
@@ -281,7 +286,7 @@ characters = {
 			strength: 0.02,
 			resetTime: 600,
 		},
-		targetDist: 0.08,
+		targetDist: 0.12,
 		speed: 0.008,
 	}
 };
