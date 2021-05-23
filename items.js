@@ -14,6 +14,10 @@ items = {
 		range: 80, // pixels
 		damage: 0.32,
 		resetTime: 480,
+		sounds: {
+			hit: 'sword 01 hit.mp3',
+			draw: 'sword 01 draw.mp3',
+		}
 	},
 	sword_2: {
 		type: 'weapon',
@@ -24,5 +28,9 @@ items = {
 		range: 64, // pixels
 		damage: 0.2,
 		resetTime: 300,
+		sounds: {
+			hit: 'sword 02 hit.mp3',
+			draw: 'sword 02 draw.mp3',
+		},
 	},
 };

@@ -131,7 +131,7 @@ characters = {
 		animInterval: 400,
 		width: 0.05,
 		height: 0.1,
-		standing: [
+		idleFrames: [
 			'player standing 01.png',
 			'player standing 02.png',
 		],
@@ -158,7 +158,7 @@ characters = {
 				right: [
 					'player right wielding sword_01.png',
 				],
-				standing: [
+				idle: [
 					'player standing wielding sword_01.png',
 				],
 				up: [
@@ -177,7 +177,7 @@ characters = {
 					'player right wielding sword_02 01.png',
 					'player right wielding sword_02 02.png',
 				],
-				standing: [
+				idle: [
 					'player standing wielding sword_02.png',
 				],
 				up: [
@@ -205,6 +205,9 @@ characters = {
 					'player right strike sword_02.png',
 				]
 			},
+		},
+		sounds: {
+			walk: 'player walk.mp3',
 		}
 	},
 	doomScreen: {
@@ -212,7 +215,7 @@ characters = {
 		animInterval: 140,
 		width: 0.18,
 		height: 0.12,
-		standing: [
+		idleFrames: [
 			// 'test.png',
 			// 'doom screen standing 01.png',
 			'doom screen standing 02.png',
@@ -241,10 +244,14 @@ characters = {
 		interact: [
 			interactionFuncs.moveTowardPlayer,
 		],
+		sounds: {
+			injured: 'doomscreen injured.mp3',
+			attack: 'doomscreen attack.mp3',
+		},
 		resilience: 2.4,
 		attackMetrics: {
 			prob: 0.012,
-			prepTime: 400,
+			prepTime: 600,
 			range: 0.4,
 			strength: 0.02,
 			resetTime: 600,
@@ -257,7 +264,7 @@ characters = {
 		animInterval: 120,
 		width: 0.1,
 		height: 0.06,
-		standing: [
+		idleFrames: [
 			'zlakik 01.png',
 			'zlakik 02.png',
 			'zlakik 03.png',
@@ -278,6 +285,10 @@ characters = {
 		interact: [
 			interactionFuncs.circlePlayer,
 		],
+		sounds: {
+			injured: 'zlakik injured.mp3',
+			attack: 'zlakik attack.mp3',
+		},
 		resilience: 1.4,
 		attackMetrics: {
 			prob: 0.012,

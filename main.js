@@ -4,7 +4,7 @@ const state = {
 		x: 0.5,
 		y: 0.5,
 		health: 1,
-		motion: 'standing',
+		motion: 'idleFrames',
 	},
 	inventory: {},
 	room: rooms[0],
@@ -64,8 +64,9 @@ function load() {
 	statusCtx = statusCanvas.getContext('2d');
 
 	for (const characterId in characters) {
+		const character = characters[characterId];
 		characterFrames[characterId] = {
-			standing: [],
+			idleFrames: [],
 			left: [],
 			right: [],
 			up: [],
@@ -98,17 +99,25 @@ function load() {
 				}
 			}
 		}
+
+		for (const sound in character.sounds) {
+			character.sounds[sound] = new Audio(`sounds/${character.sounds[sound]}`);
+		}
 	}
 
-	characterImages.player = characterFrames.player.standing[0];
+	characterImages.player = characterFrames.player.idleFrames[0];
 
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
 
 	for (const itemKey in items) {
+		const item = items[itemKey];
 		const image = new Image();
-		image.src = `img/items/${items[itemKey].image}`;
-		items[itemKey].image = image;
+		image.src = `img/items/${item.image}`;
+		item.image = image;
+		for (const sound in item.sounds || {}) {
+			item.sounds[sound] = new Audio(`sounds/${item.sounds[sound]}`);
+		}
 	}
 
 	for (let i = 1; i <= numPortalFrames; i++) {
@@ -130,7 +139,7 @@ function load() {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
 		for (const character of room.characters || []) {
-			character.motion = 'standing';
+			character.motion = 'idleFrames';
 			animate(character);
 		}
 	}
@@ -289,12 +298,15 @@ function drawGame() {
 							roomCharacter.motion = 'attackFrames';
 							animate(roomCharacter);
 							state.player.health -= character.attackMetrics.strength;
+							if (character.sounds.attack) {
+								play(character.sounds.attack);
+							}
 							setTimeout(() => {
-								roomCharacter.motion = 'standing';
+								roomCharacter.motion = 'idleFrames';
 								animate(roomCharacter);
 							}, character.attackMetrics.resetTime);
 						} else {
-							roomCharacter.motion = 'standing';
+							roomCharacter.motion = 'idleFrames';
 							animate(roomCharacter);
 						}
 					}, character.attackMetrics.prepTime || 0);
@@ -898,7 +910,7 @@ function drawMap() {
 		const height = characters.player.height * mapScale * canvas.height;
 		const x = (canvas.width - width) / 2;
 		const y = (canvas.height - height) / 2;
-		ctx.drawImage(characterFrames.player.standing[0], x, y, width, height);
+		ctx.drawImage(characterFrames.player.idleFrames[0], x, y, width, height);
 	}
 }
 
@@ -941,6 +953,16 @@ function attack() {
 		}, weapon.resetTime);
 		const character = characters[targetedCharacter.id];
 		targetedCharacter.health -= weapon.damage / character.resilience;
+
+		if (weapon.sounds.hit) {
+			play(weapon.sounds.hit);
+		}
+		if (character.sounds.injured) {
+			setTimeout(() => {
+				play(character.sounds.injured);
+			}, 200);
+		}
+
 		if (targetedCharacter.health <= 0) {
 			// die
 			targetedCharacter.motion = 'dieFrames';
@@ -995,7 +1017,7 @@ function getTargetedCharacter() {
 function onKeyUp(e) {
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
-		state.player.motion = 'standing';
+		state.player.motion = 'idleFrames';
 		animate(state.player);
 	}
 
@@ -1026,6 +1048,10 @@ function onKeyUp(e) {
 		} else if (Object.keys(state.inventory).length > 0) {
 			state.player.wielding = weaponIds[0];
 		}
+		if (state.player.wielding && items[state.player.wielding].sounds.draw) {
+			play(items[state.player.wielding].sounds.draw);
+		}
+
 		animate(state.player);
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
@@ -1050,6 +1076,7 @@ function onKeyDown(e) {
 
 function animate(character) {
 	clearInterval(animIntervalIds[character.id]);
+
 	animFrameNums[character.id] = 0;
 	let motion = character.motion;
 	// console.log('starting anim', motion);
@@ -1075,6 +1102,18 @@ function animate(character) {
 
 	f();
 	animIntervalIds[character.id] = setInterval(f, characters[character.id].animInterval);
+
+	if (character.id == 'player' && ['left', 'right', 'up', 'down'].includes(motion)) {
+		play(characters.player.sounds.walk);
+		characters.player.sounds.walk.addEventListener('ended', function () {
+			if (['left', 'right', 'up', 'down'].includes(state.player.motion)) {
+				play(characters.player.sounds.walk);
+			}
+		});
+	} else {
+
+	}
+
 }
 
 function toScreen(loc, character) {
@@ -1104,4 +1143,11 @@ function debug(text) {
 	ctx.font = `22px ${fontFamily}`;
 	ctx.fillStyle = '#00f';
 	ctx.fillText(text, 8, 22);
+}
+
+function play(sound) {
+	try {
+		sound.play();
+	} catch (e) {
+	}
 }
