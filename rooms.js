@@ -1,3 +1,5 @@
+defaultRoomMusic = 'holy grail theme.mp3';
+
 rooms = [
 	{
 		id: 0,

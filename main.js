@@ -43,7 +43,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -62,6 +62,8 @@ function load() {
 	statusCanvas.height = innerHeight * 0.14;
 	ctx = canvas.getContext('2d');
 	statusCtx = statusCanvas.getContext('2d');
+
+	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
 
 	for (const characterId in characters) {
 		const character = characters[characterId];
@@ -503,6 +505,12 @@ function drawGame() {
 		ctx.fillStyle = '#f00';
 		const x = (canvas.width - ctx.measureText(text).width) / 2;
 		ctx.fillText(text, x, 0.4 * canvas.height);
+
+		if (!didDie) {
+			didDie = true;
+			play(characters.player.sounds.die);
+		}
+
 		return;
 	}
 
@@ -729,6 +737,7 @@ function drawGame() {
 				}
 				const item = items[roomItem.id];
 				state.inventory[roomItem.id] += item.value || 0;
+				play(item.sounds.pickup);
 			}
 		}
 
@@ -967,6 +976,7 @@ function attack() {
 			// die
 			targetedCharacter.motion = 'dieFrames';
 			animate(targetedCharacter);
+			play(character.sounds.die);
 
 			const interval = 24;
 			targetedCharacter.animStep = 0;
@@ -1015,6 +1025,13 @@ function getTargetedCharacter() {
 
 
 function onKeyUp(e) {
+	setTimeout(() => {
+		play(defaultRoomMusic);
+		defaultRoomMusic.addEventListener('ended', function () {
+			play(defaultRoomMusic);
+		});
+	}, 20);
+
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
 		state.player.motion = 'idleFrames';
@@ -1087,6 +1104,7 @@ function animate(character) {
 				frames = characterFrames[character.id].attack[state.player.wielding][attackMotion];
 			} else {
 				if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
+					console.log(motion);
 					motion = 'left';
 				}
 				frames = characterFrames[character.id].wielding[state.player.wielding][motion];
@@ -1110,10 +1128,7 @@ function animate(character) {
 				play(characters.player.sounds.walk);
 			}
 		});
-	} else {
-
 	}
-
 }
 
 function toScreen(loc, character) {
@@ -1146,8 +1161,13 @@ function debug(text) {
 }
 
 function play(sound) {
-	try {
-		sound.play();
-	} catch (e) {
+	if (sound) {
+		try {
+			sound.play();
+			return true;
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
 	}
 }

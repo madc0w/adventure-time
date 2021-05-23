@@ -158,7 +158,7 @@ characters = {
 				right: [
 					'player right wielding sword_01.png',
 				],
-				idle: [
+				idleFrames: [
 					'player standing wielding sword_01.png',
 				],
 				up: [
@@ -177,7 +177,7 @@ characters = {
 					'player right wielding sword_02 01.png',
 					'player right wielding sword_02 02.png',
 				],
-				idle: [
+				idleFrames: [
 					'player standing wielding sword_02.png',
 				],
 				up: [
@@ -208,6 +208,7 @@ characters = {
 		},
 		sounds: {
 			walk: 'player walk.mp3',
+			die: 'player die.mp3',
 		}
 	},
 	doomScreen: {
@@ -247,6 +248,7 @@ characters = {
 		sounds: {
 			injured: 'doomscreen injured.mp3',
 			attack: 'doomscreen attack.mp3',
+			die: 'doomscreen die.mp3',
 		},
 		resilience: 2.4,
 		attackMetrics: {
@@ -288,6 +290,7 @@ characters = {
 		sounds: {
 			injured: 'zlakik injured.mp3',
 			attack: 'zlakik attack.mp3',
+			die: 'zlakik die.mp3',
 		},
 		resilience: 1.4,
 		attackMetrics: {

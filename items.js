@@ -4,6 +4,9 @@ items = {
 		label: 'Treasure',
 		value: 10,
 		size: 0.1,
+		sounds: {
+			pickup: 'treasure pickup.mp3',
+		}
 	},
 	sword_1: {
 		type: 'weapon',
@@ -17,6 +20,7 @@ items = {
 		sounds: {
 			hit: 'sword 01 hit.mp3',
 			draw: 'sword 01 draw.mp3',
+			pickup: 'sword pickup.mp3',
 		}
 	},
 	sword_2: {
@@ -31,6 +35,7 @@ items = {
 		sounds: {
 			hit: 'sword 02 hit.mp3',
 			draw: 'sword 02 draw.mp3',
+			pickup: 'sword pickup.mp3',
 		},
 	},
 };
