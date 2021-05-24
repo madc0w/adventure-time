@@ -43,7 +43,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -174,20 +174,29 @@ function load() {
 
 	t = 0;
 	requestAnimationFrame(draw);
+
+	if (!JSON.parse(localStorage.didShowInstructions || 'false')) {
+		localStorage.didShowInstructions = true;
+		setTimeout(() => {
+			toggleInstructions();
+		}, 200);
+	}
 }
 
 function draw() {
-	t++;
-	ctx.fillStyle = backgroundColor;
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	// console.log('state.player.health ', state.player.health);
-	if (state.player.health <= 0) {
-		state.player.health = 0;
-		isGameOver = true;
-	}
+	if (!isPaused) {
+		ctx.fillStyle = backgroundColor;
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		// console.log('state.player.health ', state.player.health);
+		if (state.player.health <= 0) {
+			state.player.health = 0;
+			isGameOver = true;
+		}
 
-	drawFunc();
-	drawStatus();
+		drawFunc();
+		drawStatus();
+		t++;
+	}
 	requestAnimationFrame(draw);
 }
 
@@ -1083,6 +1092,11 @@ function onKeyUp(e) {
 		animate(state.player);
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
+		const modals = document.getElementsByClassName('modal');
+		for (let i = 0; i < modals.length; i++) {
+			modals[i].classList.add('hidden');
+		}
+		isPaused = false;
 	}
 }
 
@@ -1115,7 +1129,7 @@ function animate(character) {
 				frames = characterFrames[character.id].attack[state.player.wielding][attackMotion];
 			} else {
 				if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
-					console.log(motion);
+					// console.log(motion);
 					motion = 'left';
 				}
 				frames = characterFrames[character.id].wielding[state.player.wielding][motion];
@@ -1180,4 +1194,15 @@ function play(sound) {
 			console.error(e);
 		}
 	}
+}
+
+function toggleInstructions() {
+	const modal = document.getElementById('instructions-modal');
+	isPaused = modal.classList.contains('hidden');
+	modal.classList.toggle('hidden');
+}
+
+function togglePause() {
+	isPaused = !isPaused;
+	document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
 }

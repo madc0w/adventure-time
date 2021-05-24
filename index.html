@@ -23,6 +23,46 @@
 			<canvas id="game-canvas"></canvas>
 			<canvas id="status-canvas"></canvas>
 		</div>
+		<div id="controls-conatiner">
+			<div id="how-to-play" class="button" onClick="toggleInstructions()">How to Play</div>
+			<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
+		</div>
+
+		<div id="instructions-modal" class="hidden modal">
+			<div class="header">Instructions</div>
+			<hr />
+			<table>
+				<tr>
+					<th>Key</th>
+					<th>Function</th>
+				</tr>
+				<tr>
+					<td>&larr; &rarr; &uarr; &darr;</td>
+					<td>Move</td>
+				</tr>
+				<tr>
+					<td>C</td>
+					<td>Cycle through weapons</td>
+				</tr>
+				<tr>
+					<td>A</td>
+					<td>Attack enemy</td>
+				</tr>
+				<tr>
+					<td>I</td>
+					<td>Show inventory</td>
+				</tr>
+				<tr>
+					<td>M</td>
+					<td>Show map</td>
+				</tr>
+				<tr>
+					<td>Esc</td>
+					<td>Close inventory/map/instructions</td>
+				</tr>
+			</table>
+			<div class="button" onClick="toggleInstructions()">OK</div>
+		</div>
 	</body>
 
 </html>
