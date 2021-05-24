@@ -309,6 +309,6 @@ characters = {
 			resetTime: 600,
 		},
 		targetDist: 0.12,
-		speed: 0.008,
+		speed: 0.006,
 	}
 };

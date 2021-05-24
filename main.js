@@ -1055,6 +1055,10 @@ function getTargetedCharacter() {
 
 
 function onKeyUp(e) {
+	if (didDie) {
+		return;
+	}
+
 	setTimeout(() => {
 		play(defaultRoomMusic);
 		defaultRoomMusic.addEventListener('ended', function () {
@@ -1112,6 +1116,10 @@ function onKeyUp(e) {
 }
 
 function onKeyDown(e) {
+	if (didDie) {
+		return;
+	}
+
 	if (!keysDown[e.code]) {
 		const motion = {
 			ArrowLeft: 'left',
