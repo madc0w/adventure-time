@@ -43,7 +43,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -64,6 +64,7 @@ function load() {
 	statusCtx = statusCanvas.getContext('2d');
 
 	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
+	clickSound = new Audio('sounds/click.mp3');
 
 	for (const characterId in characters) {
 		const character = characters[characterId];
@@ -956,7 +957,11 @@ function drawInventory() {
 		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);
 		ctx.fillText(item.label, x1 + (0.04 * canvas.width), y);
 		if (state.inventory[itemId]) {
-			ctx.fillText(state.inventory[itemId], x2, y);
+			let text = state.inventory[itemId];
+			if (items[itemId].type == 'weapon') {
+				text += '/' + items[itemId].value;
+			}
+			ctx.fillText(text, x2, y);
 		}
 		y += lineHeight * canvas.height;
 	}
@@ -972,7 +977,8 @@ function attack() {
 			attackMotion = null;
 		}, weapon.resetTime);
 		const character = characters[targetedCharacter.id];
-		targetedCharacter.health -= weapon.damage / character.resilience;
+		const weaponValue = state.inventory[state.player.wielding] / weapon.value;
+		targetedCharacter.health -= weaponValue * weapon.damage / character.resilience;
 
 		if (weapon.sounds.hit) {
 			play(weapon.sounds.hit);
@@ -1097,6 +1103,7 @@ function onKeyUp(e) {
 			modals[i].classList.add('hidden');
 		}
 		isPaused = false;
+		document.getElementById('toggle-pause').innerHTML = 'Pause';
 	}
 }
 
@@ -1197,12 +1204,15 @@ function play(sound) {
 }
 
 function toggleInstructions() {
+	play(clickSound);
 	const modal = document.getElementById('instructions-modal');
 	isPaused = modal.classList.contains('hidden');
+	document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
 	modal.classList.toggle('hidden');
 }
 
 function togglePause() {
+	play(clickSound);
 	isPaused = !isPaused;
 	document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
 }
