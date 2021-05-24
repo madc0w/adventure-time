@@ -3,7 +3,7 @@ defaultRoomMusic = 'holy grail theme.mp3';
 rooms = [
 	{
 		id: 0,
-		width: 0.44,
+		width: 0.8,
 		height: 0.9,
 		backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',
@@ -47,7 +47,14 @@ rooms = [
 					x: 0.7,
 					y: 0.8
 				}
-			}
+			},
+			{
+				id: 'sword_2',
+				location: {
+					x: 0.2,
+					y: 0.3
+				}
+			},
 		],
 		characters: [
 			{

@@ -5,8 +5,8 @@ items = {
 		value: 10,
 		size: 0.1,
 		sounds: {
-			pickup: 'treasure pickup.mp3',
-		}
+			pickup: 'treasure pickup 2.mp3',
+		},
 	},
 	sword_1: {
 		type: 'weapon',
@@ -16,11 +16,13 @@ items = {
 		size: 0.15,
 		range: 80, // pixels
 		damage: 0.32,
+		value: 24, // num uses of weapon before it breaks
 		resetTime: 480,
 		sounds: {
 			hit: 'sword 01 hit.mp3',
 			draw: 'sword 01 draw.mp3',
 			pickup: 'sword pickup.mp3',
+			broken: 'broken weapon.mp3',
 		}
 	},
 	sword_2: {
@@ -32,10 +34,12 @@ items = {
 		range: 64, // pixels
 		damage: 0.2,
 		resetTime: 300,
+		value: 40, // num uses of weapon before it breaks
 		sounds: {
 			hit: 'sword 02 hit.mp3',
 			draw: 'sword 02 draw.mp3',
 			pickup: 'sword pickup.mp3',
+			broken: 'broken weapon.mp3',
 		},
 	},
 };

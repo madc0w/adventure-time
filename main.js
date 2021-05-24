@@ -703,7 +703,9 @@ function drawGame() {
 	let i = 0;
 	for (const roomItem of state.room.items || []) {
 		const item = items[roomItem.id];
-		if (item.image.height > 0) {
+		// console.log('item', item);
+		// console.log('state.inventory[item.id]', state.inventory[roomItem.id]);
+		if (item.image.height > 0 && (item.type != 'weapon' || !state.inventory[roomItem.id])) {
 			const itemLoc = toScreen(roomItem.location, {
 				width: item.size * (item.image.width / item.image.height),
 				height: item.size
@@ -984,9 +986,18 @@ function attack() {
 				targetedCharacter.animStep++;
 				if (targetedCharacter.animStep >= numCharacterDieAnimSteps) {
 					clearInterval(targetedCharacter.deathAnimIntervalId);
-					state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+					if (state.room.characters) {
+						state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+					}
 				}
 			}, interval);
+		}
+
+		state.inventory[state.player.wielding]--;
+		if (state.inventory[state.player.wielding] <= 0) {
+			delete state.inventory[state.player.wielding];
+			state.player.wielding = null;
+			play(weapon.sounds.broken);
 		}
 	}
 }
@@ -1167,7 +1178,6 @@ function play(sound) {
 			return true;
 		} catch (e) {
 			console.error(e);
-			return false;
 		}
 	}
 }
