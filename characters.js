@@ -150,6 +150,14 @@ characters = {
 			'player right 01.png',
 			'player right 02.png',
 		],
+		dieFrames: [
+			'player dead 01.png',
+			'player dead 02.png',
+			'player dead 03.png',
+			'player dead 04.png',
+			'player dead 03.png',
+			'player dead 02.png',
+		],
 		wielding: {
 			sword_1: {
 				left: [
@@ -255,7 +263,7 @@ characters = {
 			prob: 0.012,
 			prepTime: 600,
 			range: 0.4,
-			strength: 0.02,
+			strength: 0.06,
 			resetTime: 600,
 		},
 		targetDist: 0.08,
@@ -297,7 +305,7 @@ characters = {
 			prob: 0.012,
 			prepTime: 400,
 			range: 0.4,
-			strength: 0.02,
+			strength: 0.04,
 			resetTime: 600,
 		},
 		targetDist: 0.12,

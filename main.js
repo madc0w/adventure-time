@@ -517,8 +517,12 @@ function drawGame() {
 		ctx.fillText(text, x, 0.4 * canvas.height);
 
 		if (!didDie) {
+			document.getElementById('toggle-pause').innerHTML = 'Play Again';
 			didDie = true;
 			play(characters.player.sounds.die);
+
+			state.player.motion = 'dieFrames';
+			animate(state.player);
 		}
 
 		return;
@@ -1213,6 +1217,10 @@ function toggleInstructions() {
 
 function togglePause() {
 	play(clickSound);
-	isPaused = !isPaused;
-	document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
+	if (didDie) {
+		location.href = location.href;
+	} else {
+		isPaused = !isPaused;
+		document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
+	}
 }
