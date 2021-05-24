@@ -176,11 +176,11 @@ function load() {
 	t = 0;
 	requestAnimationFrame(draw);
 
-	if (!JSON.parse(localStorage.didShowInstructions || 'false')) {
+	if (!JSON.parse(localStorage.didShowInstructions || null)) {
 		localStorage.didShowInstructions = true;
 		setTimeout(() => {
 			toggleInstructions();
-		}, 200);
+		}, 800);
 	}
 }
 
