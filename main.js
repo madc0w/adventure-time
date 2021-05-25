@@ -749,7 +749,7 @@ function drawGame() {
 					// console.log('after state.room.items', state.room.items);
 				}, interval * numTakeItemAnimSteps);
 				if (!state.inventory[roomItem.id]) {
-					state.inventory[roomItem.id] = 0;
+					state.inventory[roomItem.id] = roomItem.value || 0;
 				}
 				const item = items[roomItem.id];
 				state.inventory[roomItem.id] += item.value || 0;
@@ -955,6 +955,9 @@ function drawInventory() {
 			}
 			html += `<td>${text}</td>`;
 		}
+		if (items[itemId].type == 'weapon') {
+			html += `<td><div class="button" onClick="dropItem('${itemId}')">Drop</div></td>`;
+		}
 		html += '</tr>';
 	}
 	if (!html) {
@@ -1065,8 +1068,12 @@ function onKeyUp(e) {
 	}
 
 	if (e.key.toUpperCase() == 'M') {
+		state.player.motion = 'idleFrames';
+		animate(state.player);
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 	} else if (e.key.toUpperCase() == 'I') {
+		state.player.motion = 'idleFrames';
+		animate(state.player);
 		isPaused = true;
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 		document.getElementById('toggle-pause').innerHTML = 'Resume';
@@ -1230,4 +1237,27 @@ function closeModals() {
 	}
 	isPaused = false;
 	document.getElementById('toggle-pause').innerHTML = 'Pause';
+}
+
+function dropItem(itemId) {
+	const value = state.inventory[itemId];
+	delete state.inventory[itemId];
+	drawInventory();
+	let x = state.player.x;
+	if (x < 0.16) {
+		x += 0.14;
+	} else {
+		x -= 0.14;
+	}
+	state.room.items.push({
+		id: itemId,
+		location: {
+			x,
+			y: state.player.y
+		},
+		value,
+	});
+	if (state.player.wielding == itemId) {
+		state.player.wielding = null;
+	}
 }
