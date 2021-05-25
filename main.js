@@ -941,34 +941,26 @@ function drawMap() {
 
 
 function drawInventory() {
-	const lineHeight = 0.08;
-	const fontSize = lineHeight * 0.8 * canvas.height;
-	ctx.font = `${fontSize * 1.2}px ${fontFamily}`;
-	ctx.fillStyle = '#000';
-
-	let y = 0.08 * canvas.height;
-	const header = 'Inventory';
-	const x = (canvas.width - ctx.measureText(header).width) / 2;
-	ctx.fillText(header, x, y);
-	y += lineHeight * canvas.height;
-
-	ctx.font = `${fontSize}px ${fontFamily}`;
-	const x1 = 0.12 * canvas.width;
-	const x2 = 0.8 * canvas.width;
-	const imageSize = 0.08 * canvas.width;
+	document.getElementById('inventory-modal').classList.remove('hidden');
+	let html = '';
 	for (const itemId in state.inventory) {
 		const item = items[itemId];
-		ctx.drawImage(item.image, x1 - imageSize * 1.2, y - imageSize, imageSize, imageSize);
-		ctx.fillText(item.label, x1 + (0.04 * canvas.width), y);
+		html += '<tr>';
+		html += `<td><img src="${item.image.src}"/></td>`;
+		html += `<td>${item.label}</td>`;
 		if (state.inventory[itemId]) {
 			let text = state.inventory[itemId];
 			if (items[itemId].type == 'weapon') {
 				text += '/' + items[itemId].value;
 			}
-			ctx.fillText(text, x2, y);
+			html += `<td>${text}</td>`;
 		}
-		y += lineHeight * canvas.height;
+		html += '</tr>';
 	}
+	if (!html) {
+		html = '<tr><th>No items</th></tr>';
+	}
+	document.getElementById('inventory-table').innerHTML = html;
 }
 
 function attack() {
@@ -1075,7 +1067,10 @@ function onKeyUp(e) {
 	if (e.key.toUpperCase() == 'M') {
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 	} else if (e.key.toUpperCase() == 'I') {
-		drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
+		isPaused = true;
+		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
+		document.getElementById('toggle-pause').innerHTML = 'Resume';
+		drawInventory();
 	} else if (e.key.toUpperCase() == 'A') {
 		attack();
 	} else if (e.key.toUpperCase() == 'C') {
@@ -1106,12 +1101,7 @@ function onKeyUp(e) {
 		animate(state.player);
 	} else if (e.key == 'Escape') {
 		drawFunc = drawGame;
-		const modals = document.getElementsByClassName('modal');
-		for (let i = 0; i < modals.length; i++) {
-			modals[i].classList.add('hidden');
-		}
-		isPaused = false;
-		document.getElementById('toggle-pause').innerHTML = 'Pause';
+		closeModals();
 	}
 }
 
@@ -1231,4 +1221,13 @@ function togglePause() {
 		isPaused = !isPaused;
 		document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
 	}
+}
+
+function closeModals() {
+	const modals = document.getElementsByClassName('modal');
+	for (let i = 0; i < modals.length; i++) {
+		modals[i].classList.add('hidden');
+	}
+	isPaused = false;
+	document.getElementById('toggle-pause').innerHTML = 'Pause';
 }

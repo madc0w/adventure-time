@@ -95,3 +95,18 @@ canvas {
 #toggle-pause {
 	margin-top: 18px;
 }
+
+#inventory-table {
+	width: 90%;
+	height: 280px;
+}
+
+#inventory-table td img {
+	width: 40px;
+}
+
+#inventory-modal .button {
+	margin-top: 18px;
+	margin-left: auto;
+	margin-right: auto;
+}
