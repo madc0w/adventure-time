@@ -748,11 +748,8 @@ function drawGame() {
 					state.room.items.splice(n, 1);
 					// console.log('after state.room.items', state.room.items);
 				}, interval * numTakeItemAnimSteps);
-				if (!state.inventory[roomItem.id]) {
-					state.inventory[roomItem.id] = roomItem.value || 0;
-				}
 				const item = items[roomItem.id];
-				state.inventory[roomItem.id] += item.value || 0;
+				state.inventory[roomItem.id] = (state.inventory[roomItem.id] || 0) + (roomItem.value || item.value);
 				play(item.sounds.pickup);
 			}
 		}
@@ -943,7 +940,9 @@ function drawMap() {
 function drawInventory() {
 	document.getElementById('inventory-modal').classList.remove('hidden');
 	let html = '';
+	let numLines = 0;
 	for (const itemId in state.inventory) {
+		numLines++;
 		const item = items[itemId];
 		html += '<tr>';
 		html += `<td><img src="${item.image.src}"/></td>`;
@@ -961,8 +960,11 @@ function drawInventory() {
 		html += '</tr>';
 	}
 	if (!html) {
+		numLines = 1;
 		html = '<tr><th>No items</th></tr>';
 	}
+	const spacerHeight = 280 - (numLines * 40);
+	html += `<tr id="inventory-spacer" style="height: ${spacerHeight}px;"></tr>`;
 	document.getElementById('inventory-table').innerHTML = html;
 }
 
@@ -1074,9 +1076,10 @@ function onKeyUp(e) {
 	} else if (e.key.toUpperCase() == 'I') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
-		isPaused = true;
+		if (!isPaused) {
+			togglePause();
+		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
-		document.getElementById('toggle-pause').innerHTML = 'Resume';
 		drawInventory();
 	} else if (e.key.toUpperCase() == 'A') {
 		attack();
@@ -1235,24 +1238,19 @@ function closeModals() {
 	for (let i = 0; i < modals.length; i++) {
 		modals[i].classList.add('hidden');
 	}
-	isPaused = false;
-	document.getElementById('toggle-pause').innerHTML = 'Pause';
+	if (isPaused) {
+		togglePause();
+	}
 }
 
 function dropItem(itemId) {
 	const value = state.inventory[itemId];
 	delete state.inventory[itemId];
 	drawInventory();
-	let x = state.player.x;
-	if (x < 0.16) {
-		x += 0.14;
-	} else {
-		x -= 0.14;
-	}
 	state.room.items.push({
 		id: itemId,
 		location: {
-			x,
+			x: state.player.x + (state.player.x > 0.16 ? -1 : 1) * 0.14,
 			y: state.player.y
 		},
 		value,

@@ -97,12 +97,17 @@ canvas {
 }
 
 #inventory-table {
-	width: 90%;
+	width: 100%;
 	height: 280px;
 }
 
+#inventory-table td {
+	height: 24px;
+}
+
 #inventory-table td img {
-	width: 40px;
+	max-width: 40px;
+	max-height: 40px;
 }
 
 #inventory-modal .button {
