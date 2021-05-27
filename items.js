@@ -46,7 +46,7 @@ items = {
 		type: 'potion',
 		image: 'healing potion 01.png',
 		label: 'Healing Potion',
-		size: 0.08,
+		size: 0.06,
 		sounds: {
 			quaff: 'quaff potion.mp3',
 			pickup: 'pickup potion.mp3',

@@ -211,7 +211,7 @@ function drawStatus() {
 	statusCtx.fillText('Weapons', 0.02 * statusCanvas.width, 0.58 * statusCanvas.height);
 
 	statusCtx.fillStyle = '#444';
-	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * statusCanvas.width, 0.1 * statusCanvas.height);
+	statusCtx.fillRect(0.24 * statusCanvas.width - 4, 0.14 * statusCanvas.height - 4, 0.6 * statusCanvas.width + 8, 0.1 * statusCanvas.height + 8);
 	statusCtx.fillStyle = '#b44';
 	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
 
