@@ -749,7 +749,7 @@ function drawGame() {
 					// console.log('after state.room.items', state.room.items);
 				}, interval * numTakeItemAnimSteps);
 				const item = items[roomItem.id];
-				state.inventory[roomItem.id] = (state.inventory[roomItem.id] || 0) + (roomItem.value || item.value);
+				state.inventory[roomItem.id] = (state.inventory[roomItem.id] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
 			}
 		}
@@ -954,8 +954,11 @@ function drawInventory() {
 			}
 			html += `<td>${text}</td>`;
 		}
-		if (items[itemId].type == 'weapon') {
+		const type = items[itemId].type;
+		if (type == 'weapon') {
 			html += `<td><div class="button" onClick="dropItem('${itemId}')">Drop</div></td>`;
+		} else if (type == 'potion') {
+			html += `<td><div class="button" onClick="quaffPotion('${itemId}')">Quaff</div></td>`;
 		}
 		html += '</tr>';
 	}
@@ -1257,5 +1260,17 @@ function dropItem(itemId) {
 	});
 	if (state.player.wielding == itemId) {
 		state.player.wielding = null;
+	}
+}
+
+function quaffPotion(itemId) {
+	if (items[itemId].action(state)) {
+		state.inventory[itemId]--;
+		if (state.inventory[itemId] <= 0) {
+			delete state.inventory[itemId];
+		}
+		play(items[itemId].sounds.quaff);
+		drawInventory();
+		drawStatus();
 	}
 }

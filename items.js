@@ -42,4 +42,20 @@ items = {
 			broken: 'broken weapon.mp3',
 		},
 	},
+	healing_potion_1: {
+		type: 'potion',
+		image: 'healing potion 01.png',
+		label: 'Healing Potion',
+		size: 0.08,
+		sounds: {
+			quaff: 'quaff potion.mp3',
+			pickup: 'pickup potion.mp3',
+		},
+		action: state => {
+			if (state.player.health < 1) {
+				state.player.health = Math.min(1, state.player.health + 0.12);
+				return true;
+			}
+		}
+	}
 };

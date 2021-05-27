@@ -150,11 +150,25 @@ rooms = [
 					x: 0.2,
 					y: 0.2
 				}
-			},
-			{
+			}, {
 				id: 'zlakik',
 				location: {
 					x: 0.4,
+					y: 0.4
+				}
+			},
+		],
+		items: [
+			{
+				id: 'healing_potion_1',
+				location: {
+					x: 0.5,
+					y: 0.8
+				}
+			}, {
+				id: 'healing_potion_1',
+				location: {
+					x: 0.5,
 					y: 0.4
 				}
 			},
