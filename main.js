@@ -528,7 +528,10 @@ function drawGame() {
 		return;
 	}
 
-
+	const prevPlayerLoc = {
+		x: state.player.x,
+		y: state.player.y,
+	};
 	let numKeysDown = 0;
 	for (const key in keysDown) {
 		if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp'].includes(key)) {
@@ -688,6 +691,21 @@ function drawGame() {
 			if (!throughDoor || throughDoor.wall != 's') {
 				state.player.y = y;
 			}
+		}
+	}
+
+	// check for intersection with other character
+	for (const roomCharacter of state.room.characters || []) {
+		const character = characters[roomCharacter.id];
+		if (state.player.x + characters.player.width / 2 > roomCharacter.location.x - character.width / 2 &&
+			state.player.x - characters.player.width / 2 < roomCharacter.location.x + character.width / 2 &&
+			state.player.y + characters.player.height / 2 > roomCharacter.location.y - character.height / 2 &&
+			state.player.y - characters.player.height / 2 < roomCharacter.location.y + character.height / 2
+		) {
+			state.player.x = prevPlayerLoc.x;
+			state.player.y = prevPlayerLoc.y;
+			console.log(roomCharacter.location);
+			console.log(character.width);
 		}
 	}
 
