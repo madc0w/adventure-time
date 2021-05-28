@@ -310,5 +310,17 @@ characters = {
 		},
 		targetDist: 0.12,
 		speed: 0.006,
+	},
+	merchant: {
+		type: 'merchant',
+		animInterval: 280,
+		width: 0.4,
+		height: 0.4,
+		idleFrames: [
+			'merchant 01.png',
+			'merchant 02.png',
+			'merchant 03.png',
+			'merchant 02.png',
+		],
 	}
 };

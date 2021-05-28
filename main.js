@@ -402,7 +402,7 @@ function drawGame() {
 			ctx.globalAlpha = 1;
 
 			roomCharacter.health = roomCharacter.health || 1;
-			if (!roomCharacter.animStep) {
+			if (character.type == 'enemy' && !roomCharacter.animStep) {
 				const healthIndicatorRadius = 0.014;
 				const targetedCharacter = getTargetedCharacter();
 				if (targetedCharacter) {
@@ -697,15 +697,15 @@ function drawGame() {
 	// check for intersection with other character
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
-		if (state.player.x + characters.player.width / 2 > roomCharacter.location.x - character.width / 2 &&
-			state.player.x - characters.player.width / 2 < roomCharacter.location.x + character.width / 2 &&
-			state.player.y + characters.player.height / 2 > roomCharacter.location.y - character.height / 2 &&
-			state.player.y - characters.player.height / 2 < roomCharacter.location.y + character.height / 2
+		if (state.player.x + (characters.player.width / state.room.width) / 2 > roomCharacter.location.x - (character.width / state.room.width) / 2 &&
+			state.player.x - (characters.player.width / state.room.width) / 2 < roomCharacter.location.x + (character.width / state.room.width) / 2 &&
+			state.player.y + (characters.player.height / state.room.height) / 2 > roomCharacter.location.y - (character.height / state.room.height) / 2 &&
+			state.player.y - (characters.player.height / state.room.height) / 2 < roomCharacter.location.y + (character.height / state.room.height) / 2
 		) {
 			state.player.x = prevPlayerLoc.x;
 			state.player.y = prevPlayerLoc.y;
-			console.log(roomCharacter.location);
-			console.log(character.width);
+			// console.log(roomCharacter.location);
+			// console.log(character.width);
 		}
 	}
 

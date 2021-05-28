@@ -57,13 +57,13 @@ rooms = [
 			},
 		],
 		characters: [
-			{
-				id: 'zlakik',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			},
+			// {
+			// 	id: 'zlakik',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// },
 			// {
 			// id: 'doomScreen',
 			// location: {
@@ -76,9 +76,7 @@ rooms = [
 			// 		x: 0.6,
 			// 		y: 0.2
 			// 	}
-			// },
 		]
-
 	}, {
 		id: 1,
 		width: 0.6,
@@ -127,18 +125,18 @@ rooms = [
 			}
 		],
 		characters: [
-			// {
-			// 	id: 'zlakik',
-			// 	location: {
-			// 		x: 0.2,
-			// 		y: 0.2
-			// 	}
-			// },
+			{
+				id: 'merchant',
+				location: {
+					x: 0.5,
+					y: 0.0
+				}
+			},
 		]
 	}, {
 		id: 3,
-		width: 0.6,
-		height: 0.7,
+		width: 0.9,
+		height: 0.9,
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
 		doors: [
