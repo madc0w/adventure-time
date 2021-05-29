@@ -999,14 +999,17 @@ function drawInventory() {
 		html += '<tr>';
 		html += `<td><img src="${item.image.src}"/></td>`;
 		html += `<td>${item.label}</td>`;
+		const type = items[itemId].type;
 		if (state.inventory[itemId]) {
 			let text = state.inventory[itemId];
 			if (items[itemId].type == 'weapon') {
 				text += '/' + items[itemId].value;
 			}
+			if (type == 'treasure') {
+				text = `${moneySymbol} ${text}`;
+			}
 			html += `<td>${text}</td>`;
 		}
-		const type = items[itemId].type;
 		if (type == 'weapon') {
 			html += `<td><div class="button" onClick="dropItem('${itemId}')">Drop</div></td>`;
 		} else if (type == 'potion') {
@@ -1014,6 +1017,13 @@ function drawInventory() {
 		}
 		html += '</tr>';
 	}
+
+	// for (let i = 0; i < 20; i++) {
+	// 	html += '<tr>';
+	// 	html += `<td>tototo</td>`;
+	// 	html += `<td>tatata</td>`;
+	// 	html += '</tr>';
+	// }
 	if (!html) {
 		numLines = 1;
 		html = '<tr><th>No items</th></tr>';

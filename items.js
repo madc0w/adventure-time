@@ -1,5 +1,6 @@
 items = {
 	treasure: {
+		type: 'treasure',
 		image: 'treasure-05.png',
 		label: 'Treasure',
 		value: 10,
