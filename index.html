@@ -39,16 +39,20 @@
 		<div id="merchant-modal" class="hidden modal">
 			<div class="header">Merchant</div>
 			<hr />
-			<div id="content">
+			<div id="merchant-modal-init-content">
 				<div id="greetings">
 					Greetings travler! Can I interest you in a transaction today?
 				</div>
 				<div id="action-buttons">
-					<div id="buy-button" class="button">Buy</div>
-					<div id="sell-button" class="button">Sell</div>
-					<div id="repair-button" class="button">Repair</div>
-					<div id="no-button" class="button" onCLick="closeModals()">No Thanks</div>
+					<div id="buy-button" class="button" onClick="showMerchantSelection('buy')">Buy an Item</div>
+					<div id="sell-button" class="button" onClick="showMerchantSelection('sell')">Sell an Item</div>
+					<div id="repair-button" class="button" onClick="showMerchantSelection('repair')">Repair a Weapon</div>
+					<div id="no-button" class="button" onClick="closeModals()">No Thanks</div>
 				</div>
+			</div>
+			<div id="merchant-modal-content" class="hidden">
+				<div id="merchant-modal-content-inner"></div>
+				<div id="back-button" class="button" onClick="merchantCancel()">Never mind</div>
 			</div>
 		</div>
 

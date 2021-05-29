@@ -9,6 +9,8 @@ const state = {
 	inventory: {},
 	room: rooms[0],
 };
+
+const moneySymbol = '&#10086;';
 const wallColor = '#3f2f0c';
 const backgroundColor = '#c1e5be';
 const doorSize = 0.15;
@@ -982,8 +984,9 @@ function drawMap() {
 
 
 function drawMerchantInteraction() {
+	document.getElementById('merchant-modal-init-content').classList.remove('hidden');
+	document.getElementById('merchant-modal-content').classList.add('hidden');
 	document.getElementById('merchant-modal').classList.remove('hidden');
-
 }
 
 function drawInventory() {
@@ -1336,4 +1339,53 @@ function setRoom(room) {
 	if (room.sounds && room.sounds.enter) {
 		play(room.sounds.enter);
 	}
+}
+
+function showMerchantSelection(type) {
+	const content = document.getElementById('merchant-modal-content');
+	const contentInner = document.getElementById('merchant-modal-content-inner');
+	const initContent = document.getElementById('merchant-modal-init-content');
+	initContent.classList.add('hidden');
+
+	let html = `<div id="player-treasure-amount">Your treasure: ${moneySymbol} ${state.inventory.treasure || 0}</div > `;
+
+	if (type == 'buy') {
+
+	} else if (type == 'sell') {
+
+	} else if (type == 'repair') {
+		let numLines = 0;
+		html += '<table>';
+		if (Object.keys(state.inventory).length == 0) {
+			html += '<tr><th>You don\'t appear to be carrying any weapons...</th></tr>';
+		} else {
+			for (const itemId in state.inventory) {
+				const item = items[itemId];
+				const type = items[itemId].type;
+				if (type == 'weapon' && state.inventory[itemId] < items[itemId].value) {
+					html += '<tr>';
+					html += `< td > <img src="${item.image.src}" /></td > `;
+					html += `< td > ${item.label}</td > `;
+					html += `< td > ${state.inventory[itemId]} /${items[itemId].value}</td > `;
+					html += `< td > ${moneySymbol} ${items[itemId].repairCost}</td > `;
+					html += `< td > <div class="button" onClick="repairItem('${itemId}')">Repair</div></td > `;
+					html += '</tr>';
+					numLines++;
+				}
+			}
+			if (numLines == 0) {
+				html += '<tr><th>All your weapons are in excellent condition!<br/> There\'s nothing for me to repair here.</th></tr>';
+			}
+		}
+		html += '</table>';
+	}
+	contentInner.innerHTML = html;
+	content.classList.remove('hidden');
+}
+
+function merchantCancel() {
+	const content = document.getElementById('merchant-modal-content');
+	const initContent = document.getElementById('merchant-modal-init-content');
+	content.classList.add('hidden');
+	initContent.classList.remove('hidden');
 }

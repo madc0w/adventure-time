@@ -18,6 +18,8 @@ items = {
 		damage: 0.32,
 		value: 24, // num uses of weapon before it breaks
 		resetTime: 480,
+		cost: 22,
+		repairCost: 14,
 		sounds: {
 			hit: 'sword 01 hit.mp3',
 			draw: 'sword 01 draw.mp3',
@@ -35,6 +37,8 @@ items = {
 		damage: 0.2,
 		resetTime: 300,
 		value: 40, // num uses of weapon before it breaks
+		cost: 12,
+		repairCost: 7,
 		sounds: {
 			hit: 'sword 02 hit.mp3',
 			draw: 'sword 02 draw.mp3',
@@ -47,6 +51,7 @@ items = {
 		image: 'healing potion 01.png',
 		label: 'Healing Potion',
 		size: 0.06,
+		cost: 12,
 		sounds: {
 			quaff: 'quaff potion.mp3',
 			pickup: 'pickup potion.mp3',
