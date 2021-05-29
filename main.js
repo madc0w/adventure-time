@@ -423,8 +423,8 @@ function drawGame() {
 			if (character.type == 'enemy' && !roomCharacter.animStep) {
 				const healthIndicatorRadius = 0.014;
 				const targetedCharacter = getTargetedCharacter();
-				if (targetedCharacter) {
-					const character = characters[targetedCharacter.id];
+				// console.log('targetedCharacter ', targetedCharacter);
+				if (targetedCharacter == roomCharacter) {
 					const r = 0.02;
 					const alpha = Math.floor(127 * (Math.sin(t / 22) + 1));
 					let alphaHex = alpha.toString(16);
@@ -1082,17 +1082,7 @@ function getTargetedCharacter() {
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
 		if (character.type == 'enemy') {
-			const characterLoc = toScreen(roomCharacter.location, character);
-			characterLoc.x += character.width * canvas.width / 2;
-			characterLoc.y += character.height * canvas.height / 2;
-
-			const playerLoc = toScreen(state.player, characters.player);
-			playerLoc.x += characters.player.width * canvas.width / 2;
-			playerLoc.y += characters.player.height * canvas.height / 2;
-
-			const dx = playerLoc.x - characterLoc.x;
-			const dy = playerLoc.y - characterLoc.y;
-			const dist = Math.sqrt(dx * dx + dy * dy);
+			const dist = distance(roomCharacter);
 			// console.log(dist);
 			if ((!minDist || dist < minDist) && dist <= weapon.range) {
 				minDist = dist;
@@ -1250,10 +1240,10 @@ function toScreen(loc, character) {
 }
 
 function distance(roomCharacter) {
-	const x1 = roomCharacter.location.x / state.room.width;
-	const y1 = roomCharacter.location.y / state.room.height;
-	const x2 = state.player.x / state.room.width;
-	const y2 = state.player.y / state.room.height;
+	const x1 = roomCharacter.location.x * state.room.width;
+	const y1 = roomCharacter.location.y * state.room.height;
+	const x2 = state.player.x * state.room.width;
+	const y2 = state.player.y * state.room.height;
 	const dx = x1 - x2;
 	const dy = y1 - y2;
 	return Math.sqrt(dx * dx + dy * dy);

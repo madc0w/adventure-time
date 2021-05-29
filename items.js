@@ -14,7 +14,7 @@ items = {
 		label: 'Enchanted Sword',
 		// value: 0.2,
 		size: 0.15,
-		range: 80, // pixels
+		range: 0.2, // proportion of canvas
 		damage: 0.32,
 		value: 24, // num uses of weapon before it breaks
 		resetTime: 480,
@@ -31,7 +31,7 @@ items = {
 		label: 'Venom Dagger',
 		// value: 0.05,
 		size: 0.09,
-		range: 64, // pixels
+		range: 0.12, // proportion of canvas
 		damage: 0.2,
 		resetTime: 300,
 		value: 40, // num uses of weapon before it breaks

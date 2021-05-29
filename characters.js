@@ -262,7 +262,7 @@ characters = {
 		attackMetrics: {
 			prob: 0.012,
 			prepTime: 600,
-			range: 0.4,
+			range: 0.12, // proportion of canvas
 			strength: 0.06,
 			resetTime: 600,
 		},
@@ -304,7 +304,7 @@ characters = {
 		attackMetrics: {
 			prob: 0.012,
 			prepTime: 400,
-			range: 0.4,
+			range: 0.2, // proportion of canvas
 			strength: 0.04,
 			resetTime: 600,
 		},
