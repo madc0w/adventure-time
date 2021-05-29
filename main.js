@@ -1128,6 +1128,7 @@ function onKeyUp(e) {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
+		closeModals();
 	} else if (e.key.toUpperCase() == 'I') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
@@ -1135,6 +1136,7 @@ function onKeyUp(e) {
 			togglePause();
 		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
+		closeModals();
 		drawInventory();
 	} else if (e.key.toUpperCase() == 'A') {
 		attack();
@@ -1364,26 +1366,35 @@ function showMerchantSelection(type) {
 	} else if (type == 'sell') {
 
 	} else if (type == 'repair') {
-		let numLines = 0;
 		html += '<table>';
 		if (Object.keys(state.inventory).length == 0) {
 			html += '<tr><th>You don\'t appear to be carrying any weapons...</th></tr>';
 		} else {
+			let hasDamagedWeapon;
+			for (const itemId in state.inventory) {
+				const type = items[itemId].type;
+				if (type == 'weapon' && state.inventory[itemId] < items[itemId].value) {
+					hasDamagedWeapon = true;
+					break;
+				}
+			}
+			if (hasDamagedWeapon) {
+				html += '<tr><th></th><th></th><th>Condition</th><th>Cost</th><th></th></tr>';
+			}
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
 				const type = items[itemId].type;
 				if (type == 'weapon' && state.inventory[itemId] < items[itemId].value) {
 					html += '<tr>';
-					html += `< td > <img src="${item.image.src}" /></td > `;
-					html += `< td > ${item.label}</td > `;
-					html += `< td > ${state.inventory[itemId]} /${items[itemId].value}</td > `;
-					html += `< td > ${moneySymbol} ${items[itemId].repairCost}</td > `;
-					html += `< td > <div class="button" onClick="repairItem('${itemId}')">Repair</div></td > `;
+					html += `<td><img src="${item.image.src}"/></td>`;
+					html += `<td>${item.label}</td > `;
+					html += `<td>${state.inventory[itemId]} /${item.value}</td>`;
+					html += `<td>${moneySymbol} ${item.repairCost}</td>`;
+					html += `<td><div class="button" onClick="repairItem('${itemId}')">Repair</div></td>`;
 					html += '</tr>';
-					numLines++;
 				}
 			}
-			if (numLines == 0) {
+			if (!hasDamagedWeapon) {
 				html += '<tr><th>All your weapons are in excellent condition!<br/> There\'s nothing for me to repair here.</th></tr>';
 			}
 		}
@@ -1393,9 +1404,39 @@ function showMerchantSelection(type) {
 	content.classList.remove('hidden');
 }
 
+function repairItem(itemId) {
+	const item = items[itemId];
+	if (item.repairCost > (state.inventory.treasure || 0)) {
+		toast('Sorry, you can\'t afford my fee. Come back with more gold!');
+	} else {
+		state.inventory.treasure -= item.repairCost;
+		state.inventory[itemId] = item.value;
+		toast('There you are... good as new!');
+		drawMerchantInteraction();
+	}
+}
+
 function merchantCancel() {
 	const content = document.getElementById('merchant-modal-content');
 	const initContent = document.getElementById('merchant-modal-init-content');
 	content.classList.add('hidden');
 	initContent.classList.remove('hidden');
+}
+
+function toast(message) {
+	const toast = document.getElementById('toast');
+	toast.innerHTML = message;
+	toast.classList.remove('hidden');
+	toast.style.opacity = 1;
+	setTimeout(() => {
+		let opacity = 1;
+		const intervalId = setInterval(() => {
+			toast.style.opacity = opacity;
+			opacity -= 0.04;
+			if (opacity <= 0) {
+				toast.classList.add('hidden');
+				clearInterval(intervalId);
+			}
+		}, 40);
+	}, 2400);
 }
