@@ -1409,6 +1409,7 @@ function repairItem(itemId) {
 	if (item.repairCost > (state.inventory.treasure || 0)) {
 		toast('Sorry, you can\'t afford my fee. Come back with more gold!');
 	} else {
+		play(characters.merchant.sounds.repair);
 		state.inventory.treasure -= item.repairCost;
 		state.inventory[itemId] = item.value;
 		toast('There you are... good as new!');
