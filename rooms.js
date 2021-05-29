@@ -99,7 +99,11 @@ rooms = [
 				// 		y: 0.2
 				// 	}
 			},
-		]
+		],
+		sounds: {
+			// ambient: 'silence.mp3',
+			ambient: 'eerie room.mp3',
+		}
 	}, {
 		id: 2,
 		width: 0.6,

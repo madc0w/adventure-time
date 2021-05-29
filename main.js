@@ -46,7 +46,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound, roomMusic;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -175,6 +175,7 @@ function load() {
 	}
 	// console.log(rooms);
 
+	setRoom(rooms[0]);
 	t = 0;
 	requestAnimationFrame(draw);
 
@@ -1113,9 +1114,9 @@ function onKeyUp(e) {
 	}
 
 	setTimeout(() => {
-		play(defaultRoomMusic);
-		defaultRoomMusic.addEventListener('ended', function () {
-			play(defaultRoomMusic);
+		play(roomMusic);
+		roomMusic.addEventListener('ended', function () {
+			play(roomMusic);
 		});
 	}, 20);
 
@@ -1351,6 +1352,12 @@ function setRoom(room) {
 
 	if (room.sounds && room.sounds.enter) {
 		play(room.sounds.enter);
+	}
+	if (room.sounds && room.sounds.ambient) {
+		roomMusic.pause();
+		roomMusic = room.sounds.ambient;
+	} else {
+		roomMusic = defaultRoomMusic;
 	}
 }
 
