@@ -323,7 +323,8 @@ characters = {
 			'merchant 02.png',
 		],
 		sounds: {
-			repair: 'merchant repair.mp3'
+			repair: 'merchant repair.mp3',
+			sell: 'cash register.mp3',
 		}
 	}
 };

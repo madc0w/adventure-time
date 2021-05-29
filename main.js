@@ -10,6 +10,7 @@ const state = {
 	room: rooms[0],
 };
 
+const resaleFactor = 0.6;
 const moneySymbol = '&#10086;';
 const wallColor = '#3f2f0c';
 const backgroundColor = '#c1e5be';
@@ -1361,30 +1362,66 @@ function showMerchantSelection(type) {
 
 	let html = `<div id="player-treasure-amount">Your treasure: ${moneySymbol} ${state.inventory.treasure || 0}</div > `;
 
+	html += '<table>';
 	if (type == 'buy') {
 
 	} else if (type == 'sell') {
-
+		let numSaleableItems = 0;
+		for (const itemId in state.inventory) {
+			const item = items[itemId];
+			if (item.type != 'treasure') {
+				numSaleableItems++;
+			}
+		}
+		if (numSaleableItems == 0) {
+			html += '<tr><th>You have nothing that interests me.</th></tr>';
+		} else {
+			html += '<tr><th></th><th>Item</th><th>Value</th><th></th></tr>';
+			for (const itemId in state.inventory) {
+				const item = items[itemId];
+				if (item.type != 'treasure') {
+					let value = Math.ceil(item.value * resaleFactor);
+					if (item.type == 'weapon') {
+						value *= state.inventory[itemId] / item.value;
+					}
+					html += '<tr>';
+					html += `<td><img src="${item.image.src}"/></td>`;
+					html += `<td>${item.label}</td>`;
+					html += `<td>${moneySymbol} ${value}</td>`;
+					html += `<td><div class="button" onClick="sellItem('${itemId}', ${value})">Sell</div></td>`;
+					html += '</tr>';
+				}
+			}
+		}
+		if (numSaleableItems == 0) {
+			html += '<tr><th>You have nothing that interests me.</th></tr>';
+		}
 	} else if (type == 'repair') {
-		html += '<table>';
-		if (Object.keys(state.inventory).length == 0) {
+		let numWeapons = 0;
+		for (const itemId in state.inventory) {
+			const type = items[itemId].type;
+			if (type == 'weapon') {
+				numWeapons++;
+			}
+		}
+
+		if (numWeapons == 0) {
 			html += '<tr><th>You don\'t appear to be carrying any weapons...</th></tr>';
 		} else {
 			let hasDamagedWeapon;
 			for (const itemId in state.inventory) {
-				const type = items[itemId].type;
-				if (type == 'weapon' && state.inventory[itemId] < items[itemId].value) {
+				const item = items[itemId];
+				if (item.type == 'weapon' && state.inventory[itemId] < item.value) {
 					hasDamagedWeapon = true;
 					break;
 				}
 			}
 			if (hasDamagedWeapon) {
-				html += '<tr><th></th><th></th><th>Condition</th><th>Cost</th><th></th></tr>';
+				html += '<tr><th></th><th>Item</th><th>Condition</th><th>Cost</th><th></th></tr>';
 			}
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
-				const type = items[itemId].type;
-				if (type == 'weapon' && state.inventory[itemId] < items[itemId].value) {
+				if (item.type == 'weapon' && state.inventory[itemId] < item.value) {
 					html += '<tr>';
 					html += `<td><img src="${item.image.src}"/></td>`;
 					html += `<td>${item.label}</td > `;
@@ -1398,8 +1435,8 @@ function showMerchantSelection(type) {
 				html += '<tr><th>All your weapons are in excellent condition!<br/> There\'s nothing for me to repair here.</th></tr>';
 			}
 		}
-		html += '</table>';
 	}
+	html += '</table>';
 	contentInner.innerHTML = html;
 	content.classList.remove('hidden');
 }
@@ -1415,6 +1452,21 @@ function repairItem(itemId) {
 		toast('There you are... good as new!');
 		drawMerchantInteraction();
 	}
+}
+
+function sellItem(itemId, value) {
+	play(characters.merchant.sounds.sell);
+	state.inventory.treasure = (state.inventory.treasure || 0) + value;
+	if (items[itemId].type == 'weapon') {
+		delete state.inventory[itemId];
+	} else {
+		state.inventory[itemId]--;
+		if (state.inventory[itemId] == 0) {
+			delete state.inventory[itemId];
+		}
+	}
+	toast('Thank you! It has been a pleasure doing business.');
+	drawMerchantInteraction();
 }
 
 function merchantCancel() {
