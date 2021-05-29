@@ -141,10 +141,10 @@ function load() {
 		for (const door of room.doors || []) {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
-		for (const character of room.characters || []) {
-			character.motion = 'idleFrames';
-			animate(character);
-		}
+		// for (const character of room.characters || []) {
+		// 	character.motion = 'idleFrames';
+		// 	// animate(character);
+		// }
 	}
 
 	for (const room of rooms) {
@@ -324,6 +324,10 @@ function drawGame() {
 					}, character.attackMetrics.prepTime || 0);
 				}
 
+				const prevCharacterLoc = {
+					x: roomCharacter.location.x,
+					y: roomCharacter.location.y,
+				};
 				for (const move of character.move || []) {
 					move(roomCharacter);
 				}
@@ -348,10 +352,24 @@ function drawGame() {
 						roomCharacter.vel.y *= -1;
 					}
 				}
+
 				roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / (2 * state.room.height), roomCharacter.location.y);
 				roomCharacter.location.y = Math.max(character.height / (2 * state.room.height), roomCharacter.location.y);
 				roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
 				roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
+
+				const playerWidth = (characters.player.width / state.room.width) / 2;
+				const playerHeight = (characters.player.height / state.room.height) / 2;
+				const characterWidth = (character.width / state.room.width) / 2;
+				const characterHeight = (character.height / state.room.height) / 2;
+				if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
+					state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
+					state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
+					state.player.y - playerHeight < roomCharacter.location.y + characterHeight
+				) {
+					roomCharacter.location.x = prevCharacterLoc.x;
+					roomCharacter.location.y = prevCharacterLoc.y;
+				}
 			}
 
 			let size = 1;
@@ -697,15 +715,24 @@ function drawGame() {
 	// check for intersection with other character
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
-		if (state.player.x + (characters.player.width / state.room.width) / 2 > roomCharacter.location.x - (character.width / state.room.width) / 2 &&
-			state.player.x - (characters.player.width / state.room.width) / 2 < roomCharacter.location.x + (character.width / state.room.width) / 2 &&
-			state.player.y + (characters.player.height / state.room.height) / 2 > roomCharacter.location.y - (character.height / state.room.height) / 2 &&
-			state.player.y - (characters.player.height / state.room.height) / 2 < roomCharacter.location.y + (character.height / state.room.height) / 2
+		const playerWidth = (characters.player.width / state.room.width) / 2;
+		const playerHeight = (characters.player.height / state.room.height) / 2;
+		const characterWidth = (character.width / state.room.width) / 2;
+		const characterHeight = (character.height / state.room.height) / 2;
+		if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
+			state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
+			state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
+			state.player.y - playerHeight < roomCharacter.location.y + characterHeight
 		) {
 			state.player.x = prevPlayerLoc.x;
 			state.player.y = prevPlayerLoc.y;
 			// console.log(roomCharacter.location);
 			// console.log(character.width);
+			if (character.type == 'merchant') {
+				isPaused = true;
+				document.getElementById('toggle-pause').innerHTML = 'Resume';
+				drawMerchantInteraction();
+			}
 		}
 	}
 
@@ -726,7 +753,7 @@ function drawGame() {
 			state.player.y > portal.location.y - portalSize / 2 &&
 			state.player.y < portal.location.y + portalSize / 2
 		) {
-			state.room = rooms.find(r => r.id == portal.roomId);
+			setRoom(rooms.find(r => r.id == portal.roomId));
 			state.player.x = state.player.y = 0.5;
 		}
 	}
@@ -784,7 +811,7 @@ function drawGame() {
 			w: 'e'
 		}[throughDoor.wall];
 		const prevRoom = state.room;
-		state.room = throughDoor.room;
+		setRoom(throughDoor.room);
 		if (!mappedRooms.includes(state.room)) {
 			mappedRooms.push(state.room);
 			// console.log(mappedRooms);
@@ -954,6 +981,11 @@ function drawMap() {
 	}
 }
 
+
+function drawMerchantInteraction() {
+	document.getElementById('merchant-modal').classList.remove('hidden');
+
+}
 
 function drawInventory() {
 	document.getElementById('inventory-modal').classList.remove('hidden');
@@ -1153,10 +1185,15 @@ function onKeyDown(e) {
 			animate(state.player);
 		}
 	}
-	keysDown[e.code] = true;
+	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C'].includes(e.code)) {
+		keysDown[e.code] = true;
+	}
 }
 
 function animate(character) {
+	// if (character.id != 'player') {
+	// 	console.log('character', character);
+	// }
 	clearInterval(animIntervalIds[character.id]);
 
 	animFrameNums[character.id] = 0;
@@ -1177,6 +1214,9 @@ function animate(character) {
 		} else {
 			frames = characterFrames[character.id][motion];
 		}
+		// if (character.id != 'player') {
+		// 	console.log('motion', motion);
+		// }
 		characterImages[character.id] = frames[animFrameNums[character.id] % frames.length];
 		animFrameNums[character.id]++;
 		// console.log('anim', motion);
@@ -1202,7 +1242,7 @@ function toScreen(loc, character) {
 		height: 0
 	};
 	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
-		console.log('bad!', loc, character);
+		console.error('bad!', loc, character);
 	}
 	const x = ((loc.x * state.room.width) - character.width / 2 + (1 - state.room.width) / 2) * canvas.width;
 	const y = ((loc.y * state.room.height) - character.height / 2 + (1 - state.room.height) / 2) * canvas.height;
@@ -1290,5 +1330,17 @@ function quaffPotion(itemId) {
 		play(items[itemId].sounds.quaff);
 		drawInventory();
 		drawStatus();
+	}
+}
+
+function setRoom(room) {
+	state.room = room;
+	for (id in animIntervalIds) {
+		clearInterval(animIntervalIds[id]);
+	}
+
+	for (const character of room.characters || []) {
+		character.motion = 'idleFrames';
+		animate(character);
 	}
 }

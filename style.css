@@ -125,3 +125,7 @@ canvas {
 #inventory-modal tr {
 	vertical-align: top;
 }
+
+#merchant-modal #action-buttons .button {
+	margin-bottom: 12px;
+}
