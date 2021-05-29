@@ -134,7 +134,10 @@ rooms = [
 				location: {
 					x: 0.5,
 					y: 0.0
-				}
+				},
+				itemsForSale: [
+					'sword_1', 'sword_2', 'healing_potion_1', 'electrosmasher',
+				],
 			},
 		],
 		sounds: {

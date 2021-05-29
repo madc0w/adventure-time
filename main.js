@@ -1,4 +1,4 @@
-const state = {
+let state = {
 	player: {
 		id: 'player',
 		x: 0.5,
@@ -185,6 +185,14 @@ function load() {
 			toggleInstructions();
 		}, 800);
 	}
+
+	if (localStorage.state) {
+		state = JSON.parse(localStorage.state);
+	}
+
+	// setTimeout(() => {
+	// 	localStorage.state = JSON.stringify(state);
+	// }, 2000);
 }
 
 function draw() {
@@ -995,7 +1003,14 @@ function drawInventory() {
 	document.getElementById('inventory-modal').classList.remove('hidden');
 	let html = '';
 	let numLines = 0;
-	for (const itemId in state.inventory) {
+	const itemIds = Object.keys(state.inventory);
+	const itemOrder = ['treasure', 'weapon', 'potion'];
+	itemIds.sort((id1, id2) => {
+		const type1 = items[id1].type;
+		const type2 = items[id2].type;
+		return itemOrder.indexOf(type1) > itemOrder.indexOf(type2) ? 1 : -1;
+	});
+	for (const itemId of itemIds) {
 		numLines++;
 		const item = items[itemId];
 		html += '<tr>';
@@ -1354,11 +1369,7 @@ function setRoom(room) {
 		play(room.sounds.enter);
 	}
 	roomMusic && roomMusic.pause();
-	if (room.sounds && room.sounds.ambient) {
-		roomMusic = room.sounds.ambient;
-	} else {
-		roomMusic = defaultRoomMusic;
-	}
+	roomMusic = (room.sounds && room.sounds.ambient) || defaultRoomMusic;
 }
 
 function showMerchantSelection(type) {
@@ -1371,7 +1382,17 @@ function showMerchantSelection(type) {
 
 	html += '<table>';
 	if (type == 'buy') {
-
+		const merchant = state.room.characters.find(c => c.id == 'merchant');
+		html += '<tr><th></th><th>Item</th><th>Value</th><th></th></tr>';
+		for (const itemId of merchant.itemsForSale) {
+			const item = items[itemId];
+			html += '<tr>';
+			html += `<td><img src="${item.image.src}"/></td>`;
+			html += `<td>${item.label}</td>`;
+			html += `<td>${moneySymbol} ${item.cost}</td>`;
+			html += `<td><div class="button" onClick="buyItem('${itemId}')">Buy</div></td>`;
+			html += '</tr>';
+		}
 	} else if (type == 'sell') {
 		let numSaleableItems = 0;
 		for (const itemId in state.inventory) {
@@ -1477,6 +1498,23 @@ function sellItem(itemId, value) {
 	}
 	toast('Thank you! It has been a pleasure doing business.');
 	drawMerchantInteraction();
+}
+
+function buyItem(itemId) {
+	const item = items[itemId];
+	if (item.cost > (state.inventory.treasure || 0)) {
+		toast('Sorry, you can\'t afford that. Come back with more gold!');
+	} else {
+		if (item.type == 'weapon' && state.inventory[itemId] > 0) {
+			toast('It looks like you\'re already carrying one of those.<br/> Maybe you\'d like to sell me yours first?');
+		} else {
+			play(characters.merchant.sounds.buy);
+			state.inventory.treasure -= item.cost;
+			state.inventory[itemId] = item.value;
+			toast('Sold! It has been a pleasure doing business.');
+			drawMerchantInteraction();
+		}
+	}
 }
 
 function merchantCancel() {

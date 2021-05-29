@@ -47,6 +47,24 @@ items = {
 			broken: 'broken weapon.mp3',
 		},
 	},
+	electrosmasher: {
+		type: 'weapon',
+		image: 'electrosmasher.png',
+		label: 'Electrosmahser',
+		size: 0.1,
+		range: 0.16, // proportion of canvas
+		damage: 0.5,
+		resetTime: 600,
+		value: 20, // num uses of weapon before it breaks
+		cost: 32,
+		repairCost: 20,
+		sounds: {
+			hit: 'sword 02 hit.mp3',
+			draw: 'sword 02 draw.mp3',
+			pickup: 'sword pickup.mp3',
+			broken: 'broken weapon.mp3',
+		},
+	},
 	healing_potion_1: {
 		type: 'potion',
 		image: 'healing potion 01.png',
@@ -63,5 +81,5 @@ items = {
 				return true;
 			}
 		}
-	}
+	},
 };

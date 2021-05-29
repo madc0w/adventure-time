@@ -325,6 +325,7 @@ characters = {
 		sounds: {
 			repair: 'merchant repair.mp3',
 			sell: 'cash register.mp3',
+			buy: 'cash register.mp3',
 		}
 	}
 };
