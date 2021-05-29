@@ -132,7 +132,10 @@ rooms = [
 					y: 0.0
 				}
 			},
-		]
+		],
+		sounds: {
+			enter: 'door open 3.mp3',
+		}
 	}, {
 		id: 3,
 		width: 0.9,

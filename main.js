@@ -141,10 +141,9 @@ function load() {
 		for (const door of room.doors || []) {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
-		// for (const character of room.characters || []) {
-		// 	character.motion = 'idleFrames';
-		// 	// animate(character);
-		// }
+		for (const sound in room.sounds || {}) {
+			room.sounds[sound] = new Audio(`sounds/${room.sounds[sound]}`);
+		}
 	}
 
 	for (const room of rooms) {
@@ -1332,5 +1331,9 @@ function setRoom(room) {
 	for (const character of room.characters || []) {
 		character.motion = 'idleFrames';
 		animate(character);
+	}
+
+	if (room.sounds && room.sounds.enter) {
+		play(room.sounds.enter);
 	}
 }

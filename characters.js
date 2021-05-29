@@ -322,5 +322,7 @@ characters = {
 			'merchant 03.png',
 			'merchant 02.png',
 		],
+		sounds: {
+		}
 	}
 };

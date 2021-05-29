@@ -127,5 +127,7 @@ canvas {
 }
 
 #merchant-modal #action-buttons .button {
-	margin-bottom: 12px;
+	margin-top: 28px;
+	margin-left: auto;
+	margin-right: auto;
 }
