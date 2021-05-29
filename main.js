@@ -10,7 +10,7 @@ const state = {
 	room: rooms[0],
 };
 
-const resaleFactor = 0.6;
+const resaleFactor = 0.7;
 const moneySymbol = '&#10086;';
 const wallColor = '#3f2f0c';
 const backgroundColor = '#c1e5be';
@@ -1353,8 +1353,8 @@ function setRoom(room) {
 	if (room.sounds && room.sounds.enter) {
 		play(room.sounds.enter);
 	}
+	roomMusic && roomMusic.pause();
 	if (room.sounds && room.sounds.ambient) {
-		roomMusic.pause();
 		roomMusic = room.sounds.ambient;
 	} else {
 		roomMusic = defaultRoomMusic;
@@ -1465,6 +1465,9 @@ function sellItem(itemId, value) {
 	play(characters.merchant.sounds.sell);
 	state.inventory.treasure = (state.inventory.treasure || 0) + value;
 	if (items[itemId].type == 'weapon') {
+		if (state.player.wielding == itemId) {
+			state.player.wielding = null;
+		}
 		delete state.inventory[itemId];
 	} else {
 		state.inventory[itemId]--;
