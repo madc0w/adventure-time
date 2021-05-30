@@ -24,8 +24,9 @@
 			<canvas id="status-canvas"></canvas>
 		</div>
 		<div id="controls-conatiner">
-			<div id="how-to-play" class="button" onClick="toggleInstructions()">How to Play</div>
+			<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
 			<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
+			<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
 		</div>
 
 		<div id="inventory-modal" class="hidden modal">
@@ -91,6 +92,20 @@
 				</tr>
 			</table>
 			<div class="button" onClick="closeModals()">OK</div>
+		</div>
+
+		<div id="reset-game-modal" class="hidden modal">
+			<div class="header">Reset Game</div>
+			<hr />
+			<div>
+				<div>
+					Do you really want to lose all your progress and start a whole new adventure?
+				</div>
+				<div>
+					<div class="button" onClick="reset()">Yes!</div>
+					<div class="button" onClick="closeModals()">Never mind</div>
+				</div>
+			</div>
 		</div>
 
 		<div id="toast" class="hidden"> </div>

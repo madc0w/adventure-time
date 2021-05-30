@@ -46,7 +46,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound, roomMusic;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound, roomMusic, dreamSound, didUserInteract;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -67,7 +67,32 @@ function load() {
 	statusCtx = statusCanvas.getContext('2d');
 
 	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
+	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
+
+	if (localStorage.state) {
+		t = parseInt(localStorage.t);
+		isPaused = localStorage.isPaused == 'true';
+		state = JSON.parse(localStorage.state);
+		state.room.doors = rooms[state.room.id].doors;
+		const savedRooms = JSON.parse(localStorage.rooms);
+		for (const savedRoom of savedRooms) {
+			const room = rooms.find(r => r.id == savedRoom.id);
+			room.items = savedRoom.items;
+			room.characters = savedRoom.characters;
+		}
+	}
+
+	setInterval(() => {
+		localStorage.state = JSON.stringify(state, (key, value) => {
+			return key == 'doors' ? [] : value;
+		});
+		localStorage.rooms = JSON.stringify(rooms, (key, value) => {
+			return key == 'doors' ? [] : value;
+		});
+		localStorage.t = t;
+		localStorage.isPaused = isPaused;
+	}, 2000);
 
 	for (const characterId in characters) {
 		const character = characters[characterId];
@@ -175,24 +200,20 @@ function load() {
 	}
 	// console.log(rooms);
 
-	setRoom(rooms[0]);
-	t = 0;
+	if (localStorage.state) {
+		setRoom(state.room);
+	} else {
+		setRoom(rooms[0]);
+		t = 0;
+	}
 	requestAnimationFrame(draw);
 
 	if (!JSON.parse(localStorage.didShowInstructions || null)) {
 		localStorage.didShowInstructions = true;
 		setTimeout(() => {
-			toggleInstructions();
+			showModal('instructions-modal');
 		}, 800);
 	}
-
-	if (localStorage.state) {
-		state = JSON.parse(localStorage.state);
-	}
-
-	// setTimeout(() => {
-	// 	localStorage.state = JSON.stringify(state);
-	// }, 2000);
 }
 
 function draw() {
@@ -552,6 +573,8 @@ function drawGame() {
 
 			state.player.motion = 'dieFrames';
 			animate(state.player);
+			delete localStorage.state;
+			delete localStorage.rooms;
 		}
 
 		return;
@@ -1128,12 +1151,14 @@ function onKeyUp(e) {
 		return;
 	}
 
-	setTimeout(() => {
-		play(roomMusic);
-		roomMusic.addEventListener('ended', function () {
+	if (e.code != 'F5') {
+		setTimeout(() => {
 			play(roomMusic);
-		});
-	}, 20);
+			roomMusic.addEventListener('ended', function () {
+				play(roomMusic);
+			});
+		}, 20);
+	}
 
 	delete keysDown[e.code];
 	if (Object.keys(keysDown).length == 0) {
@@ -1149,11 +1174,11 @@ function onKeyUp(e) {
 	} else if (e.key.toUpperCase() == 'I') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
+		closeModals();
 		if (!isPaused) {
 			togglePause();
 		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
-		closeModals();
 		drawInventory();
 	} else if (e.key.toUpperCase() == 'A') {
 		attack();
@@ -1190,6 +1215,7 @@ function onKeyUp(e) {
 }
 
 function onKeyDown(e) {
+	didUserInteract = true;
 	if (didDie) {
 		return;
 	}
@@ -1287,7 +1313,7 @@ function debug(text) {
 }
 
 function play(sound) {
-	if (sound) {
+	if (sound && didUserInteract) {
 		try {
 			sound.play();
 			return true;
@@ -1297,15 +1323,16 @@ function play(sound) {
 	}
 }
 
-function toggleInstructions() {
+function showModal(id) {
 	play(clickSound);
-	const modal = document.getElementById('instructions-modal');
-	isPaused = modal.classList.contains('hidden');
-	document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
-	modal.classList.toggle('hidden');
+	const modal = document.getElementById(id);
+	isPaused = true;
+	document.getElementById('toggle-pause').innerHTML = 'Resume';
+	modal.classList.remove('hidden');
 }
 
 function togglePause() {
+	// console.log('togglePause', isPaused);
 	play(clickSound);
 	if (didDie) {
 		location.href = location.href;
@@ -1453,7 +1480,7 @@ function showMerchantSelection(type) {
 					html += '<tr>';
 					html += `<td><img src="${item.image.src}"/></td>`;
 					html += `<td>${item.label}</td > `;
-					html += `<td>${state.inventory[itemId]} /${item.value}</td>`;
+					html += `<td>${state.inventory[itemId]}/${item.value}</td>`;
 					html += `<td>${moneySymbol} ${item.repairCost}</td>`;
 					html += `<td><div class="button" onClick="repairItem('${itemId}')">Repair</div></td>`;
 					html += '</tr>';
@@ -1540,4 +1567,18 @@ function toast(message) {
 			}
 		}, 40);
 	}, 2400);
+}
+
+function reset() {
+	play(dreamSound);
+	let opacity = 1;
+	setInterval(() => {
+		document.body.style.opacity = opacity;
+		opacity -= 0.01;
+	}, 20);
+	setTimeout(() => {
+		delete localStorage.state;
+		delete localStorage.rooms;
+		location.href = location.href;
+	}, 2000);
 }
