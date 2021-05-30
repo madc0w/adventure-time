@@ -46,7 +46,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, isPaused, clickSound, roomMusic, dreamSound, didUserInteract;
+let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, clickSound, roomMusic, dreamSound, didUserInteract;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -72,7 +72,6 @@ function load() {
 
 	if (localStorage.state) {
 		t = parseInt(localStorage.t);
-		isPaused = localStorage.isPaused == 'true';
 		state = JSON.parse(localStorage.state);
 		state.room.doors = rooms[state.room.id].doors;
 		const savedRooms = JSON.parse(localStorage.rooms);
@@ -81,17 +80,22 @@ function load() {
 			room.items = savedRoom.items;
 			room.characters = savedRoom.characters;
 		}
+		// for (const sound in state.room.sounds) {
+		// 	console.log('state.room.sounds ', sound);
+		// }
+
+		state.isPaused = false;
 	}
 
 	setInterval(() => {
 		localStorage.state = JSON.stringify(state, (key, value) => {
+			// console.log('key value', key, value);
 			return key == 'doors' ? [] : value;
 		});
 		localStorage.rooms = JSON.stringify(rooms, (key, value) => {
 			return key == 'doors' ? [] : value;
 		});
 		localStorage.t = t;
-		localStorage.isPaused = isPaused;
 	}, 2000);
 
 	for (const characterId in characters) {
@@ -140,6 +144,9 @@ function load() {
 
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
+	document.addEventListener('mousedown', e => {
+		didUserInteract = true;
+	});
 
 	for (const itemKey in items) {
 		const item = items[itemKey];
@@ -170,6 +177,7 @@ function load() {
 			door.room = rooms.find(r => r.id == door.roomId);
 		}
 		for (const sound in room.sounds || {}) {
+			// console.log('sounds/${room.sounds[sound]}', `sounds/${room.sounds[sound]}`);
 			room.sounds[sound] = new Audio(`sounds/${room.sounds[sound]}`);
 		}
 	}
@@ -206,6 +214,7 @@ function load() {
 		setRoom(rooms[0]);
 		t = 0;
 	}
+
 	requestAnimationFrame(draw);
 
 	if (!JSON.parse(localStorage.didShowInstructions || null)) {
@@ -217,7 +226,7 @@ function load() {
 }
 
 function draw() {
-	if (!isPaused) {
+	if (!state.isPaused) {
 		ctx.fillStyle = backgroundColor;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		// console.log('state.player.health ', state.player.health);
@@ -763,7 +772,7 @@ function drawGame() {
 			// console.log(roomCharacter.location);
 			// console.log(character.width);
 			if (character.type == 'merchant') {
-				isPaused = true;
+				state.isPaused = true;
 				document.getElementById('toggle-pause').innerHTML = 'Resume';
 				drawMerchantInteraction();
 			}
@@ -1147,12 +1156,17 @@ function getTargetedCharacter() {
 
 
 function onKeyUp(e) {
+	// console.log('onKeyUp', e);
+	if (e.code != 'Tab' && e.key != 'Alt') {
+		didUserInteract = true;
+	}
 	if (didDie) {
 		return;
 	}
 
 	if (e.code != 'F5') {
 		setTimeout(() => {
+			// console.log(roomMusic);
 			play(roomMusic);
 			roomMusic.addEventListener('ended', function () {
 				play(roomMusic);
@@ -1175,7 +1189,7 @@ function onKeyUp(e) {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
 		closeModals();
-		if (!isPaused) {
+		if (!state.isPaused) {
 			togglePause();
 		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
@@ -1215,7 +1229,7 @@ function onKeyUp(e) {
 }
 
 function onKeyDown(e) {
-	didUserInteract = true;
+	// console.log('onKeyDown', e);
 	if (didDie) {
 		return;
 	}
@@ -1326,19 +1340,19 @@ function play(sound) {
 function showModal(id) {
 	play(clickSound);
 	const modal = document.getElementById(id);
-	isPaused = true;
+	state.isPaused = true;
 	document.getElementById('toggle-pause').innerHTML = 'Resume';
 	modal.classList.remove('hidden');
 }
 
 function togglePause() {
-	// console.log('togglePause', isPaused);
+	// console.log('togglePause', state.isPaused);
 	play(clickSound);
 	if (didDie) {
 		location.href = location.href;
 	} else {
-		isPaused = !isPaused;
-		document.getElementById('toggle-pause').innerHTML = isPaused ? 'Resume' : 'Pause';
+		state.isPaused = !state.isPaused;
+		document.getElementById('toggle-pause').innerHTML = state.isPaused ? 'Resume' : 'Pause';
 	}
 }
 
@@ -1347,7 +1361,7 @@ function closeModals() {
 	for (let i = 0; i < modals.length; i++) {
 		modals[i].classList.add('hidden');
 	}
-	if (isPaused) {
+	if (state.isPaused) {
 		togglePause();
 	}
 }
@@ -1396,7 +1410,8 @@ function setRoom(room) {
 		play(room.sounds.enter);
 	}
 	roomMusic && roomMusic.pause();
-	roomMusic = (room.sounds && room.sounds.ambient) || defaultRoomMusic;
+	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || defaultRoomMusic;
+	// console.log('setRoom roomMusic ', roomMusic);
 }
 
 function showMerchantSelection(type) {
