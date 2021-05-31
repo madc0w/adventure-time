@@ -153,7 +153,7 @@ rooms = [
 		id: 3,
 		width: 0.9,
 		height: 0.9,
-		backgroundImage: 'room_02.jpg',
+		backgroundImage: 'granite stones texture.jpg',
 		// wallColor: '#3f2',
 		doors: [
 		],
@@ -191,7 +191,7 @@ rooms = [
 		id: 4,
 		width: 0.6,
 		height: 0.7,
-		backgroundImage: 'room_02.jpg',
+		backgroundImage: 'granite stones texture.jpg',
 		// wallColor: '#3f2',
 		doors: [
 			{
