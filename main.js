@@ -879,10 +879,10 @@ function drawGame() {
 					state.player.x = (1 - state.room.width * characters.player.width) / 2;
 				}
 			} else {
-				console.log('state.room.doors ', state.room.doors);
-				console.log('door', door);
-				console.log('oppositeWall ', oppositeWall);
-				console.log('prevRoom', prevRoom);
+				// console.log('state.room.doors ', state.room.doors);
+				// console.log('door', door);
+				// console.log('oppositeWall ', oppositeWall);
+				// console.log('prevRoom', prevRoom);
 				if (door) {
 					state.player.y = door.location + (characters.player.height / state.room.height) / 2;
 				} else {
