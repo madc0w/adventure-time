@@ -21,18 +21,16 @@ const doorwaySize = {
 	width: 0.006,
 	height: 0.04
 };
-const wallWidth = 0.01;
+const wallWidth = 0.02;
 const moveIncrement = 0.006;
 const itemTakeDistance = 32;
 const numTakeItemAnimSteps = 12;
 const numCharacterDieAnimSteps = 148;
 
 const mapBackgroundColor = '#e2e2b1';
-const mapRoomColor = '#a5a5a4';
 const mapPassageColor = '#ccd';
 const mapMargin = 0.02;
 const mapScale = 0.24;
-const mappedRooms = [rooms[0]];
 
 const portalSize = 0.12;
 const portalAnimInterval = 60;
@@ -856,8 +854,8 @@ function drawGame() {
 		}[throughDoor.wall];
 		const prevRoom = state.room;
 		setRoom(throughDoor.room);
-		if (!mappedRooms.includes(state.room)) {
-			mappedRooms.push(state.room);
+		if (!state.mappedRooms.includes(state.room.id)) {
+			state.mappedRooms.push(state.room.id);
 			// console.log(mappedRooms);
 		}
 		throughDoor = null;
@@ -898,6 +896,10 @@ function drawGame() {
 }
 
 function drawMap() {
+	if (!state.mappedRooms) {
+		state.mappedRooms = [rooms[0].id];
+	}
+
 	{
 		// map background
 		ctx.fillStyle = mapBackgroundColor;
@@ -912,7 +914,7 @@ function drawMap() {
 			mapped.push(room);
 			{
 				ctx.strokeStyle = room.wallColor || wallColor;
-				ctx.lineWidth = wallWidth * mapScale * canvas.width;
+				ctx.lineWidth = 2 * wallWidth * mapScale * canvas.width;
 				const width = room.width * mapScale * canvas.width;
 				const height = room.height * mapScale * canvas.height;
 				const x = - width / 2;
@@ -920,8 +922,11 @@ function drawMap() {
 				ctx.beginPath();
 				ctx.rect(x + offset.x, y + offset.y, width, height);
 				ctx.stroke();
-				ctx.fillStyle = mapRoomColor;
-				ctx.fillRect(x + offset.x, y + offset.y, width, height);
+				// ctx.fillStyle = mapRoomColor;
+				// ctx.fillRect(x + offset.x, y + offset.y, width, height);
+				const roomBackground = new Image();
+				roomBackground.src = `img/rooms/${room.backgroundImage}`;
+				ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
 			}
 
 			for (const door of room.doors || []) {
@@ -957,7 +962,7 @@ function drawMap() {
 			}
 
 			for (const door of room.doors || []) {
-				if (mappedRooms.includes(door.room)) {
+				if (state.mappedRooms.includes(door.room.id)) {
 					let x = offset.x, y = offset.y;
 					if (door.wall == 'n') {
 						y -= canvas.height * mapScale;
@@ -994,6 +999,17 @@ function drawMap() {
 					ctx.lineTo(door.oppositeDoor.p1.x, door.oppositeDoor.p1.y);
 					ctx.closePath();
 					ctx.fill();
+
+					ctx.strokeStyle = room.wallColor || wallColor;
+					ctx.lineWidth = wallWidth * mapScale * canvas.width;
+					ctx.beginPath();
+					ctx.moveTo(door.p1.x, door.p1.y);
+					ctx.lineTo(door.oppositeDoor.p1.x, door.oppositeDoor.p1.y);
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.lineTo(door.p2.x, door.p2.y);
+					ctx.lineTo(door.oppositeDoor.p2.x, door.oppositeDoor.p2.y);
+					ctx.stroke();
 				} else {
 					let width, height;
 					let x = door.p1.x;

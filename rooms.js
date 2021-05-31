@@ -136,7 +136,7 @@ rooms = [
 					y: 0.0
 				},
 				itemsForSale: [
-					'enchantedSword', 'venomDagger', 'healing_potion_1', 'electrosmasher',
+					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher',
 				],
 			},
 		],
@@ -169,13 +169,13 @@ rooms = [
 		],
 		items: [
 			{
-				id: 'healing_potion_1',
+				id: 'healingPotion1',
 				location: {
 					x: 0.5,
 					y: 0.8
 				}
 			}, {
-				id: 'healing_potion_1',
+				id: 'healingPotion1',
 				location: {
 					x: 0.5,
 					y: 0.4

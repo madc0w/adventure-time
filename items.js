@@ -65,7 +65,7 @@ items = {
 			broken: 'broken weapon.mp3',
 		},
 	},
-	healing_potion_1: {
+	healingPotion1: {
 		type: 'potion',
 		image: 'healing potion 01.png',
 		label: 'Healing Potion',
