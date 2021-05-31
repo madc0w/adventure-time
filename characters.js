@@ -162,10 +162,12 @@ characters = {
 		wielding: {
 			enchantedSword: {
 				left: [
-					'player left wielding enchanted sword.png',
+					'player left wielding enchanted sword 01.png',
+					'player left wielding enchanted sword 02.png',
 				],
 				right: [
-					'player right wielding enchanted sword.png',
+					'player right wielding enchanted sword 01.png',
+					'player right wielding enchanted sword 02.png',
 				],
 				idleFrames: [
 					'player standing wielding enchanted sword.png',
@@ -175,7 +177,8 @@ characters = {
 					'player up wielding 02.png',
 				],
 				down: [
-					'player standing wielding enchanted sword.png',
+					'player down wielding enchanted sword 01.png',
+					'player down wielding enchanted sword 02.png',
 				],
 			},
 			venomDagger: {
