@@ -42,13 +42,18 @@ rooms = [
 			// 	}
 			// },
 			{
+				id: 'invisibilityPotion',
+				location: {
+					x: 0.2,
+					y: 0.8
+				}
+			}, {
 				id: 'venomDagger',
 				location: {
 					x: 0.7,
 					y: 0.8
 				}
-			},
-			{
+			}, {
 				id: 'venomDagger',
 				location: {
 					x: 0.2,

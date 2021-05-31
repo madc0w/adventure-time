@@ -45,7 +45,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let t, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, clickSound, roomMusic, dreamSound, didUserInteract;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, clickSound, roomMusic, dreamSound, didUserInteract;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -70,7 +70,6 @@ function load() {
 	clickSound = new Audio('sounds/click.mp3');
 
 	if (localStorage.state) {
-		t = parseInt(localStorage.t);
 		state = JSON.parse(localStorage.state);
 		state.room.doors = rooms[state.room.id].doors;
 		const savedRooms = JSON.parse(localStorage.rooms);
@@ -94,7 +93,6 @@ function load() {
 		localStorage.rooms = JSON.stringify(rooms, (key, value) => {
 			return key == 'doors' ? [] : value;
 		});
-		localStorage.t = t;
 	}, 2000);
 
 	for (const characterId in characters) {
@@ -210,8 +208,9 @@ function load() {
 	if (localStorage.state) {
 		setRoom(state.room);
 	} else {
+		state.mappedRooms = [rooms[0].id];
 		setRoom(rooms[0]);
-		t = 0;
+		state.t = 0;
 	}
 
 	requestAnimationFrame(draw);
@@ -236,7 +235,7 @@ function draw() {
 
 		drawFunc();
 		drawStatus();
-		t++;
+		state.t++;
 	}
 	requestAnimationFrame(draw);
 }
@@ -373,7 +372,12 @@ function drawGame() {
 				}
 
 				// console.log(roomCharacter.width * state.room.width);
-				for (const roomCharacter2 of (state.room.characters || []).concat(state.player)) {
+				let interactingCharacters = state.room.characters || [];
+				if (!state.player.isInvisible) {
+					interactingCharacters = interactingCharacters.concat(state.player);
+				}
+
+				for (const roomCharacter2 of interactingCharacters) {
 					if (roomCharacter != roomCharacter2) {
 						for (const interact of character.interact || []) {
 							interact(roomCharacter, roomCharacter2);
@@ -466,7 +470,7 @@ function drawGame() {
 				// console.log('targetedCharacter ', targetedCharacter);
 				if (targetedCharacter == roomCharacter) {
 					const r = 0.02;
-					const alpha = Math.floor(127 * (Math.sin(t / 22) + 1));
+					const alpha = Math.floor(127 * (Math.sin(state.t / 22) + 1));
 					let alphaHex = alpha.toString(16);
 					if (alphaHex.length < 2) {
 						alphaHex = '0' + alphaHex;
@@ -560,7 +564,15 @@ function drawGame() {
 		const loc = toScreen(state.player, characters.player);
 		// const x = (state.player.x - characters.player.width / 2) * canvas.width;
 		// const y = (state.player.y - characters.player.height / 2) * canvas.height;
+		if (state.player.isInvisible) {
+			if (state.t - state.player.invisibilityStart > items.invisibilityPotion.duration) {
+				state.player.isInvisible = false;
+			} else {
+				ctx.globalAlpha = 0.6;
+			}
+		}
 		ctx.drawImage(characterImages.player, loc.x, loc.y, characters.player.width * canvas.width, characters.player.height * canvas.height);
+		ctx.globalAlpha = 1;
 
 		// ctx.fillStyle = '#f00';
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
@@ -896,10 +908,6 @@ function drawGame() {
 }
 
 function drawMap() {
-	if (!state.mappedRooms) {
-		state.mappedRooms = [rooms[0].id];
-	}
-
 	{
 		// map background
 		ctx.fillStyle = mapBackgroundColor;
@@ -1478,7 +1486,7 @@ function showMerchantSelection(type) {
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
 				if (item.type != 'treasure') {
-					let value = item.value * resaleFactor;
+					let value = item.cost * resaleFactor;
 					if (item.type == 'weapon') {
 						value *= state.inventory[itemId] / item.value;
 					}

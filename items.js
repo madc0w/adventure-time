@@ -82,4 +82,23 @@ items = {
 			}
 		}
 	},
+	invisibilityPotion: {
+		type: 'potion',
+		image: 'invisibility potion.png',
+		label: 'Invisibility Potion',
+		size: 0.06,
+		cost: 18,
+		duration: 2000,
+		sounds: {
+			quaff: 'quaff potion.mp3',
+			pickup: 'pickup potion.mp3',
+		},
+		action: state => {
+			if (!state.player.isInvisible) {
+				state.player.isInvisible = true;
+				state.player.invisibilityStart = state.t;
+				return true;
+			}
+		}
+	},
 };
