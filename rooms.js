@@ -142,6 +142,7 @@ rooms = [
 		],
 		sounds: {
 			enter: 'door open 3.mp3',
+			ambient: 'merchant music.mp3',
 		}
 	}, {
 		id: 3,
