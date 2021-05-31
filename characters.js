@@ -219,7 +219,8 @@ characters = {
 					'player up wielding 02.png',
 				],
 				down: [
-					'player standing wielding electrosmasher.png',
+					'player down wielding electrosmasher 01.png',
+					'player down wielding electrosmasher 02.png',
 				],
 			},
 		},

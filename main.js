@@ -1461,10 +1461,11 @@ function showMerchantSelection(type) {
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
 				if (item.type != 'treasure') {
-					let value = Math.ceil(item.value * resaleFactor);
+					let value = item.value * resaleFactor;
 					if (item.type == 'weapon') {
 						value *= state.inventory[itemId] / item.value;
 					}
+					value = Math.ceil(value);
 					html += '<tr>';
 					html += `<td><img src="${item.image.src}"/></td>`;
 					html += `<td>${item.label}</td>`;
