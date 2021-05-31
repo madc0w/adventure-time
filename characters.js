@@ -136,7 +136,8 @@ characters = {
 			'player standing 02.png',
 		],
 		up: [
-			'player up.png',
+			'player up 01.png',
+			'player up 02.png',
 		],
 		down: [
 			'player down 01.png',
@@ -170,7 +171,8 @@ characters = {
 					'player standing wielding enchanted sword.png',
 				],
 				up: [
-					'player standing wielding enchanted sword.png',
+					'player up wielding 01.png',
+					'player up wielding 02.png',
 				],
 				down: [
 					'player standing wielding enchanted sword.png',
@@ -189,10 +191,12 @@ characters = {
 					'player standing wielding venom dagger.png',
 				],
 				up: [
-					'player standing wielding venom dagger.png',
+					'player up wielding 01.png',
+					'player up wielding 02.png',
 				],
 				down: [
-					'player standing wielding venom dagger.png',
+					'player down wielding venom dagger 01.png',
+					'player down wielding venom dagger 02.png',
 				],
 			},
 			electrosmasher: {
@@ -208,7 +212,8 @@ characters = {
 					'player standing wielding electrosmasher.png',
 				],
 				up: [
-					'player standing wielding electrosmasher.png',
+					'player up wielding 01.png',
+					'player up wielding 02.png',
 				],
 				down: [
 					'player standing wielding electrosmasher.png',
@@ -230,6 +235,14 @@ characters = {
 				],
 				right: [
 					'player right strike venom dagger.png',
+				]
+			},
+			electrosmasher: {
+				left: [
+					'player left strike electrosmasher.png',
+				],
+				right: [
+					'player right strike electrosmasher.png',
 				]
 			},
 		},
