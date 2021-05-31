@@ -96,7 +96,7 @@ canvas {
 	padding: 8px;
 }
 
-#inventory-table-container {
+.table-container {
 	overflow: auto;
 	height: calc(100% - 100px);
 }
@@ -134,6 +134,10 @@ canvas {
 #merchant-modal {
 	width: 400px;
 	left: calc(50% -200px);
+}
+
+#merchant-modal .table-container {
+	height: calc(100% - 140px);
 }
 
 #merchant-modal .button {

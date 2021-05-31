@@ -871,7 +871,7 @@ function drawGame() {
 				state.player.x = characters.player.width / (2 * state.room.height);;
 			}
 
-			const door = (state.room.doors || []).find(d => d.wall == oppositeWall && d.room == prevRoom);
+			const door = (state.room.doors || []).find(d => d.wall == oppositeWall && d.room.id == prevRoom.id);
 			if (['n', 's'].includes(oppositeWall)) {
 				if (door) {
 					state.player.x = door.location + (characters.player.width / state.room.width) / 2;
@@ -879,6 +879,10 @@ function drawGame() {
 					state.player.x = (1 - state.room.width * characters.player.width) / 2;
 				}
 			} else {
+				console.log('state.room.doors ', state.room.doors);
+				console.log('door', door);
+				console.log('oppositeWall ', oppositeWall);
+				console.log('prevRoom', prevRoom);
 				if (door) {
 					state.player.y = door.location + (characters.player.height / state.room.height) / 2;
 				} else {
@@ -1303,13 +1307,14 @@ function toScreen(loc, character) {
 		height: 0
 	};
 	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
-		console.error('bad!', loc, character);
+		console.error('toScreen: NaN detected!', loc, character);
 	}
 	const x = ((loc.x * state.room.width) - character.width / 2 + (1 - state.room.width) / 2) * canvas.width;
 	const y = ((loc.y * state.room.height) - character.height / 2 + (1 - state.room.height) / 2) * canvas.height;
 	return { x, y };
 }
 
+// return distnace as proportion of canvas size
 function distance(roomCharacter) {
 	const x1 = roomCharacter.location.x * state.room.width;
 	const y1 = roomCharacter.location.y * state.room.height;
@@ -1422,6 +1427,7 @@ function showMerchantSelection(type) {
 
 	let html = `<div id="player-treasure-amount">Your treasure: ${moneySymbol} ${state.inventory.treasure || 0}</div > `;
 
+	html += '<div class="table-container">';
 	html += '<table>';
 	if (type == 'buy') {
 		const merchant = state.room.characters.find(c => c.id == 'merchant');
@@ -1435,6 +1441,11 @@ function showMerchantSelection(type) {
 			html += `<td><div class="button" onClick="buyItem('${itemId}')">Buy</div></td>`;
 			html += '</tr>';
 		}
+		// for (let i = 0; i < 20; i++) {
+		// 	html += '<tr>';
+		// 	html += `<td>wawawa</td>`;
+		// 	html += '</tr>';
+		// }
 	} else if (type == 'sell') {
 		let numSaleableItems = 0;
 		for (const itemId in state.inventory) {
@@ -1507,6 +1518,7 @@ function showMerchantSelection(type) {
 		}
 	}
 	html += '</table>';
+	html += '</div>';
 	contentInner.innerHTML = html;
 	content.classList.remove('hidden');
 }

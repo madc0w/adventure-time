@@ -159,58 +159,77 @@ characters = {
 			'player dead 02.png',
 		],
 		wielding: {
-			sword_1: {
+			enchantedSword: {
 				left: [
-					'player left wielding sword_01.png',
+					'player left wielding enchanted sword.png',
 				],
 				right: [
-					'player right wielding sword_01.png',
+					'player right wielding enchanted sword.png',
 				],
 				idleFrames: [
-					'player standing wielding sword_01.png',
+					'player standing wielding enchanted sword.png',
 				],
 				up: [
-					'player standing wielding sword_01.png',
+					'player standing wielding enchanted sword.png',
 				],
 				down: [
-					'player standing wielding sword_01.png',
+					'player standing wielding enchanted sword.png',
 				],
 			},
-			sword_2: {
+			venomDagger: {
 				left: [
-					'player left wielding sword_02 01.png',
-					'player left wielding sword_02 02.png',
+					'player left wielding venom dagger 01.png',
+					'player left wielding venom dagger 02.png',
 				],
 				right: [
-					'player right wielding sword_02 01.png',
-					'player right wielding sword_02 02.png',
+					'player right wielding venom dagger 01.png',
+					'player right wielding venom dagger 02.png',
 				],
 				idleFrames: [
-					'player standing wielding sword_02.png',
+					'player standing wielding venom dagger.png',
 				],
 				up: [
-					'player standing wielding sword_02.png',
+					'player standing wielding venom dagger.png',
 				],
 				down: [
-					'player standing wielding sword_02.png',
+					'player standing wielding venom dagger.png',
 				],
-			}
+			},
+			electrosmasher: {
+				left: [
+					'player left wielding electrosmasher 01.png',
+					'player left wielding electrosmasher 02.png',
+				],
+				right: [
+					'player right wielding electrosmasher 01.png',
+					'player right wielding electrosmasher 02.png',
+				],
+				idleFrames: [
+					'player standing wielding electrosmasher.png',
+				],
+				up: [
+					'player standing wielding electrosmasher.png',
+				],
+				down: [
+					'player standing wielding electrosmasher.png',
+				],
+			},
 		},
 		attack: {
-			sword_1: {
+			enchantedSword: {
 				left: [
-					'player left strike sword_01.png',
+					'player left strike enchanted sword.png',
 				],
 				right: [
-					'player right strike sword_01.png',
+					'player right strike enchanted sword.png',
 				]
 			},
-			sword_2: {
+			venomDagger: {
 				left: [
-					'player left strike sword_02.png',
+					'player left strike venom dagger.png',
 				],
 				right: [
-					'player right strike sword_02.png',
+					'player right strike venom dagger.png',
 				]
 			},
 		},

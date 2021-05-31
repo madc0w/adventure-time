@@ -9,9 +9,9 @@ items = {
 			pickup: 'treasure pickup 2.mp3',
 		},
 	},
-	sword_1: {
+	enchantedSword: {
 		type: 'weapon',
-		image: 'sword 01.png',
+		image: 'enchanted sword.png',
 		label: 'Enchanted Sword',
 		// value: 0.2,
 		size: 0.15,
@@ -28,9 +28,9 @@ items = {
 			broken: 'broken weapon.mp3',
 		}
 	},
-	sword_2: {
+	venomDagger: {
 		type: 'weapon',
-		image: 'sword 02.png',
+		image: 'venom dagger.png',
 		label: 'Venom Dagger',
 		// value: 0.05,
 		size: 0.09,
