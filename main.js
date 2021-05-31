@@ -10,6 +10,7 @@ let state = {
 	room: rooms[0],
 };
 
+const characterIntersectionLeeway = 0.88;
 const resaleFactor = 0.7;
 const moneySymbol = '&#10086;';
 const wallColor = '#3f2f0c';
@@ -399,10 +400,10 @@ function drawGame() {
 				roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
 				roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
 
-				const playerWidth = (characters.player.width / state.room.width) / 2;
-				const playerHeight = (characters.player.height / state.room.height) / 2;
-				const characterWidth = (character.width / state.room.width) / 2;
-				const characterHeight = (character.height / state.room.height) / 2;
+				const playerWidth = characterIntersectionLeeway * (characters.player.width / state.room.width) / 2;
+				const playerHeight = characterIntersectionLeeway * (characters.player.height / state.room.height) / 2;
+				const characterWidth = characterIntersectionLeeway * (character.width / state.room.width) / 2;
+				const characterHeight = characterIntersectionLeeway * (character.height / state.room.height) / 2;
 				if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
 					state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
 					state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
@@ -758,10 +759,10 @@ function drawGame() {
 	// check for intersection with other character
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
-		const playerWidth = (characters.player.width / state.room.width) / 2;
-		const playerHeight = (characters.player.height / state.room.height) / 2;
-		const characterWidth = (character.width / state.room.width) / 2;
-		const characterHeight = (character.height / state.room.height) / 2;
+		const playerWidth = characterIntersectionLeeway * (characters.player.width / state.room.width) / 2;
+		const playerHeight = characterIntersectionLeeway * (characters.player.height / state.room.height) / 2;
+		const characterWidth = characterIntersectionLeeway * (character.width / state.room.width) / 2;
+		const characterHeight = characterIntersectionLeeway * (character.height / state.room.height) / 2;
 		if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
 			state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
 			state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&

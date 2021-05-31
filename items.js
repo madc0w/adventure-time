@@ -59,8 +59,8 @@ items = {
 		cost: 32,
 		repairCost: 20,
 		sounds: {
-			hit: 'sword 02 hit.mp3',
-			draw: 'sword 02 draw.mp3',
+			hit: 'zap.mp3',
+			draw: 'thunderclap.mp3',
 			pickup: 'sword pickup.mp3',
 			broken: 'broken weapon.mp3',
 		},
