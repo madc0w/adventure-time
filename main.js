@@ -36,7 +36,8 @@ const portalSize = 0.12;
 const portalAnimInterval = 60;
 const numPortalFrames = 38;
 
-const fontFamily = 'Jura';
+const fontFamily = 'Lato';
+// const fontFamily = 'Jura';
 
 let drawFunc = drawGame;
 const characterFrames = {};
