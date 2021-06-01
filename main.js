@@ -45,7 +45,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, isGameOver, didDie, clickSound, roomMusic, dreamSound, didUserInteract;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, didUserInteract;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -207,6 +207,11 @@ function load() {
 
 	if (localStorage.state) {
 		setRoom(state.room);
+		if (state.isGameOver) {
+			state.player.motion = 'dieFrames';
+			animate(state.player);
+			document.getElementById('toggle-pause').innerHTML = 'Play Again';
+		}
 	} else {
 		state.mappedRooms = [rooms[0].id];
 		setRoom(rooms[0]);
@@ -230,7 +235,7 @@ function draw() {
 		// console.log('state.player.health ', state.player.health);
 		if (state.player.health <= 0) {
 			state.player.health = 0;
-			isGameOver = true;
+			state.isGameOver = true;
 		}
 
 		drawFunc();
@@ -335,7 +340,7 @@ function drawGame() {
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
 
-			if (!isGameOver) {
+			if (!state.isGameOver) {
 				if (roomCharacter.motion != 'attackFrames' &&
 					character.attackMetrics &&
 					Math.random() < character.attackMetrics.prob &&
@@ -578,7 +583,7 @@ function drawGame() {
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
-	if (isGameOver) {
+	if (state.isGameOver) {
 		const text = 'GAME OVER';
 		const lineHeight = Math.floor(0.16 * canvas.height);
 		ctx.font = `${lineHeight}px ${fontFamily}`;
@@ -586,15 +591,13 @@ function drawGame() {
 		const x = (canvas.width - ctx.measureText(text).width) / 2;
 		ctx.fillText(text, x, 0.4 * canvas.height);
 
-		if (!didDie) {
+		if (!state.didDie) {
 			document.getElementById('toggle-pause').innerHTML = 'Play Again';
-			didDie = true;
+			state.didDie = true;
 			play(characters.player.sounds.die);
 
 			state.player.motion = 'dieFrames';
 			animate(state.player);
-			delete localStorage.state;
-			delete localStorage.rooms;
 		}
 
 		return;
@@ -1189,7 +1192,7 @@ function onKeyUp(e) {
 	if (e.code != 'Tab' && e.key != 'Alt') {
 		didUserInteract = true;
 	}
-	if (didDie) {
+	if (state.didDie) {
 		return;
 	}
 
@@ -1259,7 +1262,7 @@ function onKeyUp(e) {
 
 function onKeyDown(e) {
 	// console.log('onKeyDown', e);
-	if (didDie) {
+	if (state.didDie) {
 		return;
 	}
 
@@ -1378,8 +1381,9 @@ function showModal(id) {
 function togglePause() {
 	// console.log('togglePause', state.isPaused);
 	play(clickSound);
-	if (didDie) {
-		location.href = location.href;
+	if (state.didDie) {
+		// TODO take player to init room of current level
+		reset();
 	} else {
 		state.isPaused = !state.isPaused;
 		document.getElementById('toggle-pause').innerHTML = state.isPaused ? 'Resume' : 'Pause';
