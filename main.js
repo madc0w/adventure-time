@@ -18,8 +18,8 @@ const backgroundColor = '#c1e5be';
 const doorSize = 0.15;
 const doorThreshold = 0.04;
 const doorwaySize = {
-	width: 0.006,
-	height: 0.04
+	width: 0.012,
+	height: 0.024
 };
 const wallWidth = 0.02;
 const moveIncrement = 0.006;
@@ -560,28 +560,30 @@ function drawGame() {
 
 			ctx.fillStyle = state.room.wallColor || wallColor;
 			if (['e', 'w'].includes(door.wall)) {
+				x += (door.wall == 'w' ? 1 : -1) * wallWidth * canvas.width;
 				ctx.fillRect(
-					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
-					y - doorwaySize.width * canvas.height / 2,
+					x,
+					y - (doorwaySize.width * canvas.height),
 					doorwaySize.height * canvas.width,
 					doorwaySize.width * canvas.width
 				);
 				ctx.fillRect(
-					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
-					y + doorSize * canvas.height,
+					x,
+					y + (doorSize * canvas.height),
 					doorwaySize.height * canvas.width,
 					doorwaySize.width * canvas.width
 				);
 			} else {
+				y += (door.wall == 'n' ? 1 : -1) * wallWidth * canvas.height;
 				ctx.fillRect(
-					x - doorwaySize.width * canvas.height / 2,
-					y - ((doorwaySize.width + wallWidth) * canvas.height),
+					x - (doorwaySize.width * canvas.width),
+					y,
 					doorwaySize.width * canvas.width,
 					doorwaySize.height * canvas.width
 				);
 				ctx.fillRect(
 					x + (doorSize * canvas.width),
-					y - ((doorwaySize.width + wallWidth) * canvas.height),
+					y,
 					doorwaySize.width * canvas.width,
 					doorwaySize.height * canvas.width
 				);
