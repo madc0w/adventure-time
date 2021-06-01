@@ -40,6 +40,7 @@ const fontFamily = 'Lato';
 // const fontFamily = 'Jura';
 
 let drawFunc = drawGame;
+const doorImages = {};
 const characterFrames = {};
 const keysDown = {};
 const animIntervalIds = {};
@@ -136,6 +137,17 @@ function load() {
 		for (const sound in character.sounds) {
 			character.sounds[sound] = new Audio(`sounds/${character.sounds[sound]}`);
 		}
+	}
+
+	{
+		const img = new Image();
+		img.src = `img/rooms/door vertical.png`;
+		doorImages.vertical = img;
+	}
+	{
+		const img = new Image();
+		img.src = `img/rooms/door horizontal.png`;
+		doorImages.horizontal = img;
 	}
 
 	characterImages.player = characterFrames.player.idleFrames[0];
@@ -510,7 +522,7 @@ function drawGame() {
 	{
 		// doors
 		for (const door of state.room.doors || []) {
-			ctx.fillStyle = (door.key && items[door.key].color) || backgroundColor;
+			ctx.fillStyle = (door.key && items[door.key].color) || '#ccc';
 			// ctx.fillStyle = backgroundColor;
 			let x, y;
 			if (door.wall == 'w') {
@@ -537,11 +549,19 @@ function drawGame() {
 			}
 			ctx.fillRect(x, y, width, height);
 
+			let doorImage;
+			if (['n', 's'].includes(door.wall)) {
+				doorImage = doorImages.horizontal;
+			} else {
+				doorImage = doorImages.vertical;
+			}
+			ctx.drawImage(doorImage, x, y, width, height);
+
 			ctx.fillStyle = state.room.wallColor || wallColor;
 			if (['e', 'w'].includes(door.wall)) {
 				ctx.fillRect(
 					x - ((doorwaySize.height - wallWidth) / 2 * canvas.width),
-					y,
+					y - doorwaySize.width * canvas.height / 2,
 					doorwaySize.height * canvas.width,
 					doorwaySize.width * canvas.width
 				);
@@ -553,7 +573,7 @@ function drawGame() {
 				);
 			} else {
 				ctx.fillRect(
-					x,
+					x - doorwaySize.width * canvas.height / 2,
 					y - ((doorwaySize.width + wallWidth) * canvas.height),
 					doorwaySize.width * canvas.width,
 					doorwaySize.height * canvas.width
@@ -771,6 +791,13 @@ function drawGame() {
 				state.player.y = y;
 			}
 		}
+	}
+
+	if (throughDoor && throughDoor.key && !state.inventory[throughDoor.key]) {
+		throughDoor = null;
+		state.player.x = prevPlayerLoc.x;
+		state.player.y = prevPlayerLoc.y;
+		toast('Ye must hold the key, lest the other side ye see!');
 	}
 
 	// check for intersection with other character

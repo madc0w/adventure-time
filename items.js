@@ -106,7 +106,7 @@ items = {
 		image: 'key 01.png',
 		label: 'Blue Key',
 		size: 0.04,
-		color: '#00c',
+		color: '#2774f9',
 		sounds: {
 			pickup: 'key pickup.mp3',
 		},
