@@ -20,6 +20,7 @@ rooms = [
 				roomId: 3,
 				wall: 'n',
 				location: 0.4,
+				key: 'blueKey'
 			}, {
 				roomId: 4,
 				wall: 's',
@@ -94,7 +95,7 @@ rooms = [
 		],
 		items: [
 			{
-				id: 'key1',
+				id: 'blueKey',
 				location: {
 					x: 0.2,
 					y: 0.8

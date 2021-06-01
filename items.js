@@ -101,11 +101,12 @@ items = {
 			}
 		}
 	},
-	key1: {
+	blueKey: {
 		type: 'key',
 		image: 'key 01.png',
 		label: 'Blue Key',
 		size: 0.04,
+		color: '#00c',
 		sounds: {
 			pickup: 'key pickup.mp3',
 		},

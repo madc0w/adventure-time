@@ -195,6 +195,7 @@ function load() {
 				wall,
 				location,
 				oppositeDoor: door,
+				key: door.key,
 			};
 			if (door.isOneWay) {
 				// TODO add a special hidden door for map
@@ -509,7 +510,8 @@ function drawGame() {
 	{
 		// doors
 		for (const door of state.room.doors || []) {
-			ctx.fillStyle = backgroundColor;
+			ctx.fillStyle = (door.key && items[door.key].color) || backgroundColor;
+			// ctx.fillStyle = backgroundColor;
 			let x, y;
 			if (door.wall == 'w') {
 				x = ((1 - getValue(state.room, 'width') - wallWidth) / 2) * canvas.width - 1;
@@ -522,6 +524,7 @@ function drawGame() {
 				width = wallWidth * canvas.width + 1;
 				height = doorSize * canvas.height;
 			} else if (door.wall == 'n') {
+				// console.log('ctx.fillStyle ', ctx.fillStyle);
 				x = ((1 - getValue(state.room, 'width')) / 2 + (door.location * getValue(state.room, 'width'))) * canvas.width;
 				y = (1 - getValue(state.room, 'height') - wallWidth) * canvas.height / 2 - 1;
 				height = wallWidth * canvas.height + 1;
@@ -1372,6 +1375,7 @@ function play(sound) {
 }
 
 function showModal(id) {
+	closeModals();
 	play(clickSound);
 	const modal = document.getElementById(id);
 	state.isPaused = true;
@@ -1505,9 +1509,6 @@ function showMerchantSelection(type) {
 				}
 			}
 		}
-		if (numSaleableItems == 0) {
-			html += '<tr><th>You have nothing that interests me.</th></tr>';
-		}
 	} else if (type == 'repair') {
 		let numWeapons = 0;
 		for (const itemId in state.inventory) {
@@ -1557,13 +1558,13 @@ function showMerchantSelection(type) {
 function repairItem(itemId) {
 	const item = items[itemId];
 	if (item.repairCost > (state.inventory.treasure || 0)) {
-		toast('Sorry, you can\'t afford my fee. Come back with more gold!');
+		toast('Sorry, you can\'t afford my fee. Come back with more money!');
 	} else {
 		play(characters.merchant.sounds.repair);
 		state.inventory.treasure -= item.repairCost;
 		state.inventory[itemId] = item.value;
 		toast('There you are... good as new!');
-		drawMerchantInteraction();
+		showMerchantSelection('repair');
 	}
 }
 
@@ -1582,22 +1583,22 @@ function sellItem(itemId, value) {
 		}
 	}
 	toast('Thank you! It has been a pleasure doing business.');
-	drawMerchantInteraction();
+	showMerchantSelection('sell');
 }
 
 function buyItem(itemId) {
 	const item = items[itemId];
 	if (item.cost > (state.inventory.treasure || 0)) {
-		toast('Sorry, you can\'t afford that. Come back with more gold!');
+		toast('Sorry, you can\'t afford that. Come back with more money!');
 	} else {
 		if (item.type == 'weapon' && state.inventory[itemId] > 0) {
 			toast('It looks like you\'re already carrying one of those.<br/> Maybe you\'d like to sell me yours first?');
 		} else {
 			play(characters.merchant.sounds.buy);
 			state.inventory.treasure -= item.cost;
-			state.inventory[itemId] = item.value;
+			state.inventory[itemId] = (state.inventory[itemId] || 0) + (item.value || 1);
 			toast('Sold! It has been a pleasure doing business.');
-			drawMerchantInteraction();
+			showMerchantSelection('buy');
 		}
 	}
 }
