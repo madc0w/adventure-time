@@ -58,7 +58,7 @@ function load() {
 
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
-	canvas.width = Math.min(innerWidth * 0.8, innerHeight * 0.8);
+	canvas.width = Math.min(innerWidth * 0.86 - 28, innerHeight * 0.8 - 28);
 	canvas.height = canvas.width;
 	statusCanvas.width = canvas.width;
 	statusCanvas.height = innerHeight * 0.14;
