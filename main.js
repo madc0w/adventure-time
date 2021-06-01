@@ -208,9 +208,9 @@ function load() {
 	if (localStorage.state) {
 		setRoom(state.room);
 		if (state.isGameOver) {
+			document.getElementById('toggle-pause').innerHTML = 'Play Again';
 			state.player.motion = 'dieFrames';
 			animate(state.player);
-			document.getElementById('toggle-pause').innerHTML = 'Play Again';
 		}
 	} else {
 		state.mappedRooms = [rooms[0].id];
@@ -285,18 +285,18 @@ function drawGame() {
 		// room background
 		const roomBackground = new Image();
 		roomBackground.src = `img/rooms/${state.room.backgroundImage}`;
-		const x = (1 - state.room.width) * canvas.width / 2;
-		const y = (1 - state.room.height) * canvas.height / 2;
-		ctx.drawImage(roomBackground, x, y, state.room.width * canvas.width, state.room.height * canvas.height);
+		const x = (1 - getValue(state.room, 'width')) * canvas.width / 2;
+		const y = (1 - getValue(state.room, 'height')) * canvas.height / 2;
+		ctx.drawImage(roomBackground, x, y, getValue(state.room, 'width') * canvas.width, getValue(state.room, 'height') * canvas.height);
 	}
 	{
 		// wall
 		ctx.strokeStyle = state.room.wallColor || wallColor;
 		ctx.lineWidth = canvas.width * wallWidth;
 		ctx.beginPath();
-		const x = (1 - state.room.width) * canvas.width / 2;
-		const y = (1 - state.room.height) * canvas.height / 2;
-		ctx.rect(x, y, state.room.width * canvas.width, state.room.height * canvas.height);
+		const x = (1 - getValue(state.room, 'width')) * canvas.width / 2;
+		const y = (1 - getValue(state.room, 'height')) * canvas.height / 2;
+		ctx.rect(x, y, getValue(state.room, 'width') * canvas.width, getValue(state.room, 'height') * canvas.height);
 		ctx.stroke();
 	}
 	{
@@ -331,8 +331,8 @@ function drawGame() {
 				}
 				ctx.globalAlpha = 1;
 			}
-			// let x = ((1 - state.room.width) / 2 + (roomItem.location.x * state.room.width)) * canvas.width;
-			// let y = ((1 - state.room.height) / 2 + (roomItem.location.y * state.room.height)) * canvas.height;
+			// let x = ((1 - getValue(state.room, 'width')) / 2 + (roomItem.location.x * getValue(state.room, 'width'))) * canvas.width;
+			// let y = ((1 - getValue(state.room, 'height')) / 2 + (roomItem.location.y * getValue(state.room, 'height'))) * canvas.height;
 		}
 	}
 	{
@@ -376,7 +376,7 @@ function drawGame() {
 					move(roomCharacter);
 				}
 
-				// console.log(roomCharacter.width * state.room.width);
+				// console.log(roomCharacter.width * getValue(state.room, 'width'));
 				let interactingCharacters = state.room.characters || [];
 				if (!state.player.isInvisible) {
 					interactingCharacters = interactingCharacters.concat(state.player);
@@ -390,27 +390,27 @@ function drawGame() {
 					}
 				}
 
-				if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / state.room.width)) {
+				if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / getValue(state.room, 'width'))) {
 					if (roomCharacter.vel) {
 						roomCharacter.vel.x *= -1;
 					}
 					// roomCharacter.velInversionTime.x = now;
 				}
-				if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / state.room.height)) {
+				if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / getValue(state.room, 'height'))) {
 					if (roomCharacter.vel) {
 						roomCharacter.vel.y *= -1;
 					}
 				}
 
-				roomCharacter.location.y = Math.min(1 - (character.height / state.room.height) + character.height / (2 * state.room.height), roomCharacter.location.y);
-				roomCharacter.location.y = Math.max(character.height / (2 * state.room.height), roomCharacter.location.y);
-				roomCharacter.location.x = Math.min(1 - (character.width / state.room.width) + character.width / (2 * state.room.width), roomCharacter.location.x);
-				roomCharacter.location.x = Math.max(character.width / (2 * state.room.width), roomCharacter.location.x);
+				roomCharacter.location.y = Math.min(1 - (character.height / getValue(state.room, 'height')) + character.height / (2 * getValue(state.room, 'height')), roomCharacter.location.y);
+				roomCharacter.location.y = Math.max(character.height / (2 * getValue(state.room, 'height')), roomCharacter.location.y);
+				roomCharacter.location.x = Math.min(1 - (character.width / getValue(state.room, 'width')) + character.width / (2 * getValue(state.room, 'width')), roomCharacter.location.x);
+				roomCharacter.location.x = Math.max(character.width / (2 * getValue(state.room, 'width')), roomCharacter.location.x);
 
-				const playerWidth = characterIntersectionLeeway * (characters.player.width / state.room.width) / 2;
-				const playerHeight = characterIntersectionLeeway * (characters.player.height / state.room.height) / 2;
-				const characterWidth = characterIntersectionLeeway * (character.width / state.room.width) / 2;
-				const characterHeight = characterIntersectionLeeway * (character.height / state.room.height) / 2;
+				const playerWidth = characterIntersectionLeeway * (characters.player.width / getValue(state.room, 'width')) / 2;
+				const playerHeight = characterIntersectionLeeway * (characters.player.height / getValue(state.room, 'height')) / 2;
+				const characterWidth = characterIntersectionLeeway * (character.width / getValue(state.room, 'width')) / 2;
+				const characterHeight = characterIntersectionLeeway * (character.height / getValue(state.room, 'height')) / 2;
 				if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
 					state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
 					state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
@@ -430,8 +430,8 @@ function drawGame() {
 					};
 				}
 				// console.log('roomCharacter.baseLoc', roomCharacter.baseLoc);
-				roomCharacter.location.x = roomCharacter.baseLoc.x + character.width * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.width);
-				roomCharacter.location.y = roomCharacter.baseLoc.y + character.height * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * state.room.height);
+				roomCharacter.location.x = roomCharacter.baseLoc.x + character.width * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * getValue(state.room, 'width'));
+				roomCharacter.location.y = roomCharacter.baseLoc.y + character.height * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * getValue(state.room, 'height'));
 				ctx.globalAlpha = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
 				size = 1 - roomCharacter.animStep / numCharacterDieAnimSteps;
 				// console.log('size ', size);
@@ -511,23 +511,23 @@ function drawGame() {
 			ctx.fillStyle = backgroundColor;
 			let x, y;
 			if (door.wall == 'w') {
-				x = ((1 - state.room.width - wallWidth) / 2) * canvas.width - 1;
-				y = ((1 - state.room.height) / 2 + (door.location * state.room.height)) * canvas.height;
+				x = ((1 - getValue(state.room, 'width') - wallWidth) / 2) * canvas.width - 1;
+				y = ((1 - getValue(state.room, 'height')) / 2 + (door.location * getValue(state.room, 'height'))) * canvas.height;
 				width = wallWidth * canvas.width + 1;
 				height = doorSize * canvas.height;
 			} else if (door.wall == 'e') {
-				x = ((1 + state.room.width - wallWidth) / 2) * canvas.width;
-				y = ((1 - state.room.height) / 2 + (door.location * state.room.height)) * canvas.height;
+				x = ((1 + getValue(state.room, 'width') - wallWidth) / 2) * canvas.width;
+				y = ((1 - getValue(state.room, 'height')) / 2 + (door.location * getValue(state.room, 'height'))) * canvas.height;
 				width = wallWidth * canvas.width + 1;
 				height = doorSize * canvas.height;
 			} else if (door.wall == 'n') {
-				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
-				y = (1 - state.room.height - wallWidth) * canvas.height / 2 - 1;
+				x = ((1 - getValue(state.room, 'width')) / 2 + (door.location * getValue(state.room, 'width'))) * canvas.width;
+				y = (1 - getValue(state.room, 'height') - wallWidth) * canvas.height / 2 - 1;
 				height = wallWidth * canvas.height + 1;
 				width = doorSize * canvas.width;
 			} else if (door.wall == 's') {
-				x = ((1 - state.room.width) / 2 + (door.location * state.room.width)) * canvas.width;
-				y = ((1 + state.room.height - wallWidth) / 2) * canvas.height;
+				x = ((1 - getValue(state.room, 'width')) / 2 + (door.location * getValue(state.room, 'width'))) * canvas.width;
+				y = ((1 + getValue(state.room, 'height') - wallWidth) / 2) * canvas.height;
 				height = wallWidth * canvas.height + 4;
 				width = doorSize * canvas.width;
 			}
@@ -592,8 +592,8 @@ function drawGame() {
 		ctx.fillText(text, x, 0.4 * canvas.height);
 
 		if (!state.didDie) {
-			document.getElementById('toggle-pause').innerHTML = 'Play Again';
 			state.didDie = true;
+			document.getElementById('toggle-pause').innerHTML = 'Play Again';
 			play(characters.player.sounds.die);
 
 			state.player.motion = 'dieFrames';
@@ -619,13 +619,13 @@ function drawGame() {
 	}
 
 	if (keysDown.ArrowLeft) {
-		const edge = characters.player.width / (2 * state.room.width);
-		state.player.x -= inc / state.room.width;
+		const edge = characters.player.width / (2 * getValue(state.room, 'width'));
+		state.player.x -= inc / getValue(state.room, 'width');
 		if (state.player.x <= edge) {
-			const playerPos = state.player.y - characters.player.height / (2 * state.room.height);
+			const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
 				const y1 = door.location;
-				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
+				const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
 				if (playerPos >= y1 && playerPos <= y2) {
 					throughDoor = door;
 					break;
@@ -638,14 +638,14 @@ function drawGame() {
 	}
 	if (keysDown.ArrowRight) {
 		const x = state.player.x;
-		state.player.x += inc / state.room.width;
-		const playerEdge = state.player.x * state.room.width - characters.player.width / 2 + (1 - state.room.width) / 2 + characters.player.width;
-		const edge = (1 + state.room.width) / 2;
+		state.player.x += inc / getValue(state.room, 'width');
+		const playerEdge = state.player.x * getValue(state.room, 'width') - characters.player.width / 2 + (1 - getValue(state.room, 'width')) / 2 + characters.player.width;
+		const edge = (1 + getValue(state.room, 'width')) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.y - characters.player.height / (2 * state.room.height);
+			const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
 				const y1 = door.location;
-				const y2 = door.location + (doorSize - characters.player.height) / state.room.height;
+				const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
 
 				// {
 				// 	const loc = toScreen({
@@ -683,13 +683,13 @@ function drawGame() {
 		}
 	}
 	if (keysDown.ArrowUp) {
-		const edge = characters.player.height / (2 * state.room.height);
-		state.player.y -= inc / state.room.height;
+		const edge = characters.player.height / (2 * getValue(state.room, 'height'));
+		state.player.y -= inc / getValue(state.room, 'height');
 		if (state.player.y <= edge) {
-			const playerPos = state.player.x - characters.player.width / (2 * state.room.width);
+			const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
 			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
 				const x1 = door.location;
-				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / state.room.width;
+				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
 				// {
 				// 	const loc = toScreen({
 				// 		x: x1,
@@ -726,14 +726,14 @@ function drawGame() {
 	}
 	if (keysDown.ArrowDown) {
 		const y = state.player.y;
-		state.player.y += inc / state.room.height;
-		const playerEdge = state.player.y * state.room.height - characters.player.height / 2 + (1 - state.room.height) / 2 + characters.player.height;
-		const edge = (1 + state.room.height) / 2;
+		state.player.y += inc / getValue(state.room, 'height');
+		const playerEdge = state.player.y * getValue(state.room, 'height') - characters.player.height / 2 + (1 - getValue(state.room, 'height')) / 2 + characters.player.height;
+		const edge = (1 + getValue(state.room, 'height')) / 2;
 		if (playerEdge >= edge) {
-			const playerPos = state.player.x - characters.player.width / (2 * state.room.width);
+			const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
 			for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
 				const x1 = door.location;
-				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / state.room.width;
+				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
 				// {
 				// 	const loc = toScreen({
 				// 		x: x1,
@@ -772,10 +772,10 @@ function drawGame() {
 	// check for intersection with other character
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
-		const playerWidth = characterIntersectionLeeway * (characters.player.width / state.room.width) / 2;
-		const playerHeight = characterIntersectionLeeway * (characters.player.height / state.room.height) / 2;
-		const characterWidth = characterIntersectionLeeway * (character.width / state.room.width) / 2;
-		const characterHeight = characterIntersectionLeeway * (character.height / state.room.height) / 2;
+		const playerWidth = characterIntersectionLeeway * (characters.player.width / getValue(state.room, 'width')) / 2;
+		const playerHeight = characterIntersectionLeeway * (characters.player.height / getValue(state.room, 'height')) / 2;
+		const characterWidth = characterIntersectionLeeway * (character.width / getValue(state.room, 'width')) / 2;
+		const characterHeight = characterIntersectionLeeway * (character.height / getValue(state.room, 'height')) / 2;
 		if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
 			state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
 			state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
@@ -795,8 +795,8 @@ function drawGame() {
 
 	// go through portal
 	for (const portal of state.room.portals || []) {
-		// const x = (1 - state.room.width) / 2 + (portal.location.x * state.room.width) + (portalSize * 0.1);
-		// const y = (1 - state.room.height) / 2 + (portal.location.y * state.room.height) + (portalSize * 0.1);
+		// const x = (1 - getValue(state.room, 'width')) / 2 + (portal.location.x * getValue(state.room, 'width')) + (portalSize * 0.1);
+		// const y = (1 - getValue(state.room, 'height')) / 2 + (portal.location.y * getValue(state.room, 'height')) + (portalSize * 0.1);
 		// ctx.strokeStyle = '#000';
 		// ctx.lineWidth = 2;
 		// ctx.beginPath();
@@ -876,21 +876,21 @@ function drawGame() {
 		throughDoor = null;
 		if (oppositeWall) {
 			if (oppositeWall == 's') {
-				state.player.y = 1 - characters.player.height / (2 * state.room.height);
+				state.player.y = 1 - characters.player.height / (2 * getValue(state.room, 'height'));
 			} else if (oppositeWall == 'n') {
-				state.player.y = characters.player.height / (2 * state.room.height);;
+				state.player.y = characters.player.height / (2 * getValue(state.room, 'height'));;
 			} else if (oppositeWall == 'e') {
-				state.player.x = 1 - characters.player.width / (2 * state.room.width);
+				state.player.x = 1 - characters.player.width / (2 * getValue(state.room, 'width'));
 			} else {
-				state.player.x = characters.player.width / (2 * state.room.height);;
+				state.player.x = characters.player.width / (2 * getValue(state.room, 'height'));;
 			}
 
 			const door = (state.room.doors || []).find(d => d.wall == oppositeWall && d.room.id == prevRoom.id);
 			if (['n', 's'].includes(oppositeWall)) {
 				if (door) {
-					state.player.x = door.location + (characters.player.width / state.room.width) / 2;
+					state.player.x = door.location + (characters.player.width / getValue(state.room, 'width')) / 2;
 				} else {
-					state.player.x = (1 - state.room.width * characters.player.width) / 2;
+					state.player.x = (1 - getValue(state.room, 'width') * characters.player.width) / 2;
 				}
 			} else {
 				// console.log('state.room.doors ', state.room.doors);
@@ -898,9 +898,9 @@ function drawGame() {
 				// console.log('oppositeWall ', oppositeWall);
 				// console.log('prevRoom', prevRoom);
 				if (door) {
-					state.player.y = door.location + (characters.player.height / state.room.height) / 2;
+					state.player.y = door.location + (characters.player.height / getValue(state.room, 'height')) / 2;
 				} else {
-					state.player.y = (1 - state.room.height * characters.player.height) / 2;
+					state.player.y = (1 - getValue(state.room, 'height') * characters.player.height) / 2;
 				}
 			}
 		}
@@ -926,8 +926,8 @@ function drawMap() {
 			{
 				ctx.strokeStyle = room.wallColor || wallColor;
 				ctx.lineWidth = 2 * wallWidth * mapScale * canvas.width;
-				const width = room.width * mapScale * canvas.width;
-				const height = room.height * mapScale * canvas.height;
+				const width = getValue(room, 'width') * mapScale * canvas.width;
+				const height = getValue(room, 'height') * mapScale * canvas.height;
 				const x = - width / 2;
 				const y = - height / 2;
 				ctx.beginPath();
@@ -944,17 +944,17 @@ function drawMap() {
 				door.p1 = {};
 				door.p2 = {};
 				if (['e', 'w'].includes(door.wall)) {
-					door.p1.y = (door.location - 1) * room.height / 2 * mapScale * canvas.height;
+					door.p1.y = (door.location - 1) * getValue(room, 'height') / 2 * mapScale * canvas.height;
 					door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
-					door.p1.x = door.p2.x = room.width * mapScale * canvas.width / 2;
+					door.p1.x = door.p2.x = getValue(room, 'width') * mapScale * canvas.width / 2;
 					if (door.wall == 'w') {
 						door.p1.x *= -1;
 						door.p2.x *= -1;
 					}
 				} else {
-					door.p1.x = (door.location - 1) * room.width / 2 * mapScale * canvas.width;
+					door.p1.x = (door.location - 1) * getValue(room, 'width') / 2 * mapScale * canvas.width;
 					door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
-					door.p1.y = door.p2.y = room.height * mapScale * canvas.height / 2;
+					door.p1.y = door.p2.y = getValue(room, 'height') * mapScale * canvas.height / 2;
 					if (door.wall == 'n') {
 						door.p1.y *= -1;
 						door.p2.y *= -1;
@@ -1294,7 +1294,7 @@ function animate(character) {
 	// console.log('starting anim', motion);
 	function f() {
 		let frames;
-		if (state.player.wielding && character.id == 'player') {
+		if (state.player.wielding && character.id == 'player' && !state.didDie) {
 			if (attackMotion) {
 				frames = characterFrames[character.id].attack[state.player.wielding][attackMotion];
 			} else {
@@ -1337,17 +1337,17 @@ function toScreen(loc, character) {
 	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
 		console.error('toScreen: NaN detected!', loc, character);
 	}
-	const x = ((loc.x * state.room.width) - character.width / 2 + (1 - state.room.width) / 2) * canvas.width;
-	const y = ((loc.y * state.room.height) - character.height / 2 + (1 - state.room.height) / 2) * canvas.height;
+	const x = ((loc.x * getValue(state.room, 'width')) - character.width / 2 + (1 - getValue(state.room, 'width')) / 2) * canvas.width;
+	const y = ((loc.y * getValue(state.room, 'height')) - character.height / 2 + (1 - getValue(state.room, 'height')) / 2) * canvas.height;
 	return { x, y };
 }
 
 // return distnace as proportion of canvas size
 function distance(roomCharacter) {
-	const x1 = roomCharacter.location.x * state.room.width;
-	const y1 = roomCharacter.location.y * state.room.height;
-	const x2 = state.player.x * state.room.width;
-	const y2 = state.player.y * state.room.height;
+	const x1 = roomCharacter.location.x * getValue(state.room, 'width');
+	const y1 = roomCharacter.location.y * getValue(state.room, 'height');
+	const x2 = state.player.x * getValue(state.room, 'width');
+	const y2 = state.player.y * getValue(state.room, 'height');
 	const dx = x1 - x2;
 	const dy = y1 - y2;
 	return Math.sqrt(dx * dx + dy * dy);

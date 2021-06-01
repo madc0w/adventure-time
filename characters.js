@@ -38,10 +38,10 @@ const interactionFuncs = {
 		const character = characters[roomCharacter.id];
 		const character2 = characters[roomCharacter2.id];
 		if (characters.player == character2) {
-			const characterX = roomCharacter.location.x * state.room.width;
-			const characterY = roomCharacter.location.y * state.room.height;
-			const playerX = roomCharacter2.x * state.room.width;
-			const playerY = roomCharacter2.y * state.room.height;
+			const characterX = roomCharacter.location.x * getValue(state.room, 'width');
+			const characterY = roomCharacter.location.y * getValue(state.room, 'height');
+			const playerX = roomCharacter2.x * getValue(state.room, 'width');
+			const playerY = roomCharacter2.y * getValue(state.room, 'height');
 			const dx = playerX - characterX;
 			const dy = playerY - characterY;
 			roomCharacter.rotation = Math.atan2(dy, dx);
@@ -64,10 +64,10 @@ const interactionFuncs = {
 		const character = characters[roomCharacter.id];
 		const character2 = characters[roomCharacter2.id];
 		if (characters.player == character2) {
-			const x1 = roomCharacter.location.x * state.room.width;
-			const y1 = roomCharacter.location.y * state.room.height;
-			const x2 = roomCharacter2.x * state.room.width;
-			const y2 = roomCharacter2.y * state.room.height;
+			const x1 = roomCharacter.location.x * getValue(state.room, 'width');
+			const y1 = roomCharacter.location.y * getValue(state.room, 'height');
+			const x2 = roomCharacter2.x * getValue(state.room, 'width');
+			const y2 = roomCharacter2.y * getValue(state.room, 'height');
 			const dx = x1 - x2;
 			const dy = y1 - y2;
 			const dist = Math.sqrt(dx * dx + dy * dy);
@@ -96,8 +96,10 @@ const interactionFuncs = {
 		const character2 = characters[roomCharacter2.id] || characters.player;
 		let x2, y2;
 		if (characters.player == character2) {
-			x2 = (roomCharacter2.x - (1 - state.room.width) / 2) / state.room.width;
-			y2 = (roomCharacter2.y - (1 - state.room.height) / 2) / state.room.height;
+			const roomWidth = getValue(state.room, 'width');
+			const roomHeight = getValue(state.room, 'height');
+			x2 = (roomCharacter2.x - (1 - roomWidth) / 2) / roomWidth;
+			y2 = (roomCharacter2.y - (1 - roomHeight) / 2) / roomHeight;
 		} else {
 			x2 = roomCharacter2.location.x + character2.width / 2;
 			y2 = roomCharacter2.location.y + character2.height / 2;

@@ -3,7 +3,7 @@ defaultRoomMusic = 'holy grail theme.mp3';
 rooms = [
 	{
 		id: 0,
-		width: 0.8,
+		width: 0.9,
 		height: 0.9,
 		backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',
@@ -84,7 +84,9 @@ rooms = [
 		]
 	}, {
 		id: 1,
-		width: 0.6,
+		width: state => {
+			return 0.6 + 0.2 * Math.sin(state.t / 40);
+		},
 		height: 0.7,
 		backgroundImage: 'room_02.jpg',
 		// wallColor: '#3f2',
