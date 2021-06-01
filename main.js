@@ -23,7 +23,7 @@ const doorwaySize = {
 };
 const wallWidth = 0.02;
 const moveIncrement = 0.006;
-const itemTakeDistance = 32;
+const itemTakeDistance = 0.1;
 const numTakeItemAnimSteps = 12;
 const numCharacterDieAnimSteps = 148;
 
@@ -47,7 +47,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, didUserInteract;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -70,6 +70,7 @@ function load() {
 	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
+	lockedDoorSound = new Audio('sounds/locked door.mp3');
 
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
@@ -797,7 +798,8 @@ function drawGame() {
 		throughDoor = null;
 		state.player.x = prevPlayerLoc.x;
 		state.player.y = prevPlayerLoc.y;
-		toast('Ye must hold the key, lest the other side ye see!');
+		toast('Ye must be the holder of the key, lest the other side ye see!');
+		play(lockedDoorSound);
 	}
 
 	// check for intersection with other character
@@ -853,21 +855,7 @@ function drawGame() {
 		// console.log('item', item);
 		// console.log('state.inventory[item.id]', state.inventory[roomItem.id]);
 		if (item.image.height > 0 && (item.type != 'weapon' || !state.inventory[roomItem.id])) {
-			const itemLoc = toScreen(roomItem.location, {
-				width: item.size * (item.image.width / item.image.height),
-				height: item.size
-			});
-			itemLoc.x += item.size * (item.image.width / item.image.height) * canvas.width / 2;
-			itemLoc.y += item.size * canvas.height / 2;
-
-			const playerLoc = toScreen(state.player, characters.player);
-			playerLoc.x += characters.player.width * canvas.width / 2;
-			playerLoc.y += characters.player.height * canvas.height / 2;
-
-			const dx = playerLoc.x - itemLoc.x;
-			const dy = playerLoc.y - itemLoc.y;
-			const dist = Math.sqrt(dx * dx + dy * dy);
-
+			const dist = distance(roomItem);
 			if (!roomItem.takeAnimIntervalId && dist < itemTakeDistance) {
 				const interval = 24;
 				roomItem.animStep = 0;
@@ -882,7 +870,8 @@ function drawGame() {
 					// console.log('after state.room.items', state.room.items);
 				}, interval * numTakeItemAnimSteps);
 				const item = items[roomItem.id];
-				state.inventory[roomItem.id] = (state.inventory[roomItem.id] || 0) + (roomItem.value || item.value || 1);
+				const itemId = item.type == 'treasure' ? item.type : roomItem.id;
+				state.inventory[itemId] = (state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
 			}
 		}
@@ -1371,17 +1360,6 @@ function toScreen(loc, character) {
 	const x = ((loc.x * getValue(state.room, 'width')) - character.width / 2 + (1 - getValue(state.room, 'width')) / 2) * canvas.width;
 	const y = ((loc.y * getValue(state.room, 'height')) - character.height / 2 + (1 - getValue(state.room, 'height')) / 2) * canvas.height;
 	return { x, y };
-}
-
-// return distnace as proportion of canvas size
-function distance(roomCharacter) {
-	const x1 = roomCharacter.location.x * getValue(state.room, 'width');
-	const y1 = roomCharacter.location.y * getValue(state.room, 'height');
-	const x2 = state.player.x * getValue(state.room, 'width');
-	const y2 = state.player.y * getValue(state.room, 'height');
-	const dx = x1 - x2;
-	const dy = y1 - y2;
-	return Math.sqrt(dx * dx + dy * dy);
 }
 
 function debug(text) {

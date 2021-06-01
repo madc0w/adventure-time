@@ -9,6 +9,16 @@ items = {
 			pickup: 'treasure pickup 2.mp3',
 		},
 	},
+	superTreasure: {
+		type: 'treasure',
+		image: 'treasure-06.png',
+		label: 'King\'s Treasure',
+		value: 40,
+		size: 0.1,
+		sounds: {
+			pickup: 'treasure pickup 2.mp3',
+		},
+	},
 	enchantedSword: {
 		type: 'weapon',
 		image: 'enchanted sword.png',
