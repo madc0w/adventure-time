@@ -1069,7 +1069,7 @@ function drawInventory() {
 	let html = '';
 	let numLines = 0;
 	const itemIds = Object.keys(state.inventory);
-	const itemOrder = ['treasure', 'weapon', 'potion'];
+	const itemOrder = ['treasure', 'weapon', 'key', 'potion'];
 	itemIds.sort((id1, id2) => {
 		const type1 = items[id1].type;
 		const type2 = items[id2].type;
@@ -1490,7 +1490,7 @@ function showMerchantSelection(type) {
 			html += '<tr><th></th><th>Item</th><th>Value</th><th></th></tr>';
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
-				if (item.type != 'treasure') {
+				if (item.cost) {
 					let value = item.cost * resaleFactor;
 					if (item.type == 'weapon') {
 						value *= state.inventory[itemId] / item.value;

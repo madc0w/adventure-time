@@ -101,4 +101,13 @@ items = {
 			}
 		}
 	},
+	key1: {
+		type: 'key',
+		image: 'key 01.png',
+		label: 'Blue Key',
+		size: 0.04,
+		sounds: {
+			pickup: 'key pickup.mp3',
+		},
+	}
 };

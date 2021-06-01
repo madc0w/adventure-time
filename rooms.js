@@ -92,6 +92,15 @@ rooms = [
 		// wallColor: '#3f2',
 		doors: [
 		],
+		items: [
+			{
+				id: 'key1',
+				location: {
+					x: 0.2,
+					y: 0.8
+				}
+			},
+		],
 		characters: [
 			{
 				id: 'doomScreen',
