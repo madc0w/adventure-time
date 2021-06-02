@@ -3,6 +3,7 @@ defaultRoomMusic = 'holy grail theme.mp3';
 rooms = [
 	{
 		id: 0,
+		level: 1,
 		width: 0.9,
 		height: 0.9,
 		backgroundImage: 'room_01.jpg',
@@ -261,7 +262,20 @@ rooms = [
 					x: 0.8,
 					y: 0.5
 				},
-				roomId: 0
+				roomId: 7
+			}
+		]
+	}, {
+		id: 7,
+		level: 2,
+		width: 0.8,
+		height: 0.9,
+		backgroundImage: 'pavers.jpg',
+		doors: [
+			{
+				roomId: 7,
+				wall: 'e',
+				location: 0.5,
 			}
 		]
 	},

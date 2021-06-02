@@ -192,6 +192,7 @@ function load() {
 			room.sounds[sound] = new Audio(`sounds/${room.sounds[sound]}`);
 		}
 	}
+	console.log('rooms', rooms);
 
 	for (const room of rooms) {
 		for (const door of room.doors || []) {
@@ -213,12 +214,18 @@ function load() {
 			if (door.isOneWay) {
 				// TODO add a special hidden door for map
 			} else {
-				door.room.doors.push(oppositeDoor);
-				door.oppositeDoor = oppositeDoor;
+				if (!door.room.doors) {
+					door.room.doors = [];
+				}
+				console.log(door.room.doors.find(d => d.room == room));
+				if (!door.room.doors.find(d => d.room == room)) {
+					door.room.doors.push(oppositeDoor);
+					door.oppositeDoor = oppositeDoor;
+				}
 			}
 		}
 	}
-	// console.log(rooms);
+	console.log(rooms);
 
 	if (localStorage.state) {
 		setRoom(state.room);
@@ -525,7 +532,7 @@ function drawGame() {
 		for (const door of state.room.doors || []) {
 			ctx.fillStyle = (door.key && items[door.key].color) || '#ccc';
 			// ctx.fillStyle = backgroundColor;
-			let x, y;
+			let x, y, width, height;
 			if (door.wall == 'w') {
 				x = ((1 - getValue(state.room, 'width') - wallWidth) / 2) * canvas.width - 1;
 				y = ((1 - getValue(state.room, 'height')) / 2 + (door.location * getValue(state.room, 'height'))) * canvas.height;
@@ -545,7 +552,7 @@ function drawGame() {
 			} else if (door.wall == 's') {
 				x = ((1 - getValue(state.room, 'width')) / 2 + (door.location * getValue(state.room, 'width'))) * canvas.width;
 				y = ((1 + getValue(state.room, 'height') - wallWidth) / 2) * canvas.height;
-				height = wallWidth * canvas.height + 4;
+				height = wallWidth * canvas.height;
 				width = doorSize * canvas.width;
 			}
 			ctx.fillRect(x, y, width, height);
