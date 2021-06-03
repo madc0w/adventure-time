@@ -43,9 +43,22 @@
 			<canvas id="status-canvas"></canvas>
 		</div>
 		<div id="controls-conatiner">
+			<div id="level-conatiner" onClick="showModal('level-selection-modal')">
+				Level
+				<div id="level"></div>
+			</div>
 			<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
 			<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
 			<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
+		</div>
+
+		<div id="level-selection-modal" class="hidden modal">
+			<div class="header">Select Level</div>
+			<hr />
+			<div class="table-container">
+				<table id="level-selection-table"> </table>
+			</div>
+			<div class="button" onClick="closeModals()">OK</div>
 		</div>
 
 		<div id="inventory-modal" class="hidden modal">

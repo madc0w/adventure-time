@@ -190,3 +190,25 @@ canvas {
 	margin-right: auto;
 	max-width: 200px;
 }
+
+#level-conatiner {
+	text-align: center;
+	font-weight: bold;
+	background-color: #c1e5be;
+	padding: 8px;
+	margin-bottom: 8px;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #222;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+#level-conatiner:hover {
+	color: white;
+	background-color: #444;
+}
+
+#level {
+	font-size: 1.6em;
+}

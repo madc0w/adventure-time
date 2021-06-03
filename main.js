@@ -238,6 +238,13 @@ function load() {
 		state.t = 0;
 	}
 
+	let lastFrameCount = state.t;
+	setInterval(() => {
+		console.log('FPS', state.t - lastFrameCount);
+		lastFrameCount = state.t;
+	}, 1000);
+
+	showLevel();
 	requestAnimationFrame(draw);
 
 	if (!JSON.parse(localStorage.didShowInstructions || null)) {
@@ -1482,6 +1489,7 @@ function setRoom(room) {
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
 		state.level = room.level;
+		showLevel();
 	}
 }
 
@@ -1684,4 +1692,9 @@ function saveState() {
 	}
 	localStorage.state = JSON.stringify(state, serialize);
 	localStorage.rooms = JSON.stringify(rooms, serialize);
+}
+
+function showLevel() {
+	const levelDiv = document.getElementById('level');
+	levelDiv.innerHTML = state.level;
 }
