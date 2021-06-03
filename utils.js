@@ -39,3 +39,10 @@ function assignFunctions(source, dest) {
 		}
 	}
 }
+
+function formatTime(ms) {
+	const hours = Math.floor(ms / (1000 * 60 * 60));
+	const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+	const secs = Math.floor(ms % (1000 * 60) / 1000);
+	return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}

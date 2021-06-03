@@ -212,3 +212,13 @@ canvas {
 #level {
 	font-size: 1.6em;
 }
+
+#level-selection-modal .button {
+	margin-top: 18px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#level-selection-modal table {
+	width: 100%;
+}

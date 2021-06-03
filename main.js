@@ -1,15 +1,4 @@
-let state = {
-	player: {
-		id: 'player',
-		x: 0.5,
-		y: 0.5,
-		health: 1,
-		motion: 'idleFrames',
-	},
-	inventory: {},
-	room: rooms[0],
-};
-
+let state = initState();
 const characterIntersectionLeeway = 0.88;
 const resaleFactor = 0.7;
 const moneySymbol = '&#10086;';
@@ -76,22 +65,25 @@ function load() {
 
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
-		state.room.doors = rooms[state.room.id].doors;
-		assignFunctions(rooms.find(r => r.id == state.room.id), state.room);
-		const savedRooms = JSON.parse(localStorage.rooms);
-		for (const savedRoom of savedRooms) {
-			const room = rooms.find(r => r.id == savedRoom.id);
-			assignFunctions(room, savedRoom);
-			room.items = savedRoom.items;
-			room.characters = savedRoom.characters;
+		if (state.room) {
+			state.room.doors = rooms[state.room.id].doors;
+			assignFunctions(rooms.find(r => r.id == state.room.id), state.room);
+			if (localStorage.rooms) {
+				const savedRooms = JSON.parse(localStorage.rooms);
+				for (const savedRoom of savedRooms) {
+					const room = rooms.find(r => r.id == savedRoom.id);
+					assignFunctions(room, savedRoom);
+					room.items = savedRoom.items;
+					room.characters = savedRoom.characters;
 
-			// console.log('savedRoom.width', savedRoom.width);
-			// console.log('room.width', room.width);
+					// console.log('savedRoom.width', savedRoom.width);
+					// console.log('room.width', room.width);
+				}
+			}
+			// for (const sound in state.room.sounds) {
+			// 	console.log('state.room.sounds ', sound);
+			// }
 		}
-		// for (const sound in state.room.sounds) {
-		// 	console.log('state.room.sounds ', sound);
-		// }
-
 		state.isPaused = false;
 	}
 
@@ -225,7 +217,7 @@ function load() {
 	}
 	// console.log(rooms);
 
-	if (localStorage.state) {
+	if (localStorage.state && state.room) {
 		setRoom(state.room);
 		if (state.isGameOver) {
 			document.getElementById('toggle-pause').innerHTML = 'Play Again';
@@ -1229,7 +1221,7 @@ function onKeyUp(e) {
 	if (e.code != 'Tab' && e.key != 'Alt') {
 		didUserInteract = true;
 	}
-	if (state.didDie) {
+	if (state.didDie && e.code != 'Escape') {
 		return;
 	}
 
@@ -1437,7 +1429,11 @@ function closeModals() {
 		modals[i].classList.add('hidden');
 	}
 	if (state.isPaused) {
-		togglePause();
+		if (state.didDie) {
+			state.isPaused = false;
+		} else {
+			togglePause();
+		}
 	}
 }
 
@@ -1488,7 +1484,18 @@ function setRoom(room) {
 	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || defaultRoomMusic;
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
+		const now = new Date().getTime();
 		state.level = room.level;
+		state.levelTimes = state.levelTimes || {};
+		state.levelTimes[state.level] = state.levelTimes[state.level] || {};
+		state.levelTimes[state.level].start = now;
+		if (state.level > 1) {
+			state.levelTimes[state.level - 1].end = now;
+			const completionTime = now - state.levelTimes[state.level - 1].start;
+			if (!state.levelTimes[state.level - 1].best || completionTime < state.levelTimes[state.level - 1].best) {
+				state.levelTimes[state.level - 1].best = completionTime;
+			}
+		}
 		showLevel();
 	}
 }
@@ -1676,7 +1683,10 @@ function reset() {
 		opacity -= 0.01;
 	}, 20);
 	setTimeout(() => {
-		delete localStorage.state;
+		const levelTimes = state.levelTimes;
+		state = initState();
+		state.levelTimes = levelTimes;
+		saveState();
 		delete localStorage.rooms;
 		location.href = location.href;
 	}, 2000);
@@ -1697,4 +1707,34 @@ function saveState() {
 function showLevel() {
 	const levelDiv = document.getElementById('level');
 	levelDiv.innerHTML = state.level;
+}
+
+function showLevelSelectionModal() {
+	const table = document.getElementById('level-selection-table');
+	let html = '<tr><th>Level</th><th>Best Time</th></tr>';
+	let maxLevel = 0;
+	for (const level in state.levelTimes) {
+		if (state.levelTimes[level].best) {
+			maxLevel = Math.max(maxLevel, level);
+			const best = formatTime(state.levelTimes[level].best);
+			html += `<tr><td>${level}</td><td>${best}</td></tr>`;
+		}
+	}
+	html += `<tr><td>${maxLevel + 1}</td><td>In progress...</td></tr>`;
+	table.innerHTML = html;
+	showModal('level-selection-modal');
+}
+
+function initState() {
+	return {
+		player: {
+			id: 'player',
+			x: 0.5,
+			y: 0.5,
+			health: 1,
+			motion: 'idleFrames',
+		},
+		inventory: {},
+		room: rooms[0],
+	};
 }
