@@ -68,6 +68,7 @@ const interactionFuncs = {
 			const y1 = roomCharacter.location.y * getValue(state.room, 'height');
 			const x2 = roomCharacter2.x * getValue(state.room, 'width');
 			const y2 = roomCharacter2.y * getValue(state.room, 'height');
+			// console.log(x1, y1, x2, y2);
 			const dx = x1 - x2;
 			const dy = y1 - y2;
 			const dist = Math.sqrt(dx * dx + dy * dy);
@@ -301,7 +302,7 @@ characters = {
 			prob: 0.012,
 			prepTime: 600,
 			range: 0.12, // proportion of canvas
-			strength: 0.06,
+			strength: 0.2,
 			resetTime: 600,
 		},
 		targetDist: 0.08,

@@ -47,7 +47,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -66,6 +66,8 @@ function load() {
 	statusCanvas.height = innerHeight * 0.14;
 	ctx = canvas.getContext('2d');
 	statusCtx = statusCanvas.getContext('2d');
+	initRooms = JSON.parse(JSON.stringify(rooms));
+	initCharacters = JSON.parse(JSON.stringify(characters));
 
 	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
 	dreamSound = new Audio('sounds/dream.mp3');
@@ -75,11 +77,16 @@ function load() {
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
 		state.room.doors = rooms[state.room.id].doors;
+		assignFunctions(rooms.find(r => r.id == state.room.id), state.room);
 		const savedRooms = JSON.parse(localStorage.rooms);
 		for (const savedRoom of savedRooms) {
 			const room = rooms.find(r => r.id == savedRoom.id);
+			assignFunctions(room, savedRoom);
 			room.items = savedRoom.items;
 			room.characters = savedRoom.characters;
+
+			// console.log('savedRoom.width', savedRoom.width);
+			// console.log('room.width', room.width);
 		}
 		// for (const sound in state.room.sounds) {
 		// 	console.log('state.room.sounds ', sound);
@@ -88,15 +95,7 @@ function load() {
 		state.isPaused = false;
 	}
 
-	setInterval(() => {
-		localStorage.state = JSON.stringify(state, (key, value) => {
-			// console.log('key value', key, value);
-			return key == 'doors' ? [] : value;
-		});
-		localStorage.rooms = JSON.stringify(rooms, (key, value) => {
-			return key == 'doors' ? [] : value;
-		});
-	}, 2000);
+	setInterval(saveState, 2000);
 
 	for (const characterId in characters) {
 		const character = characters[characterId];
@@ -192,7 +191,6 @@ function load() {
 			room.sounds[sound] = new Audio(`sounds/${room.sounds[sound]}`);
 		}
 	}
-	console.log('rooms', rooms);
 
 	for (const room of rooms) {
 		for (const door of room.doors || []) {
@@ -204,28 +202,28 @@ function load() {
 			}[door.wall];
 			const location = door.location;
 
-			const oppositeDoor = {
-				room,
-				wall,
-				location,
-				oppositeDoor: door,
-				key: door.key,
-			};
 			if (door.isOneWay) {
 				// TODO add a special hidden door for map
 			} else {
 				if (!door.room.doors) {
 					door.room.doors = [];
 				}
-				console.log(door.room.doors.find(d => d.room == room));
+				// console.log(door.room.doors.find(d => d.room == room));
 				if (!door.room.doors.find(d => d.room == room)) {
+					const oppositeDoor = {
+						room,
+						wall,
+						location,
+						oppositeDoor: door,
+						key: door.key,
+					};
 					door.room.doors.push(oppositeDoor);
 					door.oppositeDoor = oppositeDoor;
 				}
 			}
 		}
 	}
-	console.log(rooms);
+	// console.log(rooms);
 
 	if (localStorage.state) {
 		setRoom(state.room);
@@ -403,6 +401,7 @@ function drawGame() {
 				if (!state.player.isInvisible) {
 					interactingCharacters = interactingCharacters.concat(state.player);
 				}
+				// console.log('3 roomCharacter.location', roomCharacter.location);
 
 				for (const roomCharacter2 of interactingCharacters) {
 					if (roomCharacter != roomCharacter2) {
@@ -412,6 +411,7 @@ function drawGame() {
 					}
 				}
 
+				// console.log('4 roomCharacter.location', roomCharacter.location);
 				if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / getValue(state.room, 'width'))) {
 					if (roomCharacter.vel) {
 						roomCharacter.vel.x *= -1;
@@ -479,6 +479,7 @@ function drawGame() {
 				);
 				ctx.restore();
 			} else {
+				// console.log('roomCharacter.location', roomCharacter.location);
 				imageLoc = toScreen(roomCharacter.location, character);
 				ctx.drawImage(
 					characterImages[roomCharacter.id],
@@ -1364,7 +1365,7 @@ function toScreen(loc, character) {
 		height: 0
 	};
 	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
-		console.error('toScreen: NaN detected!', loc, character);
+		throw new Error('toScreen: NaN detected!', loc, character);
 	}
 	const x = ((loc.x * getValue(state.room, 'width')) - character.width / 2 + (1 - getValue(state.room, 'width')) / 2) * canvas.width;
 	const y = ((loc.y * getValue(state.room, 'height')) - character.height / 2 + (1 - getValue(state.room, 'height')) / 2) * canvas.height;
@@ -1401,7 +1402,21 @@ function togglePause() {
 	// console.log('togglePause', state.isPaused);
 	play(clickSound);
 	if (state.didDie) {
-		// TODO take player to init room of current level
+		for (const room of rooms) {
+			if (room.level == state.level) {
+				// take player to init room of current level
+				const initRoom = initRooms.find(r => r.id == room.id);
+				setRoom(initRoom);
+				delete localStorage.rooms;
+				state.t = 0;
+				state.didDie = false;
+				state.isGameOver = false;
+				state.player.health = 1;
+				state.inventory = {};
+				saveState();
+				location.href = location.href;
+			}
+		}
 		reset();
 	} else {
 		state.isPaused = !state.isPaused;
@@ -1465,6 +1480,9 @@ function setRoom(room) {
 	roomMusic && roomMusic.pause();
 	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || defaultRoomMusic;
 	// console.log('setRoom roomMusic ', roomMusic);
+	if (room.level) {
+		state.level = room.level;
+	}
 }
 
 function showMerchantSelection(type) {
@@ -1654,4 +1672,16 @@ function reset() {
 		delete localStorage.rooms;
 		location.href = location.href;
 	}, 2000);
+}
+
+function saveState() {
+	function serialize(key, value) {
+		// if (typeof value == 'function') {
+		// 	return '__function';
+		// }
+		// console.log('key value', key, value);
+		return key == 'doors' ? [] : value;
+	}
+	localStorage.state = JSON.stringify(state, serialize);
+	localStorage.rooms = JSON.stringify(rooms, serialize);
 }

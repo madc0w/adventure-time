@@ -92,7 +92,9 @@ rooms = [
 		]
 	}, {
 		id: 1,
+		// width: 0.6,
 		width: state => {
+			// console.log('state.t', state.t);
 			return 0.6 + 0.2 * Math.sin(state.t / 40);
 		},
 		height: 0.7,
@@ -277,6 +279,27 @@ rooms = [
 				wall: 'e',
 				location: 0.5,
 			}
-		]
+		],
+		characters: [
+			{
+				id: 'doomScreen',
+				location: {
+					x: 0.2,
+					y: 0.2
+				}
+			}, {
+				id: 'doomScreen',
+				location: {
+					x: 0.8,
+					y: 0.2
+				}
+			}, {
+				id: 'zlakik',
+				location: {
+					x: 0.4,
+					y: 0.4
+				}
+			},
+		],
 	},
 ];

@@ -4,6 +4,9 @@ function getValue(object, key) {
 	if (typeof val == 'function') {
 		return val(state);
 	}
+	if (isNaN(val)) {
+		throw new Error('getValue returns NaN');
+	}
 	return val;
 }
 
@@ -16,4 +19,23 @@ function distance(roomCharacter) {
 	const dx = x1 - x2;
 	const dy = y1 - y2;
 	return Math.sqrt(dx * dx + dy * dy);
+}
+
+// source & dest are assumed to be parallel in structure
+function assignFunctions(source, dest) {
+	for (const key in source) {
+		const sourceVal = source[key];
+		const destVal = dest[key];
+		if (typeof val == 'function') {
+			dest[key] = sourceVal;
+		} else if (Array.isArray(sourceVal)) {
+			for (let i = 0; i < sourceVal.length; i++) {
+				if (sourceVal[i] && destVal[i] && JSON.stringify(sourceVal[i]) == JSON.stringify(destVal[i])) {
+					assignFunctions(sourceVal[i], destVal[i]);
+				}
+			}
+		} else if (typeof sourceVal == 'object') {
+			assignFunctions(sourceVal, destVal);
+		}
+	}
 }
