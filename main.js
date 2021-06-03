@@ -36,7 +36,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters;
+let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -58,6 +58,7 @@ function load() {
 	initRooms = JSON.parse(JSON.stringify(rooms));
 	initCharacters = JSON.parse(JSON.stringify(characters));
 
+	levelUpSound = new Audio('sounds/level up.mp3');
 	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
@@ -225,9 +226,11 @@ function load() {
 			animate(state.player);
 		}
 	} else {
-		state.mappedRooms = [rooms[0].id];
 		setRoom(rooms[0]);
 		state.t = 0;
+	}
+	if (!state.mappedRooms) {
+		state.mappedRooms = [rooms[0].id];
 	}
 
 	let lastFrameCount = state.t;
@@ -1485,6 +1488,9 @@ function setRoom(room) {
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
 		const now = new Date().getTime();
+		if (room.level > 1 && room.level != state.level) {
+			play(levelUpSound);
+		}
 		state.level = room.level;
 		state.levelTimes = state.levelTimes || {};
 		state.levelTimes[state.level] = state.levelTimes[state.level] || {};

@@ -275,7 +275,7 @@ rooms = [
 		backgroundImage: 'pavers.jpg',
 		doors: [
 			{
-				roomId: 7,
+				roomId: 8,
 				wall: 'e',
 				location: 0.5,
 			}
@@ -300,6 +300,20 @@ rooms = [
 					y: 0.4
 				}
 			},
+		],
+	}, {
+		id: 8,
+		width: 0.2,
+		height: 0.9,
+		backgroundImage: 'pavers.jpg',
+		doors: [
+			{
+				roomId: 7,
+				wall: 'e',
+				location: 0.5,
+			}
+		],
+		characters: [
 		],
 	},
 ];
