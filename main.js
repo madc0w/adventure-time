@@ -40,14 +40,6 @@ const portalFrames = [];
 let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound;
 
 function load() {
-	// const originalValueOf = Object.prototype.valueOf;
-	// Object.prototype.valueOf = function () {
-	// 	if (typeof this !== 'number') {
-	// 		throw new Error('Object is not a Number');
-	// 	}
-	// 	return originalValueOf.bind(this)();
-	// }
-
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
 	canvas.width = Math.min(innerWidth * 0.86 - 28, innerHeight * 0.8 - 28);
@@ -87,7 +79,7 @@ function load() {
 			// 	console.log('state.room.sounds ', sound);
 			// }
 		}
-		state.isPaused = false;
+		setPaused(false);
 	}
 
 	setInterval(saveState, 2000);
@@ -237,7 +229,7 @@ function load() {
 
 	let lastFrameCount = state.t;
 	setInterval(() => {
-		console.log('FPS', state.t - lastFrameCount);
+		// console.log('FPS', state.t - lastFrameCount);
 		lastFrameCount = state.t;
 	}, 1000);
 
@@ -833,7 +825,7 @@ function drawGame() {
 			// console.log(roomCharacter.location);
 			// console.log(character.width);
 			if (character.type == 'merchant') {
-				state.isPaused = true;
+				setPaused(true);
 				document.getElementById('toggle-pause').innerHTML = 'Resume';
 				drawMerchantInteraction();
 			}
@@ -1397,9 +1389,19 @@ function showModal(id) {
 	closeModals();
 	play(clickSound);
 	const modal = document.getElementById(id);
-	state.isPaused = true;
+	setPaused(true);
 	document.getElementById('toggle-pause').innerHTML = 'Resume';
 	modal.classList.remove('hidden');
+}
+
+function setPaused(isPaused) {
+	const now = new Date().getTime();
+	if (isPaused) {
+		state.lastPausedTime = now;
+	} else if (state.isPaused && state.lastPausedTime) {
+		state.pausedTime += now - state.lastPausedTime;
+	}
+	state.isPaused = isPaused;
 }
 
 function togglePause() {
@@ -1423,7 +1425,7 @@ function togglePause() {
 		}
 		reset();
 	} else {
-		state.isPaused = !state.isPaused;
+		setPaused(!state.isPaused);
 		document.getElementById('toggle-pause').innerHTML = state.isPaused ? 'Resume' : 'Pause';
 	}
 }
@@ -1435,7 +1437,7 @@ function closeModals() {
 	}
 	if (state.isPaused) {
 		if (state.didDie) {
-			state.isPaused = false;
+			setPaused(false);
 		} else {
 			togglePause();
 		}
@@ -1473,7 +1475,7 @@ function quaffPotion(itemId) {
 
 function setRoom(room) {
 	state.room = room;
-	for (id in animIntervalIds) {
+	for (const id in animIntervalIds) {
 		clearInterval(animIntervalIds[id]);
 	}
 
@@ -1490,19 +1492,23 @@ function setRoom(room) {
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
 		const now = new Date().getTime();
-		if (room.level > 1 && room.level != state.level) {
-			play(levelUpSound);
-		}
-		state.level = room.level;
-		state.levelTimes = state.levelTimes || {};
-		state.levelTimes[state.level] = state.levelTimes[state.level] || {};
-		state.levelTimes[state.level].start = now;
-		if (state.level > 1) {
-			state.levelTimes[state.level - 1].end = now;
-			const completionTime = now - state.levelTimes[state.level - 1].start;
-			if (!state.levelTimes[state.level - 1].best || completionTime < state.levelTimes[state.level - 1].best) {
-				state.levelTimes[state.level - 1].best = completionTime;
+		if (room.level != state.level) {
+			if (room.level > 1) {
+				play(levelUpSound);
 			}
+			state.level = room.level;
+			state.levelTimes = state.levelTimes || {};
+			state.levelTimes[state.level] = state.levelTimes[state.level] || {};
+			state.levelTimes[state.level].start = now;
+			if (state.level > 1) {
+				state.levelTimes[state.level - 1].end = now;
+				const completionTime = now - state.levelTimes[state.level - 1].start - state.pausedTime;
+				const best = state.levelTimes[state.level - 1].best;
+				if (!best || completionTime < best) {
+					state.levelTimes[state.level - 1].best = completionTime;
+				}
+			}
+			state.pausedTime = 0;
 		}
 		showLevel();
 	}
@@ -1683,7 +1689,7 @@ function toast(message) {
 	}, 2400);
 }
 
-function reset() {
+function reset(isResetTimes) {
 	play(dreamSound);
 	let opacity = 1;
 	setInterval(() => {
@@ -1693,7 +1699,9 @@ function reset() {
 	setTimeout(() => {
 		const levelTimes = state.levelTimes;
 		initState();
-		state.levelTimes = levelTimes;
+		if (!isResetTimes) {
+			state.levelTimes = levelTimes;
+		}
 		saveState();
 		delete localStorage.rooms;
 		location.href = location.href;
@@ -1746,6 +1754,5 @@ function initState() {
 		room: rooms[0],
 		t: 0,
 		pausedTime: 0,
-		level: 1,
 	};
 }
