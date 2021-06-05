@@ -943,77 +943,76 @@ function drawMap() {
 		ctx.fillRect(canvas.width * mapMargin, canvas.height * mapMargin, canvas.width * (1 - 2 * mapMargin), canvas.height * (1 - 2 * mapMargin));
 	}
 	const mapped = [];
-	{
-		function drawRoom(room, offset) {
-			if (mapped.includes(room)) {
-				return;
-			}
-			mapped.push(room);
-			{
-				ctx.strokeStyle = room.wallColor || wallColor;
-				ctx.lineWidth = 2 * wallWidth * mapScale * canvas.width;
-				const width = getValue(room, 'width') * mapScale * canvas.width;
-				const height = getValue(room, 'height') * mapScale * canvas.height;
-				const x = - width / 2;
-				const y = - height / 2;
-				ctx.beginPath();
-				ctx.rect(x + offset.x, y + offset.y, width, height);
-				ctx.stroke();
-				// ctx.fillStyle = mapRoomColor;
-				// ctx.fillRect(x + offset.x, y + offset.y, width, height);
-				const roomBackground = new Image();
-				roomBackground.src = `img/rooms/${room.backgroundImage}`;
-				ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
-			}
 
-			for (const door of room.doors || []) {
-				door.p1 = {};
-				door.p2 = {};
-				if (['e', 'w'].includes(door.wall)) {
-					door.p1.y = (door.location - 1) * getValue(room, 'height') / 2 * mapScale * canvas.height;
-					door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
-					door.p1.x = door.p2.x = getValue(room, 'width') * mapScale * canvas.width / 2;
-					if (door.wall == 'w') {
-						door.p1.x *= -1;
-						door.p2.x *= -1;
-					}
-				} else {
-					door.p1.x = (door.location - 1) * getValue(room, 'width') / 2 * mapScale * canvas.width;
-					door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
-					door.p1.y = door.p2.y = getValue(room, 'height') * mapScale * canvas.height / 2;
-					if (door.wall == 'n') {
-						door.p1.y *= -1;
-						door.p2.y *= -1;
-						// console.log(door.p1);
-					}
-				}
-				for (const p of [door.p1, door.p2]) {
-					p.x += offset.x;
-					p.y += offset.y;
-				}
+	function drawRoom(room, offset) {
+		if (mapped.includes(room)) {
+			return;
+		}
+		mapped.push(room);
+		{
+			ctx.strokeStyle = room.wallColor || wallColor;
+			ctx.lineWidth = 2 * wallWidth * mapScale * canvas.width;
+			const width = getValue(room, 'width') * mapScale * canvas.width;
+			const height = getValue(room, 'height') * mapScale * canvas.height;
+			const x = - width / 2;
+			const y = - height / 2;
+			ctx.beginPath();
+			ctx.rect(x + offset.x, y + offset.y, width, height);
+			ctx.stroke();
+			// ctx.fillStyle = mapRoomColor;
+			// ctx.fillRect(x + offset.x, y + offset.y, width, height);
+			const roomBackground = new Image();
+			roomBackground.src = `img/rooms/${room.backgroundImage}`;
+			ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
+		}
 
-				// ctx.font = '10px Arial';
-				// ctx.fillStyle = '#000';
-				// ctx.fillText(1, door.p1.x, door.p1.y);
-				// ctx.fillText(2, door.p2.x, door.p2.y);
+		for (const door of room.doors || []) {
+			door.p1 = {};
+			door.p2 = {};
+			if (['e', 'w'].includes(door.wall)) {
+				door.p1.y = (door.location - 1) * getValue(room, 'height') / 2 * mapScale * canvas.height;
+				door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
+				door.p1.x = door.p2.x = getValue(room, 'width') * mapScale * canvas.width / 2;
+				if (door.wall == 'w') {
+					door.p1.x *= -1;
+					door.p2.x *= -1;
+				}
+			} else {
+				door.p1.x = (door.location - 1) * getValue(room, 'width') / 2 * mapScale * canvas.width;
+				door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
+				door.p1.y = door.p2.y = getValue(room, 'height') * mapScale * canvas.height / 2;
+				if (door.wall == 'n') {
+					door.p1.y *= -1;
+					door.p2.y *= -1;
+					// console.log(door.p1);
+				}
+			}
+			for (const p of [door.p1, door.p2]) {
+				p.x += offset.x;
+				p.y += offset.y;
 			}
 
-			for (const door of room.doors || []) {
-				if (state.mappedRooms.includes(door.room.id)) {
-					let x = offset.x, y = offset.y;
-					if (door.wall == 'n') {
-						y -= canvas.height * mapScale;
-					} else if (door.wall == 's') {
-						y += canvas.height * mapScale;
-					} else if (door.wall == 'w') {
-						x -= canvas.width * mapScale;
-					} else if (door.wall == 'e') {
-						x += canvas.width * mapScale;
-					}
-					drawRoom(door.room, {
-						x, y
-					});
+			// ctx.font = '10px Arial';
+			// ctx.fillStyle = '#000';
+			// ctx.fillText(1, door.p1.x, door.p1.y);
+			// ctx.fillText(2, door.p2.x, door.p2.y);
+		}
+
+		for (const door of room.doors || []) {
+			if (state.mappedRooms.includes(door.room.id)) {
+				let x = offset.x, y = offset.y;
+				if (door.wall == 'n') {
+					y -= canvas.height * mapScale;
+				} else if (door.wall == 's') {
+					y += canvas.height * mapScale;
+				} else if (door.wall == 'w') {
+					x -= canvas.width * mapScale;
+				} else if (door.wall == 'e') {
+					x += canvas.width * mapScale;
 				}
+				drawRoom(door.room, {
+					x, y
+				});
 			}
 		}
 	}
@@ -1410,15 +1409,11 @@ function togglePause() {
 	if (state.didDie) {
 		for (const room of rooms) {
 			if (room.level == state.level) {
+				initState();
 				// take player to init room of current level
 				const initRoom = initRooms.find(r => r.id == room.id);
-				setRoom(initRoom);
+				setRoom(initRoom, true);
 				delete localStorage.rooms;
-				state.t = 0;
-				state.didDie = false;
-				state.isGameOver = false;
-				state.player.health = 1;
-				state.inventory = {};
 				saveState();
 				location.href = location.href;
 			}
@@ -1473,7 +1468,7 @@ function quaffPotion(itemId) {
 	}
 }
 
-function setRoom(room) {
+function setRoom(room, isGameOver) {
 	state.room = room;
 	for (const id in animIntervalIds) {
 		clearInterval(animIntervalIds[id]);
@@ -1500,7 +1495,7 @@ function setRoom(room) {
 			state.levelTimes = state.levelTimes || {};
 			state.levelTimes[state.level] = state.levelTimes[state.level] || {};
 			state.levelTimes[state.level].start = now;
-			if (state.level > 1) {
+			if (state.level > 1 && !isGameOver) {
 				state.levelTimes[state.level - 1].end = now;
 				const completionTime = now - state.levelTimes[state.level - 1].start - state.pausedTime;
 				const best = state.levelTimes[state.level - 1].best;
@@ -1741,7 +1736,8 @@ function showLevelSelectionModal() {
 	showModal('level-selection-modal');
 }
 
-function initState() {
+function initState(room) {
+	room = room || rooms[0];
 	state = {
 		player: {
 			id: 'player',
@@ -1751,7 +1747,7 @@ function initState() {
 			motion: 'idleFrames',
 		},
 		inventory: {},
-		room: rooms[0],
+		room,
 		t: 0,
 		pausedTime: 0,
 	};
