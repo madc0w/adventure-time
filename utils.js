@@ -26,7 +26,7 @@ function assignFunctions(source, dest) {
 	for (const key in source) {
 		const sourceVal = source[key];
 		const destVal = dest[key];
-		if (typeof val == 'function') {
+		if (typeof sourceVal == 'function') {
 			dest[key] = sourceVal;
 		} else if (Array.isArray(sourceVal)) {
 			for (let i = 0; i < sourceVal.length; i++) {

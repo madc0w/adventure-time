@@ -1,4 +1,5 @@
-let state = initState();
+'use strict';
+
 const characterIntersectionLeeway = 0.88;
 const resaleFactor = 0.7;
 const moneySymbol = '&#10086;';
@@ -36,7 +37,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound;
 
 function load() {
 	// const originalValueOf = Object.prototype.valueOf;
@@ -64,6 +65,7 @@ function load() {
 	clickSound = new Audio('sounds/click.mp3');
 	lockedDoorSound = new Audio('sounds/locked door.mp3');
 
+	initState();
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
 		if (state.room) {
@@ -1690,7 +1692,7 @@ function reset() {
 	}, 20);
 	setTimeout(() => {
 		const levelTimes = state.levelTimes;
-		state = initState();
+		initState();
 		state.levelTimes = levelTimes;
 		saveState();
 		delete localStorage.rooms;
@@ -1732,7 +1734,7 @@ function showLevelSelectionModal() {
 }
 
 function initState() {
-	return {
+	state = {
 		player: {
 			id: 'player',
 			x: 0.5,
@@ -1742,5 +1744,8 @@ function initState() {
 		},
 		inventory: {},
 		room: rooms[0],
+		t: 0,
+		pausedTime: 0,
+		level: 1,
 	};
 }
