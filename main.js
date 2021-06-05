@@ -1311,7 +1311,7 @@ function onKeyDown(e) {
 }
 
 function animate(character) {
-	// if (character.id != 'player') {
+	// if (character.id == 'player') {
 	// 	console.log('character', character);
 	// }
 
@@ -1320,7 +1320,7 @@ function animate(character) {
 		const id = state.room.characters.indexOf(character);
 		imageId += `-${state.room.id}-${id}`;
 	}
-	clearInterval(animIntervalIds[character.id]);
+	clearInterval(animIntervalIds[imageId]);
 
 	animFrameNums[character.id] = 0;
 	let motion = character.motion;
@@ -1340,8 +1340,8 @@ function animate(character) {
 		} else {
 			frames = characterFrames[character.id][motion];
 		}
-		// if (character.id != 'player') {
-		// 	console.log('motion', motion);
+		// if (character.id == 'player') {
+		// 	console.log('frames', frames);
 		// }
 		characterImages[imageId] = frames[animFrameNums[character.id] % frames.length];
 		animFrameNums[character.id]++;
@@ -1350,7 +1350,7 @@ function animate(character) {
 	}
 
 	f();
-	animIntervalIds[character.id] = setInterval(f, characters[character.id].animInterval);
+	animIntervalIds[imageId] = setInterval(f, characters[character.id].animInterval);
 
 	if (character.id == 'player' && ['left', 'right', 'up', 'down'].includes(motion)) {
 		play(characters.player.sounds.walk);
@@ -1421,8 +1421,8 @@ function togglePause() {
 				// take player to init room of current level
 				const initRoom = initRooms.find(r => r.id == room.id);
 				setRoom(initRoom, true);
-				delete localStorage.rooms;
 				saveState();
+				delete localStorage.rooms;
 				location.href = location.href;
 			}
 		}
@@ -1478,9 +1478,9 @@ function quaffPotion(itemId) {
 
 function setRoom(room, isGameOver) {
 	state.room = room;
-	for (const id in animIntervalIds) {
-		clearInterval(animIntervalIds[id]);
-	}
+	// for (const id in animIntervalIds) {
+	// 	clearInterval(animIntervalIds[id]);
+	// }
 
 	for (const character of room.characters || []) {
 		character.motion = 'idleFrames';
