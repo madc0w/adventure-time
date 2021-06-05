@@ -457,6 +457,8 @@ function drawGame() {
 
 			let imageLoc;
 			// console.log(characterImages[roomCharacter.id]);
+			const id = state.room.characters.indexOf(roomCharacter);
+			const imageId = `${roomCharacter.id}-${state.room.id}-${id}`;
 			if (roomCharacter.rotation) {
 				// debug(roomCharacter.rotation);
 				imageLoc = toScreen({
@@ -467,7 +469,7 @@ function drawGame() {
 				ctx.translate(imageLoc.x, imageLoc.y);
 				ctx.rotate(roomCharacter.rotation);
 				ctx.drawImage(
-					characterImages[roomCharacter.id],
+					characterImages[imageId],
 					-character.width * canvas.width / 2,
 					-character.height * canvas.height / 2,
 					size * character.width * canvas.width,
@@ -478,7 +480,7 @@ function drawGame() {
 				// console.log('roomCharacter.location', roomCharacter.location);
 				imageLoc = toScreen(roomCharacter.location, character);
 				ctx.drawImage(
-					characterImages[roomCharacter.id],
+					characterImages[imageId],
 					imageLoc.x,
 					imageLoc.y,
 					size * character.width * canvas.width,
@@ -1312,6 +1314,12 @@ function animate(character) {
 	// if (character.id != 'player') {
 	// 	console.log('character', character);
 	// }
+
+	let imageId = character.id;
+	if (character.id != 'player') {
+		const id = state.room.characters.indexOf(character);
+		imageId += `-${state.room.id}-${id}`;
+	}
 	clearInterval(animIntervalIds[character.id]);
 
 	animFrameNums[character.id] = 0;
@@ -1335,7 +1343,7 @@ function animate(character) {
 		// if (character.id != 'player') {
 		// 	console.log('motion', motion);
 		// }
-		characterImages[character.id] = frames[animFrameNums[character.id] % frames.length];
+		characterImages[imageId] = frames[animFrameNums[character.id] % frames.length];
 		animFrameNums[character.id]++;
 		// console.log('anim', motion);
 		// console.log(characterImages[character.id]);

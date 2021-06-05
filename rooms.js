@@ -77,18 +77,19 @@ rooms = [
 			// 		y: 0.4
 			// 	}
 			// },
-			// {
-			// id: 'doomScreen',
-			// location: {
-			// 	x: 0.2,
-			// 	y: 0.2
-			// }
-			// 	// }, {
-			// 	id: 'doomScreen',
-			// 	location: {
-			// 		x: 0.6,
-			// 		y: 0.2
-			// 	}
+			{
+				id: 'doomScreen',
+				location: {
+					x: 0.2,
+					y: 0.2
+				}
+			}, {
+				id: 'doomScreen',
+				location: {
+					x: 0.6,
+					y: 0.2
+				}
+			}
 		]
 	}, {
 		id: 1,
