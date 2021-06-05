@@ -75,6 +75,37 @@ items = {
 			broken: 'broken weapon.mp3',
 		},
 	},
+	bow: {
+		type: 'weapon',
+		projectiles: ['arrow1'],
+		image: 'bow.png',
+		label: 'Bow',
+		size: 0.1,
+		resetTime: 600,
+		value: 20, // num uses of weapon before it breaks
+		cost: 32,
+		repairCost: 20,
+		sounds: {
+			draw: 'wield bow.mp3',
+			pickup: 'sword pickup.mp3',
+			broken: 'broken weapon.mp3',
+		},
+	},
+	arrow1: {
+		type: 'projectile',
+		label: 'Arrows',
+		image: 'arrow.png',
+		size: 0.032,
+		damage: 0.3,
+		speed: 0.4,
+		cost: 20,
+		value: 20, // num arrows
+		sounds: {
+			hit: 'zap.mp3',
+			pickup: 'pickup arrows.mp3',
+			broken: 'broken weapon.mp3',
+		},
+	},
 	healingPotion1: {
 		type: 'potion',
 		image: 'healing potion 01.png',

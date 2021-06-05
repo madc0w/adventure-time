@@ -56,9 +56,15 @@ rooms = [
 					y: 0.8
 				}
 			}, {
-				id: 'venomDagger',
+				id: 'bow',
 				location: {
 					x: 0.2,
+					y: 0.3
+				}
+			}, {
+				id: 'arrow1',
+				location: {
+					x: 0.4,
 					y: 0.3
 				}
 			}, {
@@ -77,19 +83,19 @@ rooms = [
 			// 		y: 0.4
 			// 	}
 			// },
-			{
-				id: 'doomScreen',
-				location: {
-					x: 0.2,
-					y: 0.2
-				}
-			}, {
-				id: 'doomScreen',
-				location: {
-					x: 0.6,
-					y: 0.2
-				}
-			}
+			// {
+			// 	id: 'doomScreen',
+			// 	location: {
+			// 		x: 0.2,
+			// 		y: 0.2
+			// 	}
+			// }, {
+			// 	id: 'doomScreen',
+			// 	location: {
+			// 		x: 0.6,
+			// 		y: 0.2
+			// 	}
+			// }
 		]
 	}, {
 		id: 1,
@@ -163,7 +169,7 @@ rooms = [
 					y: 0.0
 				},
 				itemsForSale: [
-					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher',
+					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher', 'arrow1',
 				],
 			},
 		],

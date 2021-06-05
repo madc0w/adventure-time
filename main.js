@@ -61,6 +61,7 @@ function load() {
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
 		if (state.room) {
+			state.room = rooms.find(r => r.id == state.room.id);
 			state.room.doors = rooms[state.room.id].doors;
 			assignFunctions(rooms.find(r => r.id == state.room.id), state.room);
 			if (localStorage.rooms) {
@@ -881,6 +882,7 @@ function drawGame() {
 				const itemId = item.type == 'treasure' ? item.type : roomItem.id;
 				state.inventory[itemId] = (state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
+				console.log('rooms[0].items.length', rooms[0].items.length);
 			}
 		}
 
@@ -1095,7 +1097,7 @@ function drawInventory() {
 	let html = '';
 	let numLines = 0;
 	const itemIds = Object.keys(state.inventory);
-	const itemOrder = ['treasure', 'weapon', 'key', 'potion'];
+	const itemOrder = ['treasure', 'weapon', 'projectile', 'key', 'potion'];
 	itemIds.sort((id1, id2) => {
 		const type1 = items[id1].type;
 		const type2 = items[id2].type;
@@ -1562,6 +1564,8 @@ function showMerchantSelection(type) {
 					let value = item.cost * resaleFactor;
 					if (item.type == 'weapon') {
 						value *= state.inventory[itemId] / item.value;
+					} else if (item.type == 'projectile') {
+						value = state.inventory[itemId] * item.cost / item.value;
 					}
 					value = Math.ceil(value);
 					html += '<tr>';
@@ -1634,7 +1638,12 @@ function repairItem(itemId) {
 
 function sellItem(itemId, value) {
 	play(characters.merchant.sounds.sell);
-	state.inventory.treasure = (state.inventory.treasure || 0) + value;
+	let saleValue = value;
+	if (items[itemId].type == 'projectile') {
+		saleValue = items[itemId].cost / items[itemId].value;
+	}
+	state.inventory.treasure = (state.inventory.treasure || 0) + saleValue;
+
 	if (items[itemId].type == 'weapon') {
 		if (state.player.wielding == itemId) {
 			state.player.wielding = null;
