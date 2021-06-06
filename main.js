@@ -655,153 +655,88 @@ function drawGame() {
 		inc /= Math.sqrt(2);
 	}
 
-	if (keysDown.ArrowLeft) {
-		const edge = characters.player.width / (2 * getValue(state.room, 'width'));
-		state.player.x -= inc / getValue(state.room, 'width');
-		if (state.player.x <= edge) {
-			const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
-			for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
-				const y1 = door.location;
-				const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
-				if (playerPos >= y1 && playerPos <= y2) {
-					throughDoor = door;
-					break;
-				}
-			}
-			if (!throughDoor || throughDoor.wall != 'w') {
-				state.player.x = edge;
-			}
-		}
-	}
-	if (keysDown.ArrowRight) {
-		const x = state.player.x;
-		state.player.x += inc / getValue(state.room, 'width');
-		const playerEdge = state.player.x * getValue(state.room, 'width') - characters.player.width / 2 + (1 - getValue(state.room, 'width')) / 2 + characters.player.width;
-		const edge = (1 + getValue(state.room, 'width')) / 2;
-		if (playerEdge >= edge) {
-			const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
-			for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
-				const y1 = door.location;
-				const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
+	if (keysDown.ArrowLeft || keysDown.ArrowRight || keysDown.ArrowUp || keysDown.ArrowDown) {
+		if (isAiming) {
+			const direction = keysDown.ArrowLeft || keysDown.ArrowDown ? 1 : -1;
+			state.aimAngle += direction * Math.PI / 20;
 
-				// {
-				// 	const loc = toScreen({
-				// 		x: 1,
-				// 		y: y1
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: 1,
-				// 		y: y2
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: 1,
-				// 		y: playerPos
-				// 	});
-				// 	ctx.fillStyle = '#0f0';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
+		} else {
 
-				if (playerPos >= y1 && playerPos <= y2) {
-					throughDoor = door;
-					break;
+			if (keysDown.ArrowLeft) {
+				const edge = characters.player.width / (2 * getValue(state.room, 'width'));
+				state.player.x -= inc / getValue(state.room, 'width');
+				if (state.player.x <= edge) {
+					const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
+					for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
+						const y1 = door.location;
+						const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
+						if (playerPos >= y1 && playerPos <= y2) {
+							throughDoor = door;
+							break;
+						}
+					}
+					if (!throughDoor || throughDoor.wall != 'w') {
+						state.player.x = edge;
+					}
 				}
 			}
-			if (!throughDoor || throughDoor.wall != 'e') {
-				state.player.x = x;
-			}
-		}
-	}
-	if (keysDown.ArrowUp) {
-		const edge = characters.player.height / (2 * getValue(state.room, 'height'));
-		state.player.y -= inc / getValue(state.room, 'height');
-		if (state.player.y <= edge) {
-			const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
-			for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
-				const x1 = door.location;
-				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
-				// {
-				// 	const loc = toScreen({
-				// 		x: x1,
-				// 		y: 0
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: x2,
-				// 		y: 0
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: playerPos,
-				// 		y: 0
-				// 	});
-				// 	ctx.fillStyle = '#0f0';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				if (playerPos >= x1 && playerPos <= x2) {
-					throughDoor = door;
-					break;
+			if (keysDown.ArrowRight) {
+				const x = state.player.x;
+				state.player.x += inc / getValue(state.room, 'width');
+				const playerEdge = state.player.x * getValue(state.room, 'width') - characters.player.width / 2 + (1 - getValue(state.room, 'width')) / 2 + characters.player.width;
+				const edge = (1 + getValue(state.room, 'width')) / 2;
+				if (playerEdge >= edge) {
+					const playerPos = state.player.y - characters.player.height / (2 * getValue(state.room, 'height'));
+					for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
+						const y1 = door.location;
+						const y2 = door.location + (doorSize - characters.player.height) / getValue(state.room, 'height');
+						if (playerPos >= y1 && playerPos <= y2) {
+							throughDoor = door;
+							break;
+						}
+					}
+					if (!throughDoor || throughDoor.wall != 'e') {
+						state.player.x = x;
+					}
 				}
 			}
-			if (!throughDoor || throughDoor.wall != 'n') {
-				state.player.y = edge;
-			}
-		}
-	}
-	if (keysDown.ArrowDown) {
-		const y = state.player.y;
-		state.player.y += inc / getValue(state.room, 'height');
-		const playerEdge = state.player.y * getValue(state.room, 'height') - characters.player.height / 2 + (1 - getValue(state.room, 'height')) / 2 + characters.player.height;
-		const edge = (1 + getValue(state.room, 'height')) / 2;
-		if (playerEdge >= edge) {
-			const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
-			for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
-				const x1 = door.location;
-				const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
-				// {
-				// 	const loc = toScreen({
-				// 		x: x1,
-				// 		y: 1
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: x2,
-				// 		y: 1
-				// 	});
-				// 	ctx.fillStyle = '#f00';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				// {
-				// 	const loc = toScreen({
-				// 		x: playerPos,
-				// 		y: 1
-				// 	});
-				// 	ctx.fillStyle = '#0f0';
-				// 	ctx.fillRect(loc.x, loc.y, 4, 4);
-				// }
-				if (playerPos >= x1 && playerPos <= x2) {
-					throughDoor = door;
-					break;
+			if (keysDown.ArrowUp) {
+				const edge = characters.player.height / (2 * getValue(state.room, 'height'));
+				state.player.y -= inc / getValue(state.room, 'height');
+				if (state.player.y <= edge) {
+					const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
+					for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
+						const x1 = door.location;
+						const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
+						if (playerPos >= x1 && playerPos <= x2) {
+							throughDoor = door;
+							break;
+						}
+					}
+					if (!throughDoor || throughDoor.wall != 'n') {
+						state.player.y = edge;
+					}
 				}
 			}
-			if (!throughDoor || throughDoor.wall != 's') {
-				state.player.y = y;
+			if (keysDown.ArrowDown) {
+				const y = state.player.y;
+				state.player.y += inc / getValue(state.room, 'height');
+				const playerEdge = state.player.y * getValue(state.room, 'height') - characters.player.height / 2 + (1 - getValue(state.room, 'height')) / 2 + characters.player.height;
+				const edge = (1 + getValue(state.room, 'height')) / 2;
+				if (playerEdge >= edge) {
+					const playerPos = state.player.x - characters.player.width / (2 * getValue(state.room, 'width'));
+					for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
+						const x1 = door.location;
+						const x2 = door.location + (doorSize - 0.8 * characters.player.width) / getValue(state.room, 'width');
+						if (playerPos >= x1 && playerPos <= x2) {
+							throughDoor = door;
+							break;
+						}
+					}
+					if (!throughDoor || throughDoor.wall != 's') {
+						state.player.y = y;
+					}
+				}
 			}
 		}
 	}
@@ -1149,12 +1084,21 @@ function aim() {
 	const weapon = items[state.player.wielding];
 	const projectile = items[weapon.projectile];
 	if (state.inventory[weapon.projectile]) {
+		isAiming = true;
+		state.aimAngle = state.aimAngle || 0;
+
 		// aim circle
 		const loc = toScreen(state.player);
 		ctx.strokeStyle = '#f00';
 		ctx.lineWidth = 6;
 		ctx.beginPath();
 		ctx.arc(loc.x, loc.y, 8 + canvas.height * characters.player.height / 2, 0, 2 * Math.PI);
+		ctx.stroke();
+
+		ctx.strokeStyle = '#444';
+		ctx.lineWidth = 16;
+		ctx.beginPath();
+		ctx.arc(loc.x, loc.y, 2 + canvas.height * characters.player.height / 2, state.aimAngle - Math.PI / 24, state.aimAngle + Math.PI / 24);
 		ctx.stroke();
 
 	} else {
@@ -1164,7 +1108,7 @@ function aim() {
 
 function attack() {
 	const targetedCharacter = getTargetedCharacter();
-	if (targetedCharacter) {
+	if (targetedCharacter && !state.isPaused) {
 		attackMotion = targetedCharacter.location.x < state.player.x ? 'left' : 'right';
 		animate(state.player);
 		const weapon = items[state.player.wielding];
@@ -1279,7 +1223,7 @@ function onKeyUp(e) {
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 		drawInventory();
 	} else if (key == 'A') {
-		if (!items[state.player.wielding].projectile) {
+		if (items[state.player.wielding] && !items[state.player.wielding].projectile) {
 			attack();
 		}
 	} else if (key == 'C') {
@@ -1331,7 +1275,7 @@ function onKeyDown(e) {
 			ArrowUp: 'up',
 			ArrowDown: 'down'
 		}[key];
-		if (motion) {
+		if (motion && !isAiming) {
 			state.player.motion = motion;
 			animate(state.player);
 		}
