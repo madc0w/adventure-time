@@ -228,12 +228,14 @@ characters = {
 			},
 			bow: {
 				left: [
-					'player left wielding bow 01.png',
-					'player left wielding bow 02.png',
+					'player standing wielding bow.png',
+					// 'player left wielding bow 01.png',
+					// 'player left wielding bow 02.png',
 				],
 				right: [
-					'player right wielding bow 01.png',
-					'player right wielding bow 02.png',
+					'player standing wielding bow.png',
+					// 'player right wielding bow 01.png',
+					// 'player right wielding bow 02.png',
 				],
 				idleFrames: [
 					'player standing wielding bow.png',
@@ -243,8 +245,9 @@ characters = {
 					'player up wielding 02.png',
 				],
 				down: [
-					'player down wielding bow 01.png',
-					'player down wielding bow 02.png',
+					'player standing wielding bow.png',
+					// 'player down wielding bow 01.png',
+					// 'player down wielding bow 02.png',
 				],
 			},
 		},

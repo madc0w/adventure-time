@@ -37,7 +37,7 @@ const animIntervalIds = {};
 const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -616,6 +616,10 @@ function drawGame() {
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
+	if (keysDown['A'] && state.player.wielding && items[state.player.wielding].projectile) {
+		aim();
+	}
+
 	if (state.isGameOver) {
 		const text = 'GAME OVER';
 		const lineHeight = Math.floor(0.16 * canvas.height);
@@ -1141,6 +1145,23 @@ function drawInventory() {
 	document.getElementById('inventory-table').innerHTML = html;
 }
 
+function aim() {
+	const weapon = items[state.player.wielding];
+	const projectile = items[weapon.projectile];
+	if (state.inventory[weapon.projectile]) {
+		// aim circle
+		const loc = toScreen(state.player);
+		ctx.strokeStyle = '#f00';
+		ctx.lineWidth = 6;
+		ctx.beginPath();
+		ctx.arc(loc.x, loc.y, 8 + canvas.height * characters.player.height / 2, 0, 2 * Math.PI);
+		ctx.stroke();
+
+	} else {
+		toast(`You\'re all out of ${projectile.label}!<br/> Try a different weapon.`);
+	}
+}
+
 function attack() {
 	const targetedCharacter = getTargetedCharacter();
 	if (targetedCharacter) {
@@ -1233,18 +1254,22 @@ function onKeyUp(e) {
 		}, 20);
 	}
 
-	delete keysDown[e.code];
+	let key = e.key;
+	if (key.length == 1) {
+		key = key.toUpperCase();
+	}
+	delete keysDown[key];
 	if (Object.keys(keysDown).length == 0) {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
 	}
 
-	if (e.key.toUpperCase() == 'M') {
+	if (key == 'M') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 		closeModals();
-	} else if (e.key.toUpperCase() == 'I') {
+	} else if (key == 'I') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
 		closeModals();
@@ -1253,9 +1278,11 @@ function onKeyUp(e) {
 		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 		drawInventory();
-	} else if (e.key.toUpperCase() == 'A') {
-		attack();
-	} else if (e.key.toUpperCase() == 'C') {
+	} else if (key == 'A') {
+		if (!items[state.player.wielding].projectile) {
+			attack();
+		}
+	} else if (key == 'C') {
 		const weaponIds = Object.keys(state.inventory).filter(id => items[id].type == 'weapon');
 		let next, didSelect;
 		if (state.player.wielding) {
@@ -1281,7 +1308,7 @@ function onKeyUp(e) {
 		}
 
 		animate(state.player);
-	} else if (e.key == 'Escape') {
+	} else if (key == 'Escape') {
 		drawFunc = drawGame;
 		closeModals();
 	}
@@ -1293,27 +1320,32 @@ function onKeyDown(e) {
 		return;
 	}
 
-	if (!keysDown[e.code]) {
+	let key = e.key;
+	if (key.length == 1) {
+		key = key.toUpperCase();
+	}
+	if (!keysDown[key]) {
 		const motion = {
 			ArrowLeft: 'left',
 			ArrowRight: 'right',
 			ArrowUp: 'up',
 			ArrowDown: 'down'
-		}[e.code];
+		}[key];
 		if (motion) {
 			state.player.motion = motion;
 			animate(state.player);
 		}
 	}
-	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C'].includes(e.code)) {
-		keysDown[e.code] = true;
+
+	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C'].includes(key)) {
+		keysDown[key] = true;
 	}
 }
 
 function makeImageId(character) {
 	let imageId = character.id;
 	if (character.id != 'player') {
-		const id = character.imageId || state.room.characters.indexOf(character);
+		const id = character.imageId || (state.room.characters.indexOf(character) + 1);
 		imageId += `-${state.room.id}-${id}`;
 		character.imageId = id;
 	}

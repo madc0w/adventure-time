@@ -62,7 +62,7 @@ rooms = [
 					y: 0.3
 				}
 			}, {
-				id: 'arrow1',
+				id: 'arrow',
 				location: {
 					x: 0.4,
 					y: 0.3
@@ -169,7 +169,7 @@ rooms = [
 					y: 0.0
 				},
 				itemsForSale: [
-					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher', 'arrow1',
+					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher', 'arrow',
 				],
 			},
 		],

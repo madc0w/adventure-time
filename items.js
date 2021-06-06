@@ -77,7 +77,7 @@ items = {
 	},
 	bow: {
 		type: 'weapon',
-		projectiles: ['arrow1'],
+		projectile: 'arrow',
 		image: 'bow.png',
 		label: 'Bow',
 		size: 0.1,
@@ -91,11 +91,11 @@ items = {
 			broken: 'broken weapon.mp3',
 		},
 	},
-	arrow1: {
+	arrow: {
 		type: 'projectile',
 		label: 'Arrows',
 		image: 'arrow.png',
-		size: 0.032,
+		size: 0.03,
 		damage: 0.3,
 		speed: 0.4,
 		cost: 20,
