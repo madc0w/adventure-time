@@ -226,6 +226,27 @@ characters = {
 					'player down wielding electrosmasher 02.png',
 				],
 			},
+			bow: {
+				left: [
+					'player left wielding bow 01.png',
+					'player left wielding bow 02.png',
+				],
+				right: [
+					'player right wielding bow 01.png',
+					'player right wielding bow 02.png',
+				],
+				idleFrames: [
+					'player standing wielding bow.png',
+				],
+				up: [
+					'player up wielding 01.png',
+					'player up wielding 02.png',
+				],
+				down: [
+					'player down wielding bow 01.png',
+					'player down wielding bow 02.png',
+				],
+			},
 		},
 		attack: {
 			enchantedSword: {
@@ -250,6 +271,14 @@ characters = {
 				],
 				right: [
 					'player right strike electrosmasher.png',
+				]
+			},
+			bow: {
+				left: [
+					'player left strike bow.png',
+				],
+				right: [
+					'player right strike bow.png',
 				]
 			},
 		},

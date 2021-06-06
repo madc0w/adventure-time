@@ -458,8 +458,7 @@ function drawGame() {
 
 			let imageLoc;
 			// console.log(characterImages[roomCharacter.id]);
-			const id = state.room.characters.indexOf(roomCharacter);
-			const imageId = `${roomCharacter.id}-${state.room.id}-${id}`;
+			const imageId = makeImageId(roomCharacter);
 			if (roomCharacter.rotation) {
 				// debug(roomCharacter.rotation);
 				imageLoc = toScreen({
@@ -829,7 +828,6 @@ function drawGame() {
 			// console.log(character.width);
 			if (character.type == 'merchant') {
 				setPaused(true);
-				document.getElementById('toggle-pause').innerHTML = 'Resume';
 				drawMerchantInteraction();
 			}
 		}
@@ -882,7 +880,7 @@ function drawGame() {
 				const itemId = item.type == 'treasure' ? item.type : roomItem.id;
 				state.inventory[itemId] = (state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
-				console.log('rooms[0].items.length', rooms[0].items.length);
+				// console.log('rooms[0].items.length', rooms[0].items.length);
 			}
 		}
 
@@ -1312,16 +1310,22 @@ function onKeyDown(e) {
 	}
 }
 
+function makeImageId(character) {
+	let imageId = character.id;
+	if (character.id != 'player') {
+		const id = character.imageId || state.room.characters.indexOf(character);
+		imageId += `-${state.room.id}-${id}`;
+		character.imageId = id;
+	}
+	return imageId;
+}
+
 function animate(character) {
 	// if (character.id == 'player') {
 	// 	console.log('character', character);
 	// }
 
-	let imageId = character.id;
-	if (character.id != 'player') {
-		const id = state.room.characters.indexOf(character);
-		imageId += `-${state.room.id}-${id}`;
-	}
+	const imageId = makeImageId(character);
 	clearInterval(animIntervalIds[imageId]);
 
 	animFrameNums[character.id] = 0;
@@ -1399,7 +1403,6 @@ function showModal(id) {
 	play(clickSound);
 	const modal = document.getElementById(id);
 	setPaused(true);
-	document.getElementById('toggle-pause').innerHTML = 'Resume';
 	modal.classList.remove('hidden');
 }
 
@@ -1407,6 +1410,7 @@ function setPaused(isPaused) {
 	const now = new Date().getTime();
 	if (isPaused) {
 		state.lastPausedTime = now;
+		document.getElementById('toggle-pause').innerHTML = state.didDie ? 'Play Again' : 'Resume';
 	} else if (state.isPaused && state.lastPausedTime) {
 		state.pausedTime += now - state.lastPausedTime;
 	}
@@ -1419,7 +1423,9 @@ function togglePause() {
 	if (state.didDie) {
 		for (const room of rooms) {
 			if (room.level == state.level) {
+				const levelTimes = state.levelTimes;
 				initState();
+				state.levelTimes = levelTimes;
 				// take player to init room of current level
 				const initRoom = initRooms.find(r => r.id == room.id);
 				setRoom(initRoom, true);
