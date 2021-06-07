@@ -16,6 +16,7 @@ const moveIncrement = 0.006;
 const itemTakeDistance = 0.1;
 const numTakeItemAnimSteps = 12;
 const numCharacterDieAnimSteps = 148;
+const projectileSizeFactor = 1.2;
 
 const mapBackgroundColor = '#e2e2b1';
 const mapPassageColor = '#ccd';
@@ -657,7 +658,7 @@ function drawGame() {
 
 	if (keysDown.ArrowLeft || keysDown.ArrowRight || keysDown.ArrowUp || keysDown.ArrowDown) {
 		if (isAiming) {
-			const direction = keysDown.ArrowLeft || keysDown.ArrowDown ? 1 : -1;
+			const direction = keysDown.ArrowLeft || keysDown.ArrowDown ? -1 : 1;
 			state.aimAngle += direction * Math.PI / 20;
 
 		} else {
@@ -874,6 +875,46 @@ function drawGame() {
 		// console.log('oppositeWall', oppositeWall);
 		// console.log('x', state.player.x);
 		// console.log('y', state.player.y);
+	}
+
+	// projectiles
+	for (const projectile of state.projectiles || []) {
+		// console.log('projectile', items[projectile.id]);
+		const item = items[projectile.id];
+		const size = item.size;
+		const imageLoc = toScreen({
+			x: projectile.loc.x,
+			y: projectile.loc.y
+			// }, {
+			// 	width: size * item.image.width / item.image.height,
+			// 	height: size * canvas.height
+		});
+		ctx.save();
+		ctx.translate(imageLoc.x, imageLoc.y);
+		ctx.rotate(projectile.angle);
+		const width = (size * item.image.width / item.image.height) * canvas.width / projectileSizeFactor;
+		const height = size * canvas.height / projectileSizeFactor;
+		ctx.drawImage(
+			item.image,
+			projectile.loc.x,
+			projectile.loc.y,
+			width,
+			height,
+		);
+		ctx.restore();
+		projectile.loc.x += Math.cos(projectile.angle) * item.speed;
+		projectile.loc.y += Math.sin(projectile.angle) * item.speed;
+
+		ctx.fillStyle = '#f00';
+		ctx.beginPath();
+		// console.log(projectile.loc);
+		const tip = {
+			x: imageLoc.x + Math.cos(projectile.angle) * Math.max(width, height),
+			y: imageLoc.y + Math.sin(projectile.angle) * Math.max(width, height)
+		};
+		ctx.arc(tip.x, tip.y, 4, 0, Math.PI * 2);
+		ctx.fill();
+
 	}
 }
 
@@ -1107,51 +1148,66 @@ function aim() {
 }
 
 function attack() {
-	const targetedCharacter = getTargetedCharacter();
-	if (targetedCharacter && !state.isPaused) {
-		attackMotion = targetedCharacter.location.x < state.player.x ? 'left' : 'right';
-		animate(state.player);
-		const weapon = items[state.player.wielding];
-		setTimeout(() => {
-			attackMotion = null;
-		}, weapon.resetTime);
-		const character = characters[targetedCharacter.id];
-		const weaponValue = state.inventory[state.player.wielding] / weapon.value;
-		targetedCharacter.health -= weaponValue * weapon.damage / character.resilience;
+	const weapon = items[state.player.wielding];
+	if (!state.isPaused && weapon) {
+		const projectile = weapon.projectile;
+		if (projectile) {
+			state.projectiles = state.projectiles || [];
+			state.projectiles.push({
+				id: projectile,
+				loc: {
+					x: state.player.x,
+					y: state.player.y,
+				},
+				angle: state.aimAngle
+			});
+		} else {
+			const targetedCharacter = getTargetedCharacter();
+			if (targetedCharacter) {
+				attackMotion = targetedCharacter.location.x < state.player.x ? 'left' : 'right';
+				animate(state.player);
+				setTimeout(() => {
+					attackMotion = null;
+				}, weapon.resetTime);
+				const character = characters[targetedCharacter.id];
+				const weaponValue = state.inventory[state.player.wielding] / weapon.value;
+				targetedCharacter.health -= weaponValue * weapon.damage / character.resilience;
 
-		if (weapon.sounds.hit) {
-			play(weapon.sounds.hit);
-		}
-		if (character.sounds.injured) {
-			setTimeout(() => {
-				play(character.sounds.injured);
-			}, 200);
-		}
-
-		if (targetedCharacter.health <= 0) {
-			// die
-			targetedCharacter.motion = 'dieFrames';
-			animate(targetedCharacter);
-			play(character.sounds.die);
-
-			const interval = 24;
-			targetedCharacter.animStep = 0;
-			targetedCharacter.deathAnimIntervalId = setInterval(() => {
-				targetedCharacter.animStep++;
-				if (targetedCharacter.animStep >= numCharacterDieAnimSteps) {
-					clearInterval(targetedCharacter.deathAnimIntervalId);
-					if (state.room.characters) {
-						state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
-					}
+				if (weapon.sounds.hit) {
+					play(weapon.sounds.hit);
 				}
-			}, interval);
-		}
+				if (character.sounds.injured) {
+					setTimeout(() => {
+						play(character.sounds.injured);
+					}, 200);
+				}
 
-		state.inventory[state.player.wielding]--;
-		if (state.inventory[state.player.wielding] <= 0) {
-			delete state.inventory[state.player.wielding];
-			state.player.wielding = null;
-			play(weapon.sounds.broken);
+				if (targetedCharacter.health <= 0) {
+					// die
+					targetedCharacter.motion = 'dieFrames';
+					animate(targetedCharacter);
+					play(character.sounds.die);
+
+					const interval = 24;
+					targetedCharacter.animStep = 0;
+					targetedCharacter.deathAnimIntervalId = setInterval(() => {
+						targetedCharacter.animStep++;
+						if (targetedCharacter.animStep >= numCharacterDieAnimSteps) {
+							clearInterval(targetedCharacter.deathAnimIntervalId);
+							if (state.room.characters) {
+								state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
+							}
+						}
+					}, interval);
+				}
+
+				state.inventory[state.player.wielding]--;
+				if (state.inventory[state.player.wielding] <= 0) {
+					delete state.inventory[state.player.wielding];
+					state.player.wielding = null;
+					play(weapon.sounds.broken);
+				}
+			}
 		}
 	}
 }
@@ -1223,9 +1279,7 @@ function onKeyUp(e) {
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 		drawInventory();
 	} else if (key == 'A') {
-		if (items[state.player.wielding] && !items[state.player.wielding].projectile) {
-			attack();
-		}
+		attack();
 	} else if (key == 'C') {
 		const weaponIds = Object.keys(state.inventory).filter(id => items[id].type == 'weapon');
 		let next, didSelect;

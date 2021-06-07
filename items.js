@@ -97,7 +97,7 @@ items = {
 		image: 'arrow.png',
 		size: 0.03,
 		damage: 0.3,
-		speed: 0.4,
+		speed: 0.01,
 		cost: 20,
 		value: 20, // num arrows
 		sounds: {

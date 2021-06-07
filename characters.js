@@ -277,12 +277,12 @@ characters = {
 				]
 			},
 			bow: {
-				left: [
-					'player left strike bow.png',
-				],
-				right: [
-					'player right strike bow.png',
-				]
+				// left: [
+				// 	'player left strike bow.png',
+				// ],
+				// right: [
+				// 	'player right strike bow.png',
+				// ]
 			},
 		},
 		sounds: {
