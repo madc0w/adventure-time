@@ -659,7 +659,7 @@ function drawGame() {
 	if (keysDown.ArrowLeft || keysDown.ArrowRight || keysDown.ArrowUp || keysDown.ArrowDown) {
 		if (isAiming) {
 			const direction = keysDown.ArrowLeft || keysDown.ArrowDown ? -1 : 1;
-			state.aimAngle += direction * Math.PI / 20;
+			state.aimAngle += direction * Math.PI / 32;
 
 		} else {
 
@@ -905,15 +905,63 @@ function drawGame() {
 		projectile.loc.x += Math.cos(projectile.angle) * item.speed;
 		projectile.loc.y += Math.sin(projectile.angle) * item.speed;
 
-		ctx.fillStyle = '#f00';
-		ctx.beginPath();
-		// console.log(projectile.loc);
 		const tip = {
-			x: imageLoc.x + Math.cos(projectile.angle) * Math.max(width, height),
-			y: imageLoc.y + Math.sin(projectile.angle) * Math.max(width, height)
+			x: imageLoc.x + Math.cos(projectile.angle) * width + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
+			y: imageLoc.y + Math.sin(projectile.angle) * width + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
 		};
-		ctx.arc(tip.x, tip.y, 4, 0, Math.PI * 2);
-		ctx.fill();
+		const end = {
+			x: imageLoc.x + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
+			y: imageLoc.y + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
+		};
+
+		if (end.x > canvas.width * (1 - (1 - state.room.width) / 2) ||
+			end.x < canvas.width * (1 - state.room.width) / 2 ||
+			end.y > canvas.height * (1 - (1 - state.room.height) / 2) ||
+			end.y < canvas.height * (1 - state.room.height) / 2
+		) {
+			play(item.sounds.hitWall);
+			state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
+		}
+
+		for (const roomCharacter of state.room.characters || []) {
+			const character = characters[roomCharacter.id];
+			if (character.type == 'enemy') {
+				const left = roomCharacter.location.x - (character.width / getValue(state.room, 'width')) / 2;
+				const top = roomCharacter.location.y - (character.height / getValue(state.room, 'height')) / 2;
+				const right = roomCharacter.location.x + (character.width / getValue(state.room, 'width')) / 2;
+				const bottom = roomCharacter.location.y + (character.height / getValue(state.room, 'height')) / 2;
+				const upperLeft = toScreen({
+					x: left,
+					y: top
+				});
+				const lowerRight = toScreen({
+					x: right,
+					y: bottom
+				});
+				if (tip.x > upperLeft.x && tip.x < lowerRight.x && tip.y > upperLeft.y && tip.y < lowerRight.y) {
+					roomCharacter.health -= item.damage / character.resilience;
+					state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
+					play(character.sounds.injured);
+				}
+
+				// ctx.fillStyle = '#f00';
+				// ctx.beginPath();
+				// ctx.arc(upperLeft.x, upperLeft.y, 4, 0, Math.PI * 2);
+				// ctx.fill();
+				// ctx.fillStyle = '#f00';
+				// ctx.beginPath();
+				// ctx.arc(lowerRight.x, lowerRight.y, 4, 0, Math.PI * 2);
+				// ctx.fill();
+			}
+		}
+		// ctx.fillStyle = '#f00';
+		// ctx.beginPath();
+		// ctx.arc(tip.x, tip.y, 4, 0, Math.PI * 2);
+		// ctx.fill();
+
+		// ctx.beginPath();
+		// ctx.arc(end.x, end.y, 4, 0, Math.PI * 2);
+		// ctx.fill();
 
 	}
 }
@@ -1152,15 +1200,20 @@ function attack() {
 	if (!state.isPaused && weapon) {
 		const projectile = weapon.projectile;
 		if (projectile) {
-			state.projectiles = state.projectiles || [];
-			state.projectiles.push({
-				id: projectile,
-				loc: {
-					x: state.player.x,
-					y: state.player.y,
-				},
-				angle: state.aimAngle
-			});
+			if (state.inventory[projectile] > 0) {
+				state.inventory[projectile]--;
+				state.projectiles = state.projectiles || [];
+				state.projectiles.push({
+					id: projectile,
+					loc: {
+						x: state.player.x,
+						y: state.player.y,
+					},
+					angle: state.aimAngle
+				});
+			} else {
+				toast(`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`);
+			}
 		} else {
 			const targetedCharacter = getTargetedCharacter();
 			if (targetedCharacter) {
@@ -1280,6 +1333,7 @@ function onKeyUp(e) {
 		drawInventory();
 	} else if (key == 'A') {
 		attack();
+		isAiming = false;
 	} else if (key == 'C') {
 		const weaponIds = Object.keys(state.inventory).filter(id => items[id].type == 'weapon');
 		let next, didSelect;

@@ -101,9 +101,8 @@ items = {
 		cost: 20,
 		value: 20, // num arrows
 		sounds: {
-			hit: 'zap.mp3',
+			hitWall: 'arrow hit wall.mp3',
 			pickup: 'pickup arrows.mp3',
-			broken: 'broken weapon.mp3',
 		},
 	},
 	healingPotion1: {
