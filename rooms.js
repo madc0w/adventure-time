@@ -102,7 +102,7 @@ rooms = [
 		// width: 0.6,
 		width: state => {
 			// console.log('state.t', state.t);
-			return 0.6 + 0.2 * Math.sin(state.t / 40);
+			return 0.6 + 0.12 * Math.sin(state.t / 40);
 		},
 		height: 0.7,
 		backgroundImage: 'room_02.jpg',

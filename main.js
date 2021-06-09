@@ -626,10 +626,19 @@ function drawGame() {
 	if (state.isGameOver) {
 		const text = 'GAME OVER';
 		const lineHeight = Math.floor(0.16 * canvas.height);
+		ctx.font = `${lineHeight + 4}px ${fontFamily}`;
+		ctx.fillStyle = '#000';
+		{
+			const x = (canvas.width - ctx.measureText(text).width) / 2;
+			ctx.fillText(text, x, 0.4 * canvas.height + 2);
+		}
+
 		ctx.font = `${lineHeight}px ${fontFamily}`;
 		ctx.fillStyle = '#f00';
-		const x = (canvas.width - ctx.measureText(text).width) / 2;
-		ctx.fillText(text, x, 0.4 * canvas.height);
+		{
+			const x = (canvas.width - ctx.measureText(text).width) / 2;
+			ctx.fillText(text, x, 0.4 * canvas.height);
+		}
 
 		if (!state.didDie) {
 			state.didDie = true;
@@ -916,10 +925,10 @@ function drawGame() {
 			y: imageLoc.y + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
 		};
 
-		if (end.x > canvas.width * (1 - (1 - state.room.width) / 2) ||
-			end.x < canvas.width * (1 - state.room.width) / 2 ||
-			end.y > canvas.height * (1 - (1 - state.room.height) / 2) ||
-			end.y < canvas.height * (1 - state.room.height) / 2
+		if (end.x > canvas.width * (1 - (1 - getValue(state.room, 'width')) / 2) ||
+			end.x < canvas.width * (1 - getValue(state.room, 'width')) / 2 ||
+			end.y > canvas.height * (1 - (1 - getValue(state.room, 'height')) / 2) ||
+			end.y < canvas.height * (1 - getValue(state.room, 'height')) / 2
 		) {
 			play(item.sounds.hitWall);
 			state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
@@ -1211,25 +1220,30 @@ function attack() {
 				} else {
 					// set angle = direction of player motion
 					const motionKeys = Object.keys(keysDown).filter(k => k.startsWith('Arrow')).sort().join();
-					angle = Math.PI * {
+					angle = {
 						'ArrowRight': 0,
-						'ArrowUp': 1.5,
-						'ArrowLeft': 1,
-						'ArrowDown': 0.5,
-						'ArrowRight,ArrowUp': 1.75,
-						'ArrowLeft,ArrowUp': 1.25,
-						'ArrowDown,ArrowLeft': 0.75,
 						'ArrowDown,ArrowRight': 0.25,
+						'ArrowDown': 0.5,
+						'ArrowDown,ArrowLeft': 0.75,
+						'ArrowLeft': 1,
+						'ArrowLeft,ArrowUp': 1.25,
+						'ArrowUp': 1.5,
+						'ArrowRight,ArrowUp': 1.75,
 					}[motionKeys];
+					if (angle) {
+						angle *= Math.PI;
+						state.projectiles.push({
+							id: projectile,
+							loc: {
+								x: state.player.x,
+								y: state.player.y,
+							},
+							angle
+						});
+					} else {
+						console.error('angle is NaN', motionKeys);
+					}
 				}
-				state.projectiles.push({
-					id: projectile,
-					loc: {
-						x: state.player.x,
-						y: state.player.y,
-					},
-					angle
-				});
 			} else {
 				toast(`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`);
 			}
