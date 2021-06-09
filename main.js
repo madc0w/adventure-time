@@ -617,7 +617,9 @@ function drawGame() {
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
-	if (keysDown['A'] && state.player.wielding && items[state.player.wielding].projectile) {
+	if (keysDown['A'] && state.player.wielding && items[state.player.wielding].projectile &&
+		state.player.motion == 'idleFrames') {
+		// !(keysDown.ArrowDown || keysDown.ArrowUp || keysDown.ArrowLeft || keysDown.ArrowRight)
 		aim();
 	}
 
@@ -1203,13 +1205,30 @@ function attack() {
 			if (state.inventory[projectile] > 0) {
 				state.inventory[projectile]--;
 				state.projectiles = state.projectiles || [];
+				let angle;
+				if (isAiming) {
+					angle = state.aimAngle;
+				} else {
+					// set angle = direction of player motion
+					const motionKeys = Object.keys(keysDown).filter(k => k.startsWith('Arrow')).sort().join();
+					angle = Math.PI * {
+						'ArrowRight': 0,
+						'ArrowUp': 1.5,
+						'ArrowLeft': 1,
+						'ArrowDown': 0.5,
+						'ArrowRight,ArrowUp': 1.75,
+						'ArrowLeft,ArrowUp': 1.25,
+						'ArrowDown,ArrowLeft': 0.75,
+						'ArrowDown,ArrowRight': 0.25,
+					}[motionKeys];
+				}
 				state.projectiles.push({
 					id: projectile,
 					loc: {
 						x: state.player.x,
 						y: state.player.y,
 					},
-					angle: state.aimAngle
+					angle
 				});
 			} else {
 				toast(`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`);
