@@ -172,11 +172,19 @@ rooms = [
 					'enchantedSword', 'venomDagger', 'healingPotion1', 'electrosmasher', 'arrow',
 				],
 			},
+			{
+				id: 'gilgamin',
+				location: {
+					x: 0.2,
+					y: 0.9
+				}
+			}
+
 		],
 		sounds: {
 			enter: 'door open 3.mp3',
 			ambient: 'merchant music.mp3',
-		}
+		},
 	}, {
 		id: 3,
 		width: 0.9,

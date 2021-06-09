@@ -228,14 +228,12 @@ characters = {
 			},
 			bow: {
 				left: [
-					'player standing wielding bow.png',
-					// 'player left wielding bow 01.png',
-					// 'player left wielding bow 02.png',
+					'player left wielding bow 01.png',
+					'player left wielding bow 02.png',
 				],
 				right: [
-					'player standing wielding bow.png',
-					// 'player right wielding bow 01.png',
-					// 'player right wielding bow 02.png',
+					'player right wielding bow 01.png',
+					'player right wielding bow 02.png',
 				],
 				idleFrames: [
 					'player standing wielding bow.png',
@@ -245,9 +243,8 @@ characters = {
 					'player up wielding 02.png',
 				],
 				down: [
-					'player standing wielding bow.png',
-					// 'player down wielding bow 01.png',
-					// 'player down wielding bow 02.png',
+					'player down wielding bow 01.png',
+					'player down wielding bow 02.png',
 				],
 			},
 		},
@@ -289,6 +286,16 @@ characters = {
 			walk: 'player walk.mp3',
 			die: 'player die.mp3',
 		}
+	},
+	gilgamin: {
+		type: 'supporting',
+		animInterval: 140,
+		width: 0.2,
+		height: 0.2,
+		idleFrames: [
+			'gilgamin.png'
+		],
+
 	},
 	doomScreen: {
 		type: 'enemy',
