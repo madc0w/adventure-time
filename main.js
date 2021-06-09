@@ -939,7 +939,7 @@ function drawGame() {
 					y: bottom
 				});
 				if (tip.x > upperLeft.x && tip.x < lowerRight.x && tip.y > upperLeft.y && tip.y < lowerRight.y) {
-					roomCharacter.health -= item.damage / character.resilience;
+					injur(roomCharacter, item.damage / character.resilience);
 					state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
 					play(character.sounds.injured);
 				}
@@ -1224,7 +1224,6 @@ function attack() {
 				}, weapon.resetTime);
 				const character = characters[targetedCharacter.id];
 				const weaponValue = state.inventory[state.player.wielding] / weapon.value;
-				targetedCharacter.health -= weaponValue * weapon.damage / character.resilience;
 
 				if (weapon.sounds.hit) {
 					play(weapon.sounds.hit);
@@ -1235,25 +1234,7 @@ function attack() {
 					}, 200);
 				}
 
-				if (targetedCharacter.health <= 0) {
-					// die
-					targetedCharacter.motion = 'dieFrames';
-					animate(targetedCharacter);
-					play(character.sounds.die);
-
-					const interval = 24;
-					targetedCharacter.animStep = 0;
-					targetedCharacter.deathAnimIntervalId = setInterval(() => {
-						targetedCharacter.animStep++;
-						if (targetedCharacter.animStep >= numCharacterDieAnimSteps) {
-							clearInterval(targetedCharacter.deathAnimIntervalId);
-							if (state.room.characters) {
-								state.room.characters = state.room.characters.filter(c => c != targetedCharacter);
-							}
-						}
-					}, interval);
-				}
-
+				injur(targetedCharacter, weaponValue * weapon.damage / character.resilience);
 				state.inventory[state.player.wielding]--;
 				if (state.inventory[state.player.wielding] <= 0) {
 					delete state.inventory[state.player.wielding];
@@ -1262,6 +1243,29 @@ function attack() {
 				}
 			}
 		}
+	}
+}
+
+function injur(character, injuryValue) {
+	character.health -= injuryValue;
+	if (character.health <= 0) {
+		// die
+		character.motion = 'dieFrames';
+		animate(character);
+		play(characters[character.id].sounds.die);
+
+		const interval = 24;
+		character.animStep = 0;
+		const room = state.room;
+		character.deathAnimIntervalId = setInterval(() => {
+			character.animStep++;
+			if (character.animStep >= numCharacterDieAnimSteps) {
+				clearInterval(character.deathAnimIntervalId);
+				if (room.characters) {
+					room.characters = room.characters.filter(c => c != character);
+				}
+			}
+		}, interval);
 	}
 }
 
