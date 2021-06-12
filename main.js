@@ -53,10 +53,12 @@ function load() {
 	initCharacters = JSON.parse(JSON.stringify(characters));
 
 	levelUpSound = new Audio('sounds/level up.mp3');
-	defaultRoomMusic = new Audio(`sounds/${defaultRoomMusic}`);
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
 	lockedDoorSound = new Audio('sounds/locked door.mp3');
+	if (window.defaultRoomMusic) {
+		window.defaultRoomMusic = new Audio(`sounds/${window.defaultRoomMusic}`);
+	}
 
 	initState();
 	if (localStorage.state) {
@@ -302,7 +304,7 @@ function drawGame() {
 	{
 		// room background
 		const roomBackground = new Image();
-		roomBackground.src = `img/rooms/${state.room.backgroundImage}`;
+		roomBackground.src = `img/rooms/${state.room.backgroundImage || defaultRoomBackground}`;
 		const x = (1 - getValue(state.room, 'width')) * canvas.width / 2;
 		const y = (1 - getValue(state.room, 'height')) * canvas.height / 2;
 		ctx.drawImage(roomBackground, x, y, getValue(state.room, 'width') * canvas.width, getValue(state.room, 'height') * canvas.height);
@@ -1003,7 +1005,7 @@ function drawMap() {
 			// ctx.fillStyle = mapRoomColor;
 			// ctx.fillRect(x + offset.x, y + offset.y, width, height);
 			const roomBackground = new Image();
-			roomBackground.src = `img/rooms/${room.backgroundImage}`;
+			roomBackground.src = `img/rooms/${room.backgroundImage || defaultRoomBackground}`;
 			ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
 		}
 
@@ -1334,7 +1336,7 @@ function onKeyUp(e) {
 		return;
 	}
 
-	if (e.code != 'F5') {
+	if (roomMusic && e.code != 'F5') {
 		setTimeout(() => {
 			// console.log(roomMusic);
 			play(roomMusic);
@@ -1620,7 +1622,7 @@ function setRoom(room, isGameOver) {
 		play(room.sounds.enter);
 	}
 	roomMusic && roomMusic.pause();
-	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || defaultRoomMusic;
+	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || window.defaultRoomMusic;
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
 		const now = new Date().getTime();
