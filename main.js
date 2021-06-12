@@ -606,10 +606,13 @@ function drawGame() {
 		// const x = (state.player.x - characters.player.width / 2) * canvas.width;
 		// const y = (state.player.y - characters.player.height / 2) * canvas.height;
 		if (state.player.isInvisible) {
-			if (state.t - state.player.invisibilityStart > items.invisibilityPotion.duration) {
+			const duration = state.t - state.player.invisibilityStart;
+			if (duration > items.invisibilityPotion.duration) {
 				state.player.isInvisible = false;
+			} else if (duration >= 0.8 * items.invisibilityPotion.duration) {
+				ctx.globalAlpha = 0.45 + 0.35 * Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 16);
 			} else {
-				ctx.globalAlpha = 0.6;
+				ctx.globalAlpha = 0.5;
 			}
 		}
 		ctx.drawImage(characterImages.player, loc.x, loc.y, characters.player.width * canvas.width, characters.player.height * canvas.height);

@@ -10,5 +10,29 @@ rooms = [
 		height: 0.9,
 		// backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',
+
+		items: [
+			// {
+			// 	id: 'treasure',
+			// 	location: {
+			// 		x: 0.2,
+			// 		y: 0.4
+			// 	}
+			// },
+			// {
+			// 	id: 'sword_1',
+			// 	location: {
+			// 		x: 0.8,
+			// 		y: 0.5
+			// 	}
+			// },
+			{
+				id: 'invisibilityPotion',
+				location: {
+					x: 0.2,
+					y: 0.8
+				}
+			}
+		],
 	}
 ];
