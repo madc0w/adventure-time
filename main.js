@@ -609,7 +609,7 @@ function drawGame() {
 			const duration = state.t - state.player.invisibilityStart;
 			if (duration > items.invisibilityPotion.duration) {
 				state.player.isInvisible = false;
-			} else if (duration >= 0.8 * items.invisibilityPotion.duration) {
+			} else if (duration >= 0.88 * items.invisibilityPotion.duration) {
 				ctx.globalAlpha = 0.45 + 0.35 * Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 16);
 			} else {
 				ctx.globalAlpha = 0.5;

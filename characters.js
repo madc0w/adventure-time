@@ -7,8 +7,8 @@ const moveFuncs = {
 				y: 0
 			};
 		}
-		const velFactor = 0.0008;
-		const maxVel = 0.004;
+		const velFactor = character.deltaSpeed || 0.0008;
+		const maxVel = character.maxSpeed || 0.004;
 		character.vel.x += (Math.random() - 0.5) * velFactor;
 		character.vel.x = Math.max(Math.min(character.vel.x, maxVel), -maxVel)
 		character.vel.y += (Math.random() - 0.5) * velFactor;
@@ -47,16 +47,21 @@ const interactionFuncs = {
 			roomCharacter.rotation = Math.atan2(dy, dx);
 			const dist = Math.sqrt(dx * dx + dy * dy);
 			// console.log(dist, dx, dy);
-			if (dist > 0) {
-				const factor = (character.speed || 0.004) / dist;
-				if (dist < character.targetDist) {
-					roomCharacter.location.x -= factor * dx / 2;
-					roomCharacter.location.y -= factor * dy / 2;
-				}
-				// console.log(dx, dy);
-				roomCharacter.location.x += factor * dy;
-				roomCharacter.location.y -= factor * dx;
+			const factor = (character.speed || 0.004) / dist;
+			if (roomCharacter.motion == 'attackFrames' && dist > 0.04) {
+				roomCharacter.location.x += factor * dx;
+				roomCharacter.location.y += factor * dy;
+			} else if (dist < character.targetDist) {
+				roomCharacter.location.x -= 2 * factor * dx;
+				roomCharacter.location.y -= 2 * factor * dy;
+			} else if (dist > character.targetDist * 2) {
+				roomCharacter.location.x += 2 * factor * dx;
+				roomCharacter.location.y += 2 * factor * dy;
 			}
+
+			// console.log(dx, dy);
+			roomCharacter.location.x += factor * dy;
+			roomCharacter.location.y -= factor * dx;
 		}
 	},
 
@@ -380,14 +385,63 @@ characters = {
 		},
 		resilience: 1.4,
 		attackMetrics: {
-			prob: 0.012,
+			prob: 0.004,
 			prepTime: 400,
-			range: 0.2, // proportion of canvas
-			strength: 0.04,
+			range: 0.32, // proportion of canvas
+			strength: 0.08,
 			resetTime: 600,
 		},
-		targetDist: 0.12,
+		targetDist: 0.2,
 		speed: 0.006,
+	},
+	megabug: {
+		type: 'enemy',
+		animInterval: 80,
+		width: 0.1,
+		height: 0.1,
+		idleFrames: [
+			'megabug v2 01.png',
+			'megabug v2 02.png',
+			'megabug v2 03.png',
+			'megabug v2 04.png',
+			'megabug v2 03.png',
+			'megabug v2 02.png',
+		],
+		dieFrames: [
+			'megabug v2 die 01.png',
+			'megabug v2 die 02.png'
+		],
+		attackFrames: [
+			'megabug v2 attack 01.png',
+			'megabug v2 attack 02.png',
+			'megabug v2 attack 01.png',
+		],
+		attackPrepFrames: [
+			'megabug v2 01.png',
+		],
+		move: [
+			moveFuncs.random,
+		],
+		interact: [
+			interactionFuncs.moveTowardPlayer,
+		],
+		sounds: {
+			injured: 'megabug injured.mp3',
+			attack: 'megabug attack.mp3',
+			// die: 'zlakik die.mp3',
+		},
+		resilience: 1.4,
+		attackMetrics: {
+			prob: 0.2,
+			prepTime: 0,
+			range: 0.1, // proportion of canvas
+			strength: 0.012,
+			resetTime: 200,
+		},
+		targetDist: 0.08,
+		speed: 0.012,
+		deltaSpeed: 0.0012,
+		maxSpeed: 0.008,
 	},
 	merchant: {
 		type: 'merchant',
