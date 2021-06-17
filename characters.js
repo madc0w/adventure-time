@@ -34,6 +34,25 @@ const moveFuncs = {
 
 const interactionFuncs = {
 
+	followSameType(roomCharacter, roomCharacter2) {
+		const character = characters[roomCharacter.id];
+		const character2 = characters[roomCharacter2.id];
+		if (character.id == character2.id) {
+			const character1X = roomCharacter.location.x * getValue(state.room, 'width');
+			const character1Y = roomCharacter.location.y * getValue(state.room, 'height');
+			const character2X = roomCharacter.location.x * getValue(state.room, 'width');
+			const character2Y = roomCharacter.location.y * getValue(state.room, 'height');
+			const dx = character2X - character1X;
+			const dy = character2Y - character1Y;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+			if (dist > 0) {
+				const factor = (character.speed || 0.004) / dist;
+				roomCharacter.location.x += factor * dx;
+				roomCharacter.location.y += factor * dy;
+			}
+		}
+	},
+
 	circlePlayer(roomCharacter, roomCharacter2) {
 		const character = characters[roomCharacter.id];
 		const character2 = characters[roomCharacter2.id];
@@ -396,14 +415,12 @@ characters = {
 	},
 	megabug: {
 		type: 'enemy',
-		animInterval: 80,
+		animInterval: 100,
 		width: 0.1,
 		height: 0.1,
 		idleFrames: [
 			'megabug v2 01.png',
 			'megabug v2 02.png',
-			'megabug v2 03.png',
-			'megabug v2 04.png',
 			'megabug v2 03.png',
 			'megabug v2 02.png',
 		],
@@ -423,7 +440,8 @@ characters = {
 			moveFuncs.random,
 		],
 		interact: [
-			interactionFuncs.moveTowardPlayer,
+			// interactionFuncs.moveTowardPlayer,
+			interactionFuncs.followSameType,
 		],
 		sounds: {
 			injured: 'megabug injured.mp3',

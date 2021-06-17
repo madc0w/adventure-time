@@ -481,6 +481,7 @@ function drawGame() {
 				ctx.restore();
 			} else {
 				// console.log('roomCharacter.location', roomCharacter.location);
+				// console.log(`drawing characterImages[${imageId}]`, characterImages[imageId]);
 				imageLoc = toScreen(roomCharacter.location, character);
 				ctx.drawImage(
 					characterImages[imageId],
@@ -1454,7 +1455,7 @@ function animate(character) {
 	const imageId = makeImageId(character);
 	clearInterval(animIntervalIds[imageId]);
 
-	animFrameNums[character.id] = 0;
+	animFrameNums[imageId] = 0;
 	let motion = character.motion;
 	// console.log('starting anim', motion);
 	function f() {
@@ -1475,10 +1476,13 @@ function animate(character) {
 		// if (character.id == 'player') {
 		// 	console.log('frames', frames);
 		// }
-		characterImages[imageId] = frames[animFrameNums[character.id] % frames.length];
-		animFrameNums[character.id]++;
+		characterImages[imageId] = frames[animFrameNums[imageId]];
+		animFrameNums[imageId]++;
+		animFrameNums[imageId] %= frames.length;
 		// console.log('anim', motion);
-		// console.log(characterImages[character.id]);
+		// if (character.id != 'player') {
+		// 	console.log(`change frame: characterImages[${imageId}]`, characterImages[imageId]);
+		// }
 	}
 
 	f();
