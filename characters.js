@@ -40,13 +40,13 @@ const interactionFuncs = {
 		if (character.id == character2.id) {
 			const character1X = roomCharacter.location.x * getValue(state.room, 'width');
 			const character1Y = roomCharacter.location.y * getValue(state.room, 'height');
-			const character2X = roomCharacter.location.x * getValue(state.room, 'width');
-			const character2Y = roomCharacter.location.y * getValue(state.room, 'height');
+			const character2X = roomCharacter2.location.x * getValue(state.room, 'width');
+			const character2Y = roomCharacter2.location.y * getValue(state.room, 'height');
 			const dx = character2X - character1X;
 			const dy = character2Y - character1Y;
 			const dist = Math.sqrt(dx * dx + dy * dy);
 			if (dist > 0) {
-				const factor = (character.speed || 0.004) / dist;
+				const factor = (character.followFactor || 0.05) * (character.speed || 0.004) / dist;
 				roomCharacter.location.x += factor * dx;
 				roomCharacter.location.y += factor * dy;
 			}
@@ -155,6 +155,7 @@ const interactionFuncs = {
 characters = {
 
 	player: {
+		id: 'player',
 		animInterval: 400,
 		width: 0.05,
 		height: 0.1,
@@ -312,6 +313,7 @@ characters = {
 		}
 	},
 	gilgamin: {
+		id: 'gilgamin',
 		type: 'supporting',
 		animInterval: 140,
 		width: 0.2,
@@ -322,6 +324,7 @@ characters = {
 
 	},
 	doomScreen: {
+		id: 'doomScreen',
 		type: 'enemy',
 		animInterval: 140,
 		width: 0.18,
@@ -372,6 +375,7 @@ characters = {
 		speed: 0.012,
 	},
 	zlakik: {
+		id: 'zlakik',
 		type: 'enemy',
 		animInterval: 120,
 		width: 0.1,
@@ -414,6 +418,7 @@ characters = {
 		speed: 0.006,
 	},
 	megabug: {
+		id: 'megabug',
 		type: 'enemy',
 		animInterval: 100,
 		width: 0.1,
@@ -459,7 +464,8 @@ characters = {
 		targetDist: 0.08,
 		speed: 0.012,
 		deltaSpeed: 0.0012,
-		maxSpeed: 0.008,
+		maxSpeed: 0.12,
+		followFactor: 0.048,
 	},
 	merchant: {
 		type: 'merchant',
