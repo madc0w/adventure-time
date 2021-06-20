@@ -515,13 +515,20 @@ function drawGame() {
 				// health circle
 				ctx.fillStyle = '#444';
 				ctx.beginPath();
-				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * healthIndicatorRadius, 0, 2 * Math.PI);
+				ctx.arc(
+					imageLoc.x + (character.width * canvas.width / 2),
+					imageLoc.y - canvas.width * healthIndicatorRadius,
+					canvas.width * healthIndicatorRadius, 0, 2 * Math.PI
+				);
 				ctx.fill();
 
 				ctx.fillStyle = '#f00';
 				ctx.beginPath();
 				ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
-				ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * healthIndicatorRadius, 0, roomCharacter.health * Math.PI * 2, false);
+				ctx.arc(
+					imageLoc.x + (character.width * canvas.width / 2),
+					imageLoc.y - canvas.width * healthIndicatorRadius,
+					0.8 * canvas.width * healthIndicatorRadius, 0, roomCharacter.health * Math.PI * 2, false);
 				ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
 				ctx.fill();
 			}
