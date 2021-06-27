@@ -1,4 +1,5 @@
 defaultRoomBackground = 'granite stones texture.jpg';
+defaultWallBackground = 'pavers.jpg';
 // defaultRoomMusic = 'holy grail theme.mp3';
 
 
@@ -50,6 +51,18 @@ rooms = [
 					x: 0.4,
 					y: 0.5
 				}
+			}
+		],
+
+		walls: [
+			{
+				background: '20210613_144502.jpg',
+				location: {
+					x: 0.1,
+					y: 0.1,
+				},
+				width: 0.1,
+				height: 0.4,
 			}
 		],
 
