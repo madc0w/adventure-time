@@ -56,13 +56,21 @@ rooms = [
 
 		walls: [
 			{
-				background: '20210613_144502.jpg',
+				// background: '20210613_144502.jpg',
 				location: {
 					x: 0.1,
-					y: 0.1,
+					y: 0.16,
 				},
-				width: 0.1,
+				width: 0.04,
 				height: 0.4,
+				// }, {
+				// 	// background: '20210613_144502.jpg',
+				// 	location: {
+				// 		x: 0.6,
+				// 		y: 0.16,
+				// 	},
+				// 	width: 0.3,
+				// 	height: 0.4,
 			}
 		],
 
@@ -73,36 +81,36 @@ rooms = [
 					x: 0.4,
 					y: 0.4
 				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
 			},
 		],
 

@@ -26,6 +26,7 @@ const mapScale = 0.24;
 const portalSize = 0.12;
 const portalAnimInterval = 60;
 const numPortalFrames = 38;
+const roomWallColor = '#222';
 
 const fontFamily = 'Lato';
 // const fontFamily = 'Jura';
@@ -321,57 +322,56 @@ function drawGame() {
 		ctx.rect(x, y, roomWidth * canvas.width, roomHeight * canvas.height);
 		ctx.stroke();
 	}
-	{
-		// room walls
-		for (const wall of state.room.walls || []) {
-			if (wall.background) {
-				const image = new Image();
-				image.src = `img/rooms/${wall.background}`;
-				const x = (1 - roomWidth) / 2 + (wall.location.x * roomWidth);
-				const y = (1 - roomHeight) / 2 + (wall.location.y * roomHeight);
-				const width = roomWidth * wall.width;
-				const height = roomHeight * wall.height;
-				ctx.drawImage(image, x * canvas.width, y * canvas.height, width * canvas.width, height * canvas.height);
-			} else {
+	// room walls
+	for (const wall of state.room.walls || []) {
+		const x = (1 - roomWidth) / 2 + (wall.location.x * roomWidth);
+		const y = (1 - roomHeight) / 2 + (wall.location.y * roomHeight);
+		const width = roomWidth * wall.width;
+		const height = roomHeight * wall.height;
+		if (wall.background) {
+			const image = new Image();
+			image.src = `img/rooms/${wall.background}`;
+			ctx.drawImage(image, x * canvas.width, y * canvas.height, width * canvas.width, height * canvas.height);
+		} else {
+			ctx.fillStyle = wall.color || roomWallColor;
+			ctx.beginPath();
+			ctx.rect(x * canvas.width, y * canvas.height, width * canvas.width, height * canvas.height);
+			ctx.fill();
+		}
+	}
 
-			}
-		}
+	// portals
+	for (const portal of state.room.portals || []) {
+		const loc = toScreen(portal.location, {
+			width: portalSize,
+			height: portalSize
+		});
+		ctx.drawImage(portalImage, loc.x, loc.y, portalSize * canvas.width, portalSize * canvas.height);
 	}
-	{
-		// portals
-		for (const portal of state.room.portals || []) {
-			const loc = toScreen(portal.location, {
-				width: portalSize,
-				height: portalSize
+
+	// items
+	for (const roomItem of state.room.items || []) {
+		const item = items[roomItem.id];
+		let size = item.size;
+		if (item.image.height != 0) {
+			const loc = toScreen(roomItem.location, {
+				width: size * item.image.width / item.image.height,
+				height: size
 			});
-			ctx.drawImage(portalImage, loc.x, loc.y, portalSize * canvas.width, portalSize * canvas.height);
-		}
-	}
-	{
-		// items
-		for (const roomItem of state.room.items || []) {
-			const item = items[roomItem.id];
-			let size = item.size;
-			if (item.image.height != 0) {
-				const loc = toScreen(roomItem.location, {
-					width: size * item.image.width / item.image.height,
-					height: size
-				});
-				if (roomItem.animStep) {
-					size -= roomItem.animStep * item.size / 16;
-					loc.x += (item.size - size) * canvas.width / 2;
-					loc.y += (item.size - size) * canvas.height / 2;
-					ctx.globalAlpha = (numTakeItemAnimSteps - roomItem.animStep) / numTakeItemAnimSteps;
-				}
-				// console.log(item.image.width / item.image.height);
-				if (size > 0) {
-					ctx.drawImage(item.image, loc.x, loc.y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
-				}
-				ctx.globalAlpha = 1;
+			if (roomItem.animStep) {
+				size -= roomItem.animStep * item.size / 16;
+				loc.x += (item.size - size) * canvas.width / 2;
+				loc.y += (item.size - size) * canvas.height / 2;
+				ctx.globalAlpha = (numTakeItemAnimSteps - roomItem.animStep) / numTakeItemAnimSteps;
 			}
-			// let x = ((1 - getValue(state.room, 'width')) / 2 + (roomItem.location.x * getValue(state.room, 'width'))) * canvas.width;
-			// let y = ((1 - getValue(state.room, 'height')) / 2 + (roomItem.location.y * getValue(state.room, 'height'))) * canvas.height;
+			// console.log(item.image.width / item.image.height);
+			if (size > 0) {
+				ctx.drawImage(item.image, loc.x, loc.y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
+			}
+			ctx.globalAlpha = 1;
 		}
+		// let x = ((1 - getValue(state.room, 'width')) / 2 + (roomItem.location.x * getValue(state.room, 'width'))) * canvas.width;
+		// let y = ((1 - getValue(state.room, 'height')) / 2 + (roomItem.location.y * getValue(state.room, 'height'))) * canvas.height;
 	}
 	{
 		// characters
@@ -458,6 +458,56 @@ function drawGame() {
 				) {
 					roomCharacter.location.x = prevCharacterLoc.x;
 					roomCharacter.location.y = prevCharacterLoc.y;
+				}
+
+				// check for intersection with room walls
+				{
+					const left = roomCharacter.location.x - (character.width / roomWidth) / 2;
+					const right = roomCharacter.location.x + (character.width / roomWidth) / 2;
+					const top = roomCharacter.location.y - (character.height / roomHeight) / 2;
+					const bottom = roomCharacter.location.y + (character.height / roomHeight) / 2;
+					const characterCorners = [
+						{
+							x: left,
+							y: top
+						}, {
+							x: right,
+							y: top
+						}, {
+							x: left,
+							y: bottom
+						}, {
+							x: right,
+							y: bottom
+						}
+					];
+					let isCollision;
+					outer: for (const wall of state.room.walls || []) {
+						for (const corner of characterCorners) {
+							if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
+								corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
+								isCollision = true;
+								break outer;
+							}
+						}
+						// now check for corners on opposite sides of the wall!
+						if (left < wall.location.x && right > wall.location.x + wall.width &&
+							(top < wall.location.y + wall.height || bottom > wall.location.y)
+						) {
+							isCollision = true;
+							break outer;
+						} else if (top < wall.location.y && bottom > wall.location.y + wall.height &&
+							(left < wall.location.x + wall.width || right > wall.location.x)
+						) {
+							isCollision = true;
+							break outer;
+						}
+					}
+
+					if (isCollision) {
+						roomCharacter.location.x = prevCharacterLoc.x;
+						roomCharacter.location.y = prevCharacterLoc.y;
+					}
 				}
 			}
 
@@ -793,24 +843,55 @@ function drawGame() {
 	}
 
 	// check for intersection with other character
-	for (const roomCharacter of state.room.characters || []) {
-		const character = characters[roomCharacter.id];
+	{
 		const playerWidth = characterIntersectionLeeway * (characters.player.width / roomWidth) / 2;
 		const playerHeight = characterIntersectionLeeway * (characters.player.height / roomHeight) / 2;
-		const characterWidth = characterIntersectionLeeway * (character.width / roomWidth) / 2;
-		const characterHeight = characterIntersectionLeeway * (character.height / roomHeight) / 2;
-		if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
-			state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
-			state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
-			state.player.y - playerHeight < roomCharacter.location.y + characterHeight
-		) {
-			state.player.x = prevPlayerLoc.x;
-			state.player.y = prevPlayerLoc.y;
-			// console.log(roomCharacter.location);
-			// console.log(character.width);
-			if (character.type == 'merchant') {
-				setPaused(true);
-				drawMerchantInteraction();
+		for (const roomCharacter of state.room.characters || []) {
+			const character = characters[roomCharacter.id];
+			const characterWidth = characterIntersectionLeeway * (character.width / roomWidth) / 2;
+			const characterHeight = characterIntersectionLeeway * (character.height / roomHeight) / 2;
+			if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
+				state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
+				state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
+				state.player.y - playerHeight < roomCharacter.location.y + characterHeight
+			) {
+				state.player.x = prevPlayerLoc.x;
+				state.player.y = prevPlayerLoc.y;
+				// console.log(roomCharacter.location);
+				// console.log(character.width);
+				if (character.type == 'merchant') {
+					setPaused(true);
+					drawMerchantInteraction();
+				}
+			}
+		}
+	}
+
+	// check for intersection with room walls
+	{
+		const playerCorners = [
+			{
+				x: state.player.x - (characters.player.width / roomWidth) / 2,
+				y: state.player.y - (characters.player.height / roomHeight) / 2
+			}, {
+				x: state.player.x + (characters.player.width / roomWidth) / 2,
+				y: state.player.y - (characters.player.height / roomHeight) / 2
+			}, {
+				x: state.player.x - (characters.player.width / roomWidth) / 2,
+				y: state.player.y + (characters.player.height / roomHeight) / 2
+			}, {
+				x: state.player.x + (characters.player.width / roomWidth) / 2,
+				y: state.player.y + (characters.player.height / roomHeight) / 2
+			}
+		];
+		outer: for (const wall of state.room.walls || []) {
+			for (const corner of playerCorners) {
+				if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
+					corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
+					state.player.x = prevPlayerLoc.x;
+					state.player.y = prevPlayerLoc.y;
+					break outer;
+				}
 			}
 		}
 	}

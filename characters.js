@@ -442,11 +442,11 @@ characters = {
 			'megabug v2 01.png',
 		],
 		move: [
-			moveFuncs.random,
+			// moveFuncs.random,
 		],
 		interact: [
-			// interactionFuncs.moveTowardPlayer,
-			interactionFuncs.followSameType,
+			interactionFuncs.moveTowardPlayer,
+			// interactionFuncs.followSameType,
 		],
 		sounds: {
 			injured: 'megabug injured.mp3',
