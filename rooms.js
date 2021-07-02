@@ -40,16 +40,16 @@ rooms = [
 					y: 0.5
 				}
 			}, {
-				id: 'enchantedSword',
+				id: 'bow',
 				location: {
-					x: 0.4,
+					x: 0.8,
 					y: 0.5
 				}
 			}, {
-				id: 'enchantedSword',
+				id: 'arrow',
 				location: {
-					x: 0.4,
-					y: 0.5
+					x: 0.8,
+					y: 0.6
 				}
 			}
 		],
@@ -75,43 +75,43 @@ rooms = [
 		],
 
 		characters: [
-			{
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-			},
+			// {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// },
 		],
 
 	}

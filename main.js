@@ -1342,19 +1342,21 @@ function attack() {
 						'ArrowUp': 1.5,
 						'ArrowRight,ArrowUp': 1.75,
 					}[motionKeys];
-					if (angle) {
-						angle *= Math.PI;
-						state.projectiles.push({
-							id: projectile,
-							loc: {
-								x: state.player.x,
-								y: state.player.y,
-							},
-							angle
-						});
-					} else {
+					if (isNaN(angle)) {
 						console.error('angle is NaN', motionKeys);
 					}
+				}
+				console.log('angle', angle);
+				if (angle) {
+					angle *= Math.PI;
+					state.projectiles.push({
+						id: projectile,
+						loc: {
+							x: state.player.x,
+							y: state.player.y,
+						},
+						angle
+					});
 				}
 			} else {
 				toast(`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`);
