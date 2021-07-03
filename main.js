@@ -1032,16 +1032,35 @@ function drawGame() {
 			x: imageLoc.x + Math.cos(projectile.angle) * width + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
 			y: imageLoc.y + Math.sin(projectile.angle) * width + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
 		};
-		const end = {
-			x: imageLoc.x + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
-			y: imageLoc.y + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
-		};
+		// const end = {
+		// 	x: imageLoc.x + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
+		// 	y: imageLoc.y + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
+		// };
 
-		if (end.x > canvas.width * (1 - (1 - roomWidth) / 2) ||
-			end.x < canvas.width * (1 - roomWidth) / 2 ||
-			end.y > canvas.height * (1 - (1 - roomHeight) / 2) ||
-			end.y < canvas.height * (1 - roomHeight) / 2
+		let isWallHit;
+		if (tip.x > canvas.width * (1 - (1 - roomWidth) / 2) ||
+			tip.x < canvas.width * (1 - roomWidth) / 2 ||
+			tip.y > canvas.height * (1 - (1 - roomHeight) / 2) ||
+			tip.y < canvas.height * (1 - roomHeight) / 2
 		) {
+			isWallHit = true;
+		}
+		if (!isWallHit) {
+			for (const wall of state.room.walls || []) {
+				const x = ((1 - roomWidth) / 2 + (wall.location.x * roomWidth)) * canvas.width;
+				const y = ((1 - roomHeight) / 2 + (wall.location.y * roomHeight)) * canvas.height;
+				const width = roomWidth * wall.width * canvas.width;
+				const height = roomHeight * wall.height * canvas.height;
+
+				if (tip.x > x && tip.x < x + width &&
+					tip.y > y && tip.y < y + height) {
+					isWallHit = true;
+					break;
+				}
+			}
+		}
+
+		if (isWallHit) {
 			play(item.sounds.hitWall);
 			state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
 		}
@@ -1348,6 +1367,7 @@ function attack() {
 						angle *= Math.PI;
 					}
 				}
+				play(items[projectile].sounds.launch);
 				// console.log('angle', angle);
 				state.projectiles.push({
 					id: projectile,

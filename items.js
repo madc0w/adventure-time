@@ -103,6 +103,7 @@ items = {
 		sounds: {
 			hitWall: 'arrow hit wall.mp3',
 			pickup: 'pickup arrows.mp3',
+			launch: 'arrow launch.mp3',
 		},
 	},
 	healingPotion1: {
