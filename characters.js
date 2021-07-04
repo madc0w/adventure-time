@@ -455,7 +455,8 @@ characters = {
 		},
 		resilience: 1.4,
 		attackMetrics: {
-			prob: 0.2,
+			// prob: 0.2,
+			prob: 0,
 			prepTime: 0,
 			range: 0.1, // proportion of canvas
 			strength: 0.012,

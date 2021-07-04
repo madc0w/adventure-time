@@ -501,33 +501,50 @@ function drawGame() {
 
 								if (corner.prevX > wall.location.x && corner.prevX < wall.location.x + wall.width) {
 									isYCollision = true;
-									// console.log('y intersect');
+									console.log('y intersect');
 								} else if (corner.prevY > wall.location.y && corner.prevY < wall.location.y + wall.height) {
 									isXCollision = true;
-									// console.log('x intersect');
+									console.log('x intersect');
 								}
 
-								break outer;
+								// break outer;
 							}
 						}
+
+						// // now check for corners on opposite sides of the wall!
+						// if (left < wall.location.x && right > wall.location.x + wall.width &&
+						// 	(top < wall.location.y + wall.height || bottom > wall.location.y)
+						// ) {
+						// 	isCollision = true;
+						// 	break outer;
+						// } else if (top < wall.location.y && bottom > wall.location.y + wall.height &&
+						// 	(left < wall.location.x + wall.width || right > wall.location.x)
+						// ) {
+						// 	isCollision = true;
+						// 	break outer;
+						// }
+
 						// now check for corners on opposite sides of the wall!
-						if (left < wall.location.x && right > wall.location.x + wall.width &&
-							(top < wall.location.y + wall.height || bottom > wall.location.y)) {
-							// console.log('y intersect: opposite sides ');
+						if (left < wall.location.x && right > wall.location.x + wall.width && (
+							(top < wall.location.y + wall.height && top > wall.location.y) ||
+							(bottom < wall.location.y + wall.height && bottom > wall.location.y))) {
+							console.log('y intersect: opposite sides ');
 							isYCollision = true;
-							break outer;
-						} else if (top < wall.location.y && bottom > wall.location.y + wall.height &&
-							(left < wall.location.x + wall.width || right > wall.location.x)) {
-							// console.log('x intersect: opposite sides ');
+							// break outer;
+						} else if (top < wall.location.y && bottom > wall.location.y + wall.height && (
+							(left < wall.location.x + wall.width && left > wall.location.x) ||
+							(right < wall.location.x + wall.width && right > wall.location.x))) {
+							console.log('x intersect: opposite sides ');
 							isXCollision = true;
-							break outer;
+							// break outer;
 						}
 					}
 
 					if (isXCollision) {
 						roomCharacter.location.x = prevCharacterLoc.x;
 						// roomCharacter.location.y = prevCharacterLoc.y;
-					} else if (isYCollision) {
+					}
+					if (isYCollision) {
 						// roomCharacter.location.x = prevCharacterLoc.x;
 						roomCharacter.location.y = prevCharacterLoc.y;
 					}
