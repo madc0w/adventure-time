@@ -2157,3 +2157,4 @@ function drawPoint(loc, color) {
 	const p = toScreen(loc);
 	debugPoints.push({ p, color });
 }
+//
