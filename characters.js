@@ -312,17 +312,17 @@ characters = {
 			die: 'player die.mp3',
 		}
 	},
-	gilgamin: {
-		id: 'gilgamin',
-		type: 'supporting',
-		animInterval: 140,
-		width: 0.2,
-		height: 0.2,
-		idleFrames: [
-			'gilgamin.png'
-		],
+	// gilgamin: {
+	// 	id: 'gilgamin',
+	// 	type: 'supporting',
+	// 	animInterval: 140,
+	// 	width: 0.2,
+	// 	height: 0.2,
+	// 	idleFrames: [
+	// 		'gilgamin.png'
+	// 	],
 
-	},
+	// },
 	doomScreen: {
 		id: 'doomScreen',
 		type: 'enemy',
@@ -424,10 +424,11 @@ characters = {
 		width: 0.1,
 		height: 0.1,
 		idleFrames: [
-			'megabug v2 01.png',
-			'megabug v2 02.png',
-			'megabug v2 03.png',
-			'megabug v2 02.png',
+			'test.png',
+			// 'megabug v2 01.png',
+			// 'megabug v2 02.png',
+			// 'megabug v2 03.png',
+			// 'megabug v2 02.png',
 		],
 		dieFrames: [
 			'megabug v2 die 01.png',
@@ -463,9 +464,9 @@ characters = {
 			resetTime: 200,
 		},
 		targetDist: 0.08,
-		speed: 0.012,
+		speed: 0.01,
 		deltaSpeed: 0.0012,
-		maxSpeed: 0.12,
+		maxSpeed: 0.1,
 		followFactor: 0.048,
 	},
 	merchant: {

@@ -58,8 +58,8 @@ rooms = [
 			{
 				// background: '20210613_144502.jpg',
 				location: {
-					x: 0.1,
-					y: 0.16,
+					x: 0.3,
+					y: 0.24,
 				},
 				width: 0.04,
 				height: 0.4,
@@ -78,7 +78,7 @@ rooms = [
 			{
 				id: 'megabug',
 				location: {
-					x: 0.4,
+					x: 0.1,
 					y: 0.4
 				}
 			},
