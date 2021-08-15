@@ -424,11 +424,11 @@ characters = {
 		width: 0.1,
 		height: 0.1,
 		idleFrames: [
-			'test.png',
-			// 'megabug v2 01.png',
-			// 'megabug v2 02.png',
-			// 'megabug v2 03.png',
-			// 'megabug v2 02.png',
+			// 'test.png',
+			'megabug v2 01.png',
+			'megabug v2 02.png',
+			'megabug v2 03.png',
+			'megabug v2 02.png',
 		],
 		dieFrames: [
 			'megabug v2 die 01.png',
@@ -443,21 +443,20 @@ characters = {
 			'megabug v2 01.png',
 		],
 		move: [
-			// moveFuncs.random,
+			moveFuncs.random,
 		],
 		interact: [
 			interactionFuncs.moveTowardPlayer,
-			// interactionFuncs.followSameType,
+			interactionFuncs.followSameType,
 		],
 		sounds: {
 			injured: 'megabug injured.mp3',
 			attack: 'megabug attack.mp3',
-			// die: 'zlakik die.mp3',
+			die: 'zlakik die.mp3',
 		},
 		resilience: 1.4,
 		attackMetrics: {
-			// prob: 0.2,
-			prob: 0,
+			prob: 0.2,
 			prepTime: 0,
 			range: 0.1, // proportion of canvas
 			strength: 0.012,

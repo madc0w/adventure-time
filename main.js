@@ -814,7 +814,7 @@ function drawGame() {
 		const text = 'GAME OVER';
 		const lineHeight = Math.floor(0.16 * canvas.height);
 		ctx.font = `${lineHeight + 4}px ${fontFamily}`;
-		ctx.fillStyle = '#000';
+		ctx.fillStyle = '#444';
 		{
 			const x = (canvas.width - ctx.measureText(text).width) / 2;
 			ctx.fillText(text, x, 0.4 * canvas.height + 2);

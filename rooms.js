@@ -88,37 +88,37 @@ rooms = [
 					x: 0.1,
 					y: 0.4
 				}
+			}, {
+				id: 'megabug',
+				location: {
+					x: 0.4,
+					y: 0.4
+				}
+			}, {
+				id: 'megabug',
+				location: {
+					x: 0.4,
+					y: 0.4
+				}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
+				// }, {
+				// 	id: 'megabug',
+				// 	location: {
+				// 		x: 0.4,
+				// 		y: 0.4
+				// 	}
 			},
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// },
 		],
 
 	}
