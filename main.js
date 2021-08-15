@@ -510,25 +510,25 @@ function drawGame() {
 							prevY: prevBottom,
 						}
 					];
-					let isXCollision, isYCollision;
 					for (const wall of state.room.walls || []) {
+						let isXCollision, isYCollision;
 						for (const corner of characterCorners) {
 							if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
 								corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
 
 								if (corner.prevX > wall.location.x && corner.prevX < wall.location.x + wall.width) {
 									isYCollision = true;
-									console.log(state.t, 'y intersect');
+									// console.log(state.t, 'y intersect');
 								} else if (corner.prevY > wall.location.y && corner.prevY < wall.location.y + wall.height) {
 									isXCollision = true;
-									console.log(state.t, 'x intersect');
-								} else if (!isXCollision && !isYCollision) {
-									console.log(state.t, 'intersecting... but prev point is outside both X & Y wall range');
-									if (Math.abs(corner.prevX - wall.location.x) > Math.abs(corner.prevY - wall.location.y)) {
-										isXCollision = true;
-									} else {
-										isYCollision = true;
-									}
+									// console.log(state.t, 'x intersect');
+									// } else if (!isXCollision && !isYCollision) {
+									// 	console.log(state.t, 'intersecting... but prev point is outside both X & Y wall range');
+									// 	if (Math.abs(corner.prevX - wall.location.x) > Math.abs(corner.prevY - wall.location.y)) {
+									// 		isXCollision = true;
+									// 	} else {
+									// 		isYCollision = true;
+									// 	}
 								}
 							}
 						}
@@ -537,12 +537,12 @@ function drawGame() {
 						if (left < wall.location.x && right > wall.location.x + wall.width && (
 							(top < wall.location.y + wall.height && top > wall.location.y) ||
 							(bottom < wall.location.y + wall.height && bottom > wall.location.y))) {
-							console.log(state.t, 'y intersect: opposite sides ');
+							// console.log(state.t, 'y intersect: opposite sides ');
 							isYCollision = true;
 						} else if (top < wall.location.y && bottom > wall.location.y + wall.height && (
 							(left < wall.location.x + wall.width && left > wall.location.x) ||
 							(right < wall.location.x + wall.width && right > wall.location.x))) {
-							console.log(state.t, 'x intersect: opposite sides ');
+							// console.log(state.t, 'x intersect: opposite sides ');
 							isXCollision = true;
 						}
 
@@ -554,18 +554,18 @@ function drawGame() {
 						// }
 
 						if (isYCollision) {
-							console.log('isYCollision');
+							// console.log('isYCollision');
 							roomCharacter.location.y = wall.location.y - (character.height / roomHeight) / 2;
 							if (prevCharacterLoc.y > wall.location.y + wall.height) {
-								console.log('prevCharacterLoc.y > wall.location.y + wall.height', prevCharacterLoc.y, wall.location.y, wall.height);
+								// console.log('prevCharacterLoc.y > wall.location.y + wall.height', prevCharacterLoc.y, wall.location.y, wall.height);
 								roomCharacter.location.y += wall.height + (character.height / roomHeight);
 							}
 						}
 						if (isXCollision) {
-							console.log('isXCollision');
+							// console.log('isXCollision');
 							roomCharacter.location.x = wall.location.x - (character.width / roomWidth) / 2;
 							if (prevCharacterLoc.x > wall.location.x + wall.width) {
-								console.log('prevCharacterLoc.x > wall.location.x + wall.width', prevCharacterLoc.x, wall.location.x, wall.width);
+								// console.log('prevCharacterLoc.x > wall.location.x + wall.width', prevCharacterLoc.x, wall.location.x, wall.width);
 								roomCharacter.location.x += wall.width + (character.width / roomWidth);
 							}
 						}
@@ -602,9 +602,13 @@ function drawGame() {
 								const isXCollision = corner.x > wall.location.x && corner.x < wall.location.x + wall.width;
 								const isYCollision = corner.y > wall.location.y && corner.y < wall.location.y + wall.height;
 								if (isXCollision && isYCollision) {
-									console.warn(state.t, 'still intersecting!', corner);
-									// roomCharacter.location.x = prevCharacterLoc.x;
-									// roomCharacter.location.y = prevCharacterLoc.y;
+									// console.error(state.t, 'still intersecting!', corner);
+									if (Math.abs(corner.prevX - wall.location.x) > Math.abs(corner.prevY - wall.location.y)) {
+										roomCharacter.location.x = prevCharacterLoc.x;
+									} else {
+										roomCharacter.location.y = prevCharacterLoc.y;
+									}
+
 									break outer;
 								}
 							}
@@ -2157,4 +2161,3 @@ function drawPoint(loc, color) {
 	const p = toScreen(loc);
 	debugPoints.push({ p, color });
 }
-//

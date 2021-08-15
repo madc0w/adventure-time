@@ -61,8 +61,8 @@ rooms = [
 					x: 0.3,
 					y: 0.24,
 				},
-				width: 0.04,
-				height: 0.4,
+				width: 0.24,
+				height: 0.14,
 				// }, {
 				// 	// background: '20210613_144502.jpg',
 				// 	location: {
@@ -71,6 +71,13 @@ rooms = [
 				// 	},
 				// 	width: 0.3,
 				// 	height: 0.4,
+			}, {
+				location: {
+					x: 0.3,
+					y: 0.24,
+				},
+				width: 0.04,
+				height: 0.24,
 			}
 		],
 

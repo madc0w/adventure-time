@@ -464,7 +464,7 @@ characters = {
 			resetTime: 200,
 		},
 		targetDist: 0.08,
-		speed: 0.01,
+		speed: 0.006,
 		deltaSpeed: 0.0012,
 		maxSpeed: 0.1,
 		followFactor: 0.048,
