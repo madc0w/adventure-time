@@ -1045,20 +1045,35 @@ function drawGame() {
 			}
 
 			if (wall.isMovable) {
-				let isMove;
+				let isMove, isBlocked;
 				if (isYCollision && state.player.y != prevPlayerLoc.y) {
 					// console.log('state.player.y ', state.player.y);
 					// console.log('prevPlayerLoc.y', prevPlayerLoc.y);
 					// console.log('state.player.y < prevPlayerLoc.y', state.player.y < prevPlayerLoc.y);
+					const prevWallLocation = wall.location.y;
 					wall.location.y += (state.player.y < prevPlayerLoc.y ? -1 : 1) * moveIncrement / roomHeight;
-					isMove = true;
+					if (wall.location.y < wallWidth / 2 || wall.location.y + wall.height > 1 - wallWidth / 2) {
+						isBlocked = true;
+						wall.location.y = prevWallLocation;
+					} else {
+						isMove = true;
+					}
 				}
 				if (isXCollision && state.player.x != prevPlayerLoc.x) {
+					const prevWallLocation = wall.location.x;
 					wall.location.x += (state.player.x < prevPlayerLoc.x ? -1 : 1) * moveIncrement / roomWidth;
-					isMove = true;
+					if (wall.location.x < wallWidth / 2 || wall.location.x + wall.width > 1 - wallWidth / 2) {
+						isBlocked = true;
+						wall.location.x = prevWallLocation;
+					} else {
+						isMove = true;
+					}
 				}
 				if (isMove) {
 					play(rockScrape);
+				} else if (isBlocked) {
+					state.player.x = prevPlayerLoc.x;
+					state.player.y = prevPlayerLoc.y;
 				}
 			} else {
 				if (isYCollision) {

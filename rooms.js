@@ -8,7 +8,7 @@ rooms = [
 		id: 0,
 		level: 1,
 		width: 0.9,
-		height: 0.9,
+		height: 0.6,
 		// backgroundImage: 'room_01.jpg',
 		wallColor: '#3f2f0c',
 
@@ -80,21 +80,24 @@ rooms = [
 				height: 0.24,
 			}, {
 				isMovable: true,
+				background: '20210613_144445.jpg',
 				location: {
 					x: 0.6,
-					y: 0.6,
+					y: 0.2,
 				},
-				width: 0.1,
+				width: 0.14,
 				height: 0.1,
 			}
 		],
 
 		characters: [
+			// {
 			// 	id: 'megabug',
 			// 	location: {
 			// 		x: 0.1,
 			// 		y: 0.4
 			// 	}
+			// }
 			// }, {
 			// 	id: 'megabug',
 			// 	location: {
