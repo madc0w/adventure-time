@@ -55,35 +55,36 @@ rooms = [
 		],
 
 		walls: [
+			// {
+			// 	// background: '20210613_144502.jpg',
+			// 	location: {
+			// 		x: 0.3,
+			// 		y: 0.24,
+			// 	},
+			// 	width: 0.24,
+			// 	height: 0.14,
+			// 	// }, {
+			// 	// 	// background: '20210613_144502.jpg',
+			// 	// 	location: {
+			// 	// 		x: 0.6,
+			// 	// 		y: 0.16,
+			// 	// 	},
+			// 	// 	width: 0.3,
+			// 	// 	height: 0.4,
+			// }, 
 			{
-				// background: '20210613_144502.jpg',
 				location: {
 					x: 0.3,
-					y: 0.24,
+					y: 0.4,
 				},
 				width: 0.24,
-				height: 0.14,
-				// }, {
-				// 	// background: '20210613_144502.jpg',
-				// 	location: {
-				// 		x: 0.6,
-				// 		y: 0.16,
-				// 	},
-				// 	width: 0.3,
-				// 	height: 0.4,
-			}, {
-				location: {
-					x: 0.3,
-					y: 0.24,
-				},
-				width: 0.04,
-				height: 0.24,
+				height: 0.04,
 			}, {
 				isMovable: true,
 				background: '20210613_144445.jpg',
 				location: {
-					x: 0.6,
-					y: 0.2,
+					x: 0.4,
+					y: 0.3,
 				},
 				width: 0.14,
 				height: 0.1,

@@ -1046,29 +1046,88 @@ function drawGame() {
 
 			if (wall.isMovable) {
 				let isMove, isBlocked;
+				const prevWallLocation = {
+					x: wall.location.x,
+					y: wall.location.y,
+				};
+
 				if (isYCollision && state.player.y != prevPlayerLoc.y) {
 					// console.log('state.player.y ', state.player.y);
 					// console.log('prevPlayerLoc.y', prevPlayerLoc.y);
 					// console.log('state.player.y < prevPlayerLoc.y', state.player.y < prevPlayerLoc.y);
-					const prevWallLocation = wall.location.y;
 					wall.location.y += (state.player.y < prevPlayerLoc.y ? -1 : 1) * moveIncrement / roomHeight;
 					if (wall.location.y < wallWidth / 2 || wall.location.y + wall.height > 1 - wallWidth / 2) {
 						isBlocked = true;
-						wall.location.y = prevWallLocation;
+						wall.location.y = prevWallLocation.y;
 					} else {
 						isMove = true;
 					}
 				}
 				if (isXCollision && state.player.x != prevPlayerLoc.x) {
-					const prevWallLocation = wall.location.x;
 					wall.location.x += (state.player.x < prevPlayerLoc.x ? -1 : 1) * moveIncrement / roomWidth;
 					if (wall.location.x < wallWidth / 2 || wall.location.x + wall.width > 1 - wallWidth / 2) {
 						isBlocked = true;
-						wall.location.x = prevWallLocation;
+						wall.location.x = prevWallLocation.x;
 					} else {
 						isMove = true;
 					}
 				}
+
+				outer: for (const _wall of state.room.walls || []) {
+					if (_wall != wall) {
+						const left = wall.location.x;
+						const right = wall.location.x + wall.width;
+						const top = wall.location.y;
+						const bottom = wall.location.y + wall.height;
+						const wallCorners = [
+							{
+								id: 'top-left',
+								x: left,
+								y: top,
+							}, {
+								id: 'top-right',
+								x: right,
+								y: top,
+							}, {
+								id: 'bottom-left',
+								x: left,
+								y: bottom,
+							}, {
+								id: 'bottom-right',
+								x: right,
+								y: bottom,
+							}
+						];
+
+						for (const corner of wallCorners) {
+							// console.log('corner', corner);
+							if (corner.x > _wall.location.x && corner.x < _wall.location.x + _wall.width &&
+								corner.y > _wall.location.y && corner.y < _wall.location.y + _wall.height) {
+								isMove = false;
+								isBlocked = true;
+								wall.location.x = prevWallLocation.x;
+								wall.location.y = prevWallLocation.y;
+								break outer;
+							}
+						}
+
+						// now check for corners on opposite sides of the wall!
+						if ((wallCorners[0].x < _wall.location.x && wallCorners[1].x > _wall.location.x + _wall.width && (
+							(wallCorners[0].y < _wall.location.y + _wall.height && wallCorners[0].y > _wall.location.y) ||
+							(wallCorners[2].y < _wall.location.y + _wall.height && wallCorners[2].y > _wall.location.y))) ||
+							(wallCorners[0].y < _wall.location.y && wallCorners[2].y > _wall.location.y + _wall.height && (
+								(wallCorners[0].x < _wall.location.x + _wall.width && wallCorners[0].x > _wall.location.x) ||
+								(wallCorners[1].x < _wall.location.x + _wall.width && wallCorners[1].x > _wall.location.x)))) {
+							// console.log(state.t, 'player y intersect: opposite sides ');
+							isMove = false;
+							isBlocked = true;
+							wall.location.x = prevWallLocation.x;
+							wall.location.y = prevWallLocation.y;
+							break outer;
+						}
+					}
+				}
+
 				if (isMove) {
 					play(rockScrape);
 				} else if (isBlocked) {
