@@ -78,47 +78,53 @@ rooms = [
 				},
 				width: 0.04,
 				height: 0.24,
+			}, {
+				isMovable: true,
+				location: {
+					x: 0.6,
+					y: 0.6,
+				},
+				width: 0.1,
+				height: 0.1,
 			}
 		],
 
 		characters: [
-			{
-				id: 'megabug',
-				location: {
-					x: 0.1,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-			}, {
-				id: 'megabug',
-				location: {
-					x: 0.4,
-					y: 0.4
-				}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-				// }, {
-				// 	id: 'megabug',
-				// 	location: {
-				// 		x: 0.4,
-				// 		y: 0.4
-				// 	}
-			},
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.1,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
+			// }, {
+			// 	id: 'megabug',
+			// 	location: {
+			// 		x: 0.4,
+			// 		y: 0.4
+			// 	}
 		],
 
 	}

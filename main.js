@@ -41,7 +41,7 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -59,6 +59,7 @@ function load() {
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
 	lockedDoorSound = new Audio('sounds/locked door.mp3');
+	rockScrape = new Audio('sounds/rock scrape.mp3');
 	if (window.defaultRoomMusic) {
 		window.defaultRoomMusic = new Audio(`sounds/${window.defaultRoomMusic}`);
 	}
@@ -975,46 +976,98 @@ function drawGame() {
 
 	// check for intersection with room walls
 	{
+		const left = state.player.x - (characters.player.width / roomWidth) / 2;
+		const right = state.player.x + (characters.player.width / roomWidth) / 2;
+		const top = state.player.y - (characters.player.height / roomHeight) / 2;
+		const bottom = state.player.y + (characters.player.height / roomHeight) / 2;
+		const prevLeft = prevPlayerLoc.x - (characters.player.width / roomWidth) / 2;
+		const prevRight = prevPlayerLoc.x + (characters.player.width / roomWidth) / 2;
+		const prevTop = prevPlayerLoc.y - (characters.player.height / roomHeight) / 2;
+		const prevBottom = prevPlayerLoc.y + (characters.player.height / roomHeight) / 2;
 		const playerCorners = [
 			{
-				x: state.player.x - (characters.player.width / roomWidth) / 2,
-				y: state.player.y - (characters.player.height / roomHeight) / 2
+				id: 'top-left',
+				x: left,
+				y: top,
+				prevX: prevLeft,
+				prevY: prevTop,
 			}, {
-				x: state.player.x + (characters.player.width / roomWidth) / 2,
-				y: state.player.y - (characters.player.height / roomHeight) / 2
+				id: 'top-right',
+				x: right,
+				y: top,
+				prevX: prevRight,
+				prevY: prevTop,
 			}, {
-				x: state.player.x - (characters.player.width / roomWidth) / 2,
-				y: state.player.y + (characters.player.height / roomHeight) / 2
+				id: 'bottom-left',
+				x: left,
+				y: bottom,
+				prevX: prevLeft,
+				prevY: prevBottom,
 			}, {
-				x: state.player.x + (characters.player.width / roomWidth) / 2,
-				y: state.player.y + (characters.player.height / roomHeight) / 2
+				id: 'bottom-right',
+				x: right,
+				y: bottom,
+				prevX: prevRight,
+				prevY: prevBottom,
 			}
 		];
-		outer: for (const wall of state.room.walls || []) {
-			for (const corner of playerCorners) {
-				if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
-					corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
-					state.player.x = prevPlayerLoc.x;
-					state.player.y = prevPlayerLoc.y;
+		{
+			let isYCollision, isXCollision, wall;
+			outer: for (wall of state.room.walls || []) {
+				for (const corner of playerCorners) {
+					if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
+						corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
+
+						if (corner.prevX > wall.location.x && corner.prevX < wall.location.x + wall.width) {
+							isYCollision = true;
+							break outer;
+						} else if (corner.prevY > wall.location.y && corner.prevY < wall.location.y + wall.height) {
+							isXCollision = true;
+							break outer;
+						}
+					}
+				}
+
+				// now check for corners on opposite sides of the wall!
+				if (playerCorners[0].x < wall.location.x && playerCorners[1].x > wall.location.x + wall.width && (
+					(playerCorners[0].y < wall.location.y + wall.height && playerCorners[0].y > wall.location.y) ||
+					(playerCorners[2].y < wall.location.y + wall.height && playerCorners[2].y > wall.location.y))) {
+					// console.log(state.t, 'player y intersect: opposite sides ');
+					isYCollision = true;
+					break outer;
+				} else if (playerCorners[0].y < wall.location.y && playerCorners[2].y > wall.location.y + wall.height && (
+					(playerCorners[0].x < wall.location.x + wall.width && playerCorners[0].x > wall.location.x) ||
+					(playerCorners[1].x < wall.location.x + wall.width && playerCorners[1].x > wall.location.x))) {
+					// console.log(state.t, 'player x intersect: opposite sides');
+					isXCollision = true;
 					break outer;
 				}
 			}
 
-			// now check for corners on opposite sides of the wall!
-			if (playerCorners[0].x < wall.location.x && playerCorners[1].x > wall.location.x + wall.width && (
-				(playerCorners[0].y < wall.location.y + wall.height && playerCorners[0].y > wall.location.y) ||
-				(playerCorners[2].y < wall.location.y + wall.height && playerCorners[2].y > wall.location.y))) {
-				// console.log(state.t, 'player y intersect: opposite sides ');
-				state.player.y = prevPlayerLoc.y;
-				break outer;
-			} else if (playerCorners[0].y < wall.location.y && playerCorners[2].y > wall.location.y + wall.height && (
-				(playerCorners[0].x < wall.location.x + wall.width && playerCorners[0].x > wall.location.x) ||
-				(playerCorners[1].x < wall.location.x + wall.width && playerCorners[1].x > wall.location.x))) {
-				// console.log(state.t, 'player x intersect: opposite sides');
-				state.player.x = prevPlayerLoc.x;
-				break outer;
+			if (wall.isMovable) {
+				let isMove;
+				if (isYCollision && state.player.y != prevPlayerLoc.y) {
+					// console.log('state.player.y ', state.player.y);
+					// console.log('prevPlayerLoc.y', prevPlayerLoc.y);
+					// console.log('state.player.y < prevPlayerLoc.y', state.player.y < prevPlayerLoc.y);
+					wall.location.y += (state.player.y < prevPlayerLoc.y ? -1 : 1) * moveIncrement / roomHeight;
+					isMove = true;
+				}
+				if (isXCollision && state.player.x != prevPlayerLoc.x) {
+					wall.location.x += (state.player.x < prevPlayerLoc.x ? -1 : 1) * moveIncrement / roomWidth;
+					isMove = true;
+				}
+				if (isMove) {
+					play(rockScrape);
+				}
+			} else {
+				if (isYCollision) {
+					state.player.y = prevPlayerLoc.y;
+				}
+				if (isXCollision) {
+					state.player.x = prevPlayerLoc.x;
+				}
 			}
-
 		}
 	}
 
