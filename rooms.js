@@ -81,13 +81,13 @@ rooms = [
 				height: 0.04,
 			}, {
 				isMovable: true,
-				background: '20210613_144445.jpg',
+				background: 'rock.png',
 				location: {
 					x: 0.4,
-					y: 0.3,
+					y: 0.5,
 				},
-				width: 0.14,
-				height: 0.1,
+				width: 0.16,
+				height: 0.16,
 			}
 		],
 
