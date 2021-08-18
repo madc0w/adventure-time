@@ -1,149 +1,153 @@
 <!DOCTYPE html>
 <html>
 
-	<head>
-		<title>Adventure Time</title>
-		<link rel="stylesheet" type="text/css" href="style.css" />
-		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" />
-		<!-- <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet" /> -->
-		<link href="https://fonts.googleapis.com/css2?family=Jura:wght@300&display=swap" rel="stylesheet" />
-		<!-- <script type="text/javascript" src="SAT.js"></script> -->
-		<script type="text/javascript" src="utils.js"></script>
-		<script type="text/javascript" src="characters.js"></script>
-		<script type="text/javascript" src="rooms.js"></script>
-		<script type="text/javascript" src="items.js"></script>
-		<script type="text/javascript" src="main.js"></script>
+<head>
+	<title>Adventure Time</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" />
+	<!-- <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet" /> -->
+	<link href="https://fonts.googleapis.com/css2?family=Jura:wght@300&display=swap" rel="stylesheet" />
+	<!-- <script type="text/javascript" src="SAT.js"></script> -->
+	<script type="text/javascript" src="utils.js"></script>
+	<script type="text/javascript" src="characters.js"></script>
+	<script type="text/javascript" src="rooms.js"></script>
+	<script type="text/javascript" src="items.js"></script>
+	<script type="text/javascript" src="main.js"></script>
 
-		<link rel="apple-touch-icon" sizes="57x57" href="img/favicons/apple-icon-57x57.png" />
-		<link rel="apple-touch-icon" sizes="60x60" href="img/favicons/apple-icon-60x60.png" />
-		<link rel="apple-touch-icon" sizes="72x72" href="img/favicons/apple-icon-72x72.png" />
-		<link rel="apple-touch-icon" sizes="76x76" href="img/favicons/apple-icon-76x76.png" />
-		<link rel="apple-touch-icon" sizes="114x114" href="img/favicons/apple-icon-114x114.png" />
-		<link rel="apple-touch-icon" sizes="120x120" href="img/favicons/apple-icon-120x120.png" />
-		<link rel="apple-touch-icon" sizes="144x144" href="img/favicons/apple-icon-144x144.png" />
-		<link rel="apple-touch-icon" sizes="152x152" href="img/favicons/apple-icon-152x152.png" />
-		<link rel="apple-touch-icon" sizes="180x180" href="img/favicons/apple-icon-180x180.png" />
-		<link rel="icon" type="image/png" sizes="192x192" href="img/favicons/android-icon-192x192.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="img/favicons/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="96x96" href="img/favicons/favicon-96x96.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="img/favicons/favicon-16x16.png" />
-		<!-- <link rel="manifest" href="img/favicons/manifest.json" /> -->
-		<meta name="msapplication-TileColor" content="#ffffff">
-		<meta name="msapplication-TileImage" content="img/favicons/ms-icon-144x144.png" />
-		<meta name="theme-color" content="#ffffff" />
-	</head>
+	<link rel="apple-touch-icon" sizes="57x57" href="img/favicons/apple-icon-57x57.png" />
+	<link rel="apple-touch-icon" sizes="60x60" href="img/favicons/apple-icon-60x60.png" />
+	<link rel="apple-touch-icon" sizes="72x72" href="img/favicons/apple-icon-72x72.png" />
+	<link rel="apple-touch-icon" sizes="76x76" href="img/favicons/apple-icon-76x76.png" />
+	<link rel="apple-touch-icon" sizes="114x114" href="img/favicons/apple-icon-114x114.png" />
+	<link rel="apple-touch-icon" sizes="120x120" href="img/favicons/apple-icon-120x120.png" />
+	<link rel="apple-touch-icon" sizes="144x144" href="img/favicons/apple-icon-144x144.png" />
+	<link rel="apple-touch-icon" sizes="152x152" href="img/favicons/apple-icon-152x152.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="img/favicons/apple-icon-180x180.png" />
+	<link rel="icon" type="image/png" sizes="192x192" href="img/favicons/android-icon-192x192.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="img/favicons/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="96x96" href="img/favicons/favicon-96x96.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="img/favicons/favicon-16x16.png" />
+	<!-- <link rel="manifest" href="img/favicons/manifest.json" /> -->
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="img/favicons/ms-icon-144x144.png" />
+	<meta name="theme-color" content="#ffffff" />
+</head>
 
-	<body onLoad="load();">
-		<!--
+<body onLoad="load();">
+	<!--
 		<div id="header">
 			Adventure Time!!!
 		</div> -->
 
-		<div id="game-container">
-			<canvas id="game-canvas"></canvas>
-			<canvas id="status-canvas"></canvas>
+	<div id="game-container">
+		<canvas id="game-canvas"></canvas>
+		<canvas id="status-canvas"></canvas>
+	</div>
+	<div id="controls-conatiner">
+		<div id="level-conatiner" onClick="showLevelSelectionModal()">
+			Level
+			<div id="level"></div>
 		</div>
-		<div id="controls-conatiner">
-			<div id="level-conatiner" onClick="showLevelSelectionModal()">
-				Level
-				<div id="level"></div>
-			</div>
-			<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
-			<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
-			<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
-		</div>
+		<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
+		<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
+		<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
+	</div>
 
-		<div id="level-selection-modal" class="hidden modal">
-			<div class="header">Select Level</div>
-			<hr />
-			<div class="table-container">
-				<table id="level-selection-table"> </table>
-			</div>
-			<div class="button" onClick="closeModals()">OK</div>
+	<div id="level-selection-modal" class="hidden modal">
+		<div class="header">Select Level</div>
+		<hr />
+		<div class="table-container">
+			<table id="level-selection-table"> </table>
 		</div>
+		<div class="button" onClick="closeModals()">OK</div>
+	</div>
 
-		<div id="inventory-modal" class="hidden modal">
-			<div class="header">Inventory</div>
-			<hr />
-			<div class="table-container">
-				<table id="inventory-table"> </table>
-			</div>
-			<div class="button" onClick="closeModals()">OK</div>
+	<div id="inventory-modal" class="hidden modal">
+		<div class="header">Inventory</div>
+		<hr />
+		<div class="table-container">
+			<table id="inventory-table"> </table>
 		</div>
+		<div class="button" onClick="closeModals()">OK</div>
+	</div>
 
-		<div id="merchant-modal" class="hidden modal">
-			<div class="header">Merchant</div>
-			<hr />
-			<div id="merchant-modal-init-content">
-				<div id="greetings">
-					Greetings fair travler!<br /> Might I interest you in a transaction today?
-				</div>
-				<div id="action-buttons">
-					<div id="buy-button" class="button" onClick="showMerchantSelection('buy')">Buy an Item</div>
-					<div id="sell-button" class="button" onClick="showMerchantSelection('sell')">Sell an Item</div>
-					<div id="repair-button" class="button" onClick="showMerchantSelection('repair')">Repair a Weapon</div>
-					<div id="no-button" class="button" onClick="closeModals()">No Thanks</div>
-				</div>
+	<div id="merchant-modal" class="hidden modal">
+		<div class="header">Merchant</div>
+		<hr />
+		<div id="merchant-modal-init-content">
+			<div id="greetings">
+				Greetings fair travler!<br /> Might I interest you in a transaction today?
 			</div>
-			<div id="merchant-modal-content" class="hidden">
-				<div id="merchant-modal-content-inner"></div>
-				<div id="back-button" class="button" onClick="merchantCancel()">Never mind</div>
+			<div id="action-buttons">
+				<div id="buy-button" class="button" onClick="showMerchantSelection('buy')">Buy an Item</div>
+				<div id="sell-button" class="button" onClick="showMerchantSelection('sell')">Sell an Item</div>
+				<div id="repair-button" class="button" onClick="showMerchantSelection('repair')">Repair a Weapon</div>
+				<div id="no-button" class="button" onClick="closeModals()">No Thanks</div>
 			</div>
 		</div>
-
-		<div id="instructions-modal" class="hidden modal">
-			<div class="header">Instructions</div>
-			<hr />
-			<table>
-				<tr>
-					<th>Key</th>
-					<th>Function</th>
-				</tr>
-				<tr>
-					<td>&larr; &rarr; &uarr; &darr;</td>
-					<td>Move / Aim weapon</td>
-				</tr>
-				<tr>
-					<td>C</td>
-					<td>Cycle through weapons</td>
-				</tr>
-				<tr>
-					<td>A</td>
-					<td>Attack (hold to aim long-range weapon)</td>
-				</tr>
-				<tr>
-					<td>I</td>
-					<td>Show inventory</td>
-				</tr>
-				<tr>
-					<td>M</td>
-					<td>Show map</td>
-				</tr>
-				<tr>
-					<td>Esc</td>
-					<td>Close inventory/map/instructions</td>
-				</tr>
-			</table>
-			<div class="button" onClick="closeModals()">OK</div>
+		<div id="merchant-modal-content" class="hidden">
+			<div id="merchant-modal-content-inner"></div>
+			<div id="back-button" class="button" onClick="merchantCancel()">Never mind</div>
 		</div>
+	</div>
 
-		<div id="reset-game-modal" class="hidden modal">
-			<div class="header">Reset Game</div>
-			<hr />
+	<div id="instructions-modal" class="hidden modal">
+		<div class="header">Instructions</div>
+		<hr />
+		<table>
+			<tr>
+				<th>Key</th>
+				<th>Function</th>
+			</tr>
+			<tr>
+				<td>&larr; &rarr; &uarr; &darr;</td>
+				<td>Move / Aim weapon</td>
+			</tr>
+			<tr>
+				<td>C</td>
+				<td>Cycle through weapons</td>
+			</tr>
+			<tr>
+				<td>A</td>
+				<td>Attack (hold to aim long-range weapon)</td>
+			</tr>
+			<tr>
+				<td>P</td>
+				<td>Hold to pull moving block</td>
+			</tr>
+			<tr>
+				<td>I</td>
+				<td>Show inventory</td>
+			</tr>
+			<tr>
+				<td>M</td>
+				<td>Show map</td>
+			</tr>
+			<tr>
+				<td>Esc</td>
+				<td>Close inventory/map/instructions</td>
+			</tr>
+		</table>
+		<div class="button" onClick="closeModals()">OK</div>
+	</div>
+
+	<div id="reset-game-modal" class="hidden modal">
+		<div class="header">Reset Game</div>
+		<hr />
+		<div>
 			<div>
-				<div>
-					Do you really want to lose all your progress and start a whole new adventure?
-				</div>
-				<div>
-					<div class="button" onClick="reset()">Yes!</div>
-					<div class="button" onClick="reset(true)">Yes... and also clear best times.</div>
-					<div class="button" onClick="closeModals()">Never mind</div>
-				</div>
+				Do you really want to lose all your progress and start a whole new adventure?
+			</div>
+			<div>
+				<div class="button" onClick="reset()">Yes!</div>
+				<div class="button" onClick="reset(true)">Yes... and also clear best times.</div>
+				<div class="button" onClick="closeModals()">Never mind</div>
 			</div>
 		</div>
+	</div>
 
-		<div id="toast" class="hidden"> </div>
-	</body>
+	<div id="toast" class="hidden"> </div>
+</body>
 
 </html>

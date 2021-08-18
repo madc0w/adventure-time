@@ -41,7 +41,7 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape, isPulling;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -486,25 +486,25 @@ function drawGame() {
 					const prevBottom = prevCharacterLoc.y + (character.height / roomHeight) / 2;
 					const characterCorners = [
 						{
-							id: 'top-left',
+							// id: 'top-left',
 							x: left,
 							y: top,
 							prevX: prevLeft,
 							prevY: prevTop,
 						}, {
-							id: 'top-right',
+							// id: 'top-right',
 							x: right,
 							y: top,
 							prevX: prevRight,
 							prevY: prevTop,
 						}, {
-							id: 'bottom-left',
+							// id: 'bottom-left',
 							x: left,
 							y: bottom,
 							prevX: prevLeft,
 							prevY: prevBottom,
 						}, {
-							id: 'bottom-right',
+							// id: 'bottom-right',
 							x: right,
 							y: bottom,
 							prevX: prevRight,
@@ -793,7 +793,7 @@ function drawGame() {
 			if (duration > items.invisibilityPotion.duration) {
 				state.player.isInvisible = false;
 			} else if (duration >= 0.88 * items.invisibilityPotion.duration) {
-				ctx.globalAlpha = 0.45 + 0.35 * Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 16);
+				ctx.globalAlpha = 0.45 + 0.25 * Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 8);
 			} else {
 				ctx.globalAlpha = 0.5;
 			}
@@ -805,7 +805,7 @@ function drawGame() {
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
-	if (keysDown['A'] && state.player.wielding && items[state.player.wielding].projectile &&
+	if (keysDown.A && state.player.wielding && items[state.player.wielding].projectile &&
 		state.player.motion == 'idleFrames') {
 		// !(keysDown.ArrowDown || keysDown.ArrowUp || keysDown.ArrowLeft || keysDown.ArrowRight)
 		aim();
@@ -861,6 +861,61 @@ function drawGame() {
 			state.aimAngle += direction * Math.PI / 32;
 
 		} else {
+
+			if (keysDown.P) {
+				for (const wall of state.room.walls || []) {
+					if (wall.isMovable) {
+						const margin = 0.04;
+						const top = state.player.y - characters.player.height / 2;
+						const bottom = state.player.y + characters.player.height / 2;
+						const left = state.player.x - characters.player.width / 2;
+						const right = state.player.x + characters.player.width / 2;
+						console.log('(state.player.y + characters.player.height / 2)', (state.player.y + characters.player.height / 2));
+						console.log('wall.location.y', wall.location.y);
+						console.log('keysDown.ArrowUp', keysDown.ArrowUp);
+						console.log(wall.location.y < (state.player.y + characters.player.height / 2) + margin);
+						console.log((state.player.y + characters.player.height / 2) + margin);
+						console.log(wall.location.y);
+						console.log(wall.location.y > (state.player.y + characters.player.height / 2) - margin);
+						console.log(left > wall.location.x && left < wall.location.x + wall.width);
+						console.log(right > wall.location.x && right < wall.location.x + wall.width);
+						if (keysDown.ArrowLeft &&
+							wall.location.x < (state.player.x + characters.player.width / 2) + margin &&
+							wall.location.x > (state.player.x + characters.player.width / 2) - margin &&
+							((top > wall.location.y && top < wall.location.y + wall.height) ||
+								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
+							// console.log('pull left');
+							wall.location.x -= moveIncrement / roomWidth;
+							wall.location.x = Math.max(characters.player.width + margin, wall.location.x);
+						} else if (keysDown.ArrowRight &&
+							wall.location.x + wall.width < (state.player.x - characters.player.width / 2) + margin &&
+							wall.location.x + wall.width > (state.player.x - characters.player.width / 2) - margin &&
+							((top > wall.location.y && top < wall.location.y + wall.height) ||
+								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
+							// console.log('pull right');
+							wall.location.x += moveIncrement / roomWidth;
+							wall.location.x = Math.min(1 - characters.player.width - margin - wall.width, wall.location.x);
+						} else if (keysDown.ArrowUp &&
+							wall.location.y < (state.player.y + characters.player.height / 2) + margin &&
+							wall.location.y > (state.player.y + characters.player.height / 2) - margin &&
+							((left > wall.location.x && left < wall.location.x + wall.width) ||
+								(right > wall.location.x && right < wall.location.x + wall.width))) {
+							// console.log('pull up');
+							wall.location.y -= moveIncrement / roomHeight;
+							wall.location.y = Math.max(characters.player.height + margin, wall.location.y);
+						} else if (keysDown.ArrowDown &&
+							wall.location.y + wall.height < (state.player.y - characters.player.height / 2) + margin &&
+							wall.location.y + wall.height > (state.player.y - characters.player.height / 2) - margin &&
+							((left > wall.location.x && left < wall.location.x + wall.width) ||
+								(right > wall.location.x && right < wall.location.x + wall.width))) {
+							// console.log('pull down');
+							// TODO!
+							wall.location.y += moveIncrement / roomWidth;
+							wall.location.y = Math.min(1 - characters.player.height - margin - wall.height, wall.location.y);
+						}
+					}
+				}
+			}
 
 			if (keysDown.ArrowLeft) {
 				const edge = characters.player.width / (2 * roomWidth);
@@ -1081,19 +1136,19 @@ function drawGame() {
 						const bottom = wall.location.y + wall.height;
 						const wallCorners = [
 							{
-								id: 'top-left',
+								// id: 'top-left',
 								x: left,
 								y: top,
 							}, {
-								id: 'top-right',
+								// id: 'top-right',
 								x: right,
 								y: top,
 							}, {
-								id: 'bottom-left',
+								// id: 'bottom-left',
 								x: left,
 								y: bottom,
 							}, {
-								id: 'bottom-right',
+								// id: 'bottom-right',
 								x: right,
 								y: bottom,
 							}
@@ -1750,6 +1805,8 @@ function onKeyUp(e) {
 		}
 		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
 		drawInventory();
+	} else if (key == 'P') {
+		isPulling = false;
 	} else if (key == 'A') {
 		attack();
 		isAiming = false;
@@ -1808,7 +1865,7 @@ function onKeyDown(e) {
 		}
 	}
 
-	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C'].includes(key)) {
+	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C', 'P'].includes(key)) {
 		keysDown[key] = true;
 	}
 }
