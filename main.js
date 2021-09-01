@@ -865,20 +865,20 @@ function drawGame() {
 			if (keysDown.P) {
 				for (const wall of state.room.walls || []) {
 					if (wall.isMovable) {
-						const margin = 0.04;
+						const margin = 0.06;
 						const top = state.player.y - characters.player.height / 2;
 						const bottom = state.player.y + characters.player.height / 2;
 						const left = state.player.x - characters.player.width / 2;
 						const right = state.player.x + characters.player.width / 2;
-						console.log('(state.player.y + characters.player.height / 2)', (state.player.y + characters.player.height / 2));
-						console.log('wall.location.y', wall.location.y);
-						console.log('keysDown.ArrowUp', keysDown.ArrowUp);
-						console.log(wall.location.y < (state.player.y + characters.player.height / 2) + margin);
-						console.log((state.player.y + characters.player.height / 2) + margin);
-						console.log(wall.location.y);
-						console.log(wall.location.y > (state.player.y + characters.player.height / 2) - margin);
-						console.log(left > wall.location.x && left < wall.location.x + wall.width);
-						console.log(right > wall.location.x && right < wall.location.x + wall.width);
+						// console.log('(state.player.y + characters.player.height / 2)', (state.player.y + characters.player.height / 2));
+						// console.log('wall.location.y', wall.location.y);
+						// console.log('keysDown.ArrowUp', keysDown.ArrowUp);
+						// console.log(wall.location.y < (state.player.y + characters.player.height / 2) + margin);
+						// console.log((state.player.y + characters.player.height / 2) + margin);
+						// console.log(wall.location.y);
+						// console.log(wall.location.y > (state.player.y + characters.player.height / 2) - margin);
+						// console.log(left > wall.location.x && left < wall.location.x + wall.width);
+						// console.log(right > wall.location.x && right < wall.location.x + wall.width);
 						if (keysDown.ArrowLeft &&
 							wall.location.x < (state.player.x + characters.player.width / 2) + margin &&
 							wall.location.x > (state.player.x + characters.player.width / 2) - margin &&
@@ -909,8 +909,7 @@ function drawGame() {
 							((left > wall.location.x && left < wall.location.x + wall.width) ||
 								(right > wall.location.x && right < wall.location.x + wall.width))) {
 							// console.log('pull down');
-							// TODO!
-							wall.location.y += moveIncrement / roomWidth;
+							wall.location.y += moveIncrement / roomHeight;
 							wall.location.y = Math.min(1 - characters.player.height - margin - wall.height, wall.location.y);
 						}
 					}
