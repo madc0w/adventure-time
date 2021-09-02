@@ -1216,8 +1216,9 @@ function drawGame() {
 			state.player.y > portal.location.y - portalSize / 2 &&
 			state.player.y < portal.location.y + portalSize / 2
 		) {
-			setRoom(rooms.find(r => r.id == portal.roomId));
-			state.player.x = state.player.y = 0.5;
+			setRoom(rooms.find(r => r.id == portal.destination.roomId));
+			state.player.x = portal.destination.x || 0.5;
+			state.player.y = portal.destination.y || 0.5;
 		}
 	}
 

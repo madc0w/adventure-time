@@ -273,7 +273,11 @@ rooms = [
 					x: 0.8,
 					y: 0.5
 				},
-				roomId: 7
+				destination: {
+					roomId: 7,
+					x: 0.4,
+					y: 0.6,
+				}
 			}
 		]
 	}, {
