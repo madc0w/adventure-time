@@ -1098,7 +1098,7 @@ function drawGame() {
 				}
 			}
 
-			if (wall.isMovable) {
+			if (wall && wall.isMovable) {
 				let isMove, isBlocked;
 				const prevWallLocation = {
 					x: wall.location.x,

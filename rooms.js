@@ -2,134 +2,115 @@ defaultRoomBackground = 'granite stones texture.jpg';
 defaultWallBackground = 'pavers.jpg';
 // defaultRoomMusic = 'holy grail theme.mp3';
 
-
 rooms = [
-	{
-		id: 0,
-		level: 1,
-		width: 0.9,
-		height: 0.6,
-		// backgroundImage: 'room_01.jpg',
-		wallColor: '#3f2f0c',
+    {
+        id: 0,
+        level: 1,
+        width: 0.9,
+        height: 0.6,
 
-		items: [
-			// {
-			// 	id: 'treasure',
-			// 	location: {
-			// 		x: 0.2,
-			// 		y: 0.4
-			// 	}
-			// },
-			// {
-			// 	id: 'sword_1',
-			// 	location: {
-			// 		x: 0.8,
-			// 		y: 0.5
-			// 	}
-			// },
-			{
-				id: 'invisibilityPotion',
-				location: {
-					x: 0.2,
-					y: 0.8
-				}
-			}, {
-				id: 'enchantedSword',
-				location: {
-					x: 0.4,
-					y: 0.5
-				}
-			}, {
-				id: 'bow',
-				location: {
-					x: 0.8,
-					y: 0.5
-				}
-			}, {
-				id: 'arrow',
-				location: {
-					x: 0.8,
-					y: 0.6
-				}
-			}
-		],
+        walls: [
+            {
+                location: {
+                    x: 0.76,
+                    y: 0.7,
+                },
+                width: 0.24,
+                height: 0.04,
+            },
+            {
+                location: {
+                    x: 0.76,
+                    y: 0.7,
+                },
+                width: 0.04,
+                height: 0.16,
+            }
+        ],
 
-		walls: [
-			// {
-			// 	// background: '20210613_144502.jpg',
-			// 	location: {
-			// 		x: 0.3,
-			// 		y: 0.24,
-			// 	},
-			// 	width: 0.24,
-			// 	height: 0.14,
-			// 	// }, {
-			// 	// 	// background: '20210613_144502.jpg',
-			// 	// 	location: {
-			// 	// 		x: 0.6,
-			// 	// 		y: 0.16,
-			// 	// 	},
-			// 	// 	width: 0.3,
-			// 	// 	height: 0.4,
-			// }, 
-			{
-				location: {
-					x: 0.3,
-					y: 0.4,
-				},
-				width: 0.24,
-				height: 0.04,
-			}, {
-				isMovable: true,
-				background: 'rock.png',
-				location: {
-					x: 0.4,
-					y: 0.5,
-				},
-				width: 0.16,
-				height: 0.16,
-			}
-		],
+        doors: [
+            {
+                // isOneWay: true,
+                roomId: 1,
+                wall: 's',
+                location: 0.2,
+            },
+            {
+                // isOneWay: true,
+                roomId: 2,
+                wall: 'e',
+                location: 0.74,
+            },
+            {
+                // isOneWay: true,
+                roomId: 3,
+                wall: 'n',
+                location: 0.5,
+                key: 'blueKey'
+            }
+        ],
 
-		characters: [
-			// {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.1,
-			// 		y: 0.4
-			// 	}
-			// }
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-			// }, {
-			// 	id: 'megabug',
-			// 	location: {
-			// 		x: 0.4,
-			// 		y: 0.4
-			// 	}
-		],
+        items: [
+            {
+                id: 'blueKey',
+                location: {
+                    x: 0.89,
+                    y: 0.84
+                }
+            }
 
-	}
+        ]
+    }, {
+        id: 1,
+        width: 0.9,
+        height: 0.6,
+
+        portals: [
+            {
+                location: {
+                    x: 0.8,
+                    y: 0.5
+                },
+                destination: {
+                    roomId: 0,
+                    x: 0.86,
+                    y: 0.84
+                }
+            }
+        ],
+        items: [
+        ]
+    }, {
+        id: 2,
+        width: 0.9,
+        height: 0.6,
+        items: [
+        ],
+        doors: [
+            // {
+            //     isOneWay: true,
+            //     roomId: 0,
+            //     wall: 'w',
+            //     location: 0.2,
+            // },
+        ],
+        portals: [
+            {
+                location: {
+                    x: 0.8,
+                    y: 0.5
+                },
+                destination: {
+                    roomId: 0,
+                    x: 0.5,
+                    y: 0.5
+                }
+            }
+        ],
+    },
+    {
+        id: 3,
+        width: 0.9,
+        height: 0.6,
+    }
 ];
