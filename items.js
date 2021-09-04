@@ -151,5 +151,15 @@ items = {
 		sounds: {
 			pickup: 'key pickup.mp3',
 		},
-	}
+	},
+	redKey: {
+		type: 'key',
+		image: 'key 02.png',
+		label: 'Red Key',
+		size: 0.04,
+		color: '#fc1000',
+		sounds: {
+			pickup: 'key pickup.mp3',
+		},
+	},
 };

@@ -360,7 +360,7 @@ function drawGame() {
 			width: portalSize,
 			height: portalSize
 		});
-		ctx.drawImage(portalImage, loc.x, loc.y, portalSize * canvas.width, portalSize * canvas.height);
+		portalImage && ctx.drawImage(portalImage, loc.x, loc.y, portalSize * canvas.width, portalSize * canvas.height);
 	}
 
 	// items

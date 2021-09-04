@@ -9,41 +9,23 @@ rooms = [
         width: 0.9,
         height: 0.6,
 
-        walls: [
-            {
-                location: {
-                    x: 0.76,
-                    y: 0.7,
-                },
-                width: 0.24,
-                height: 0.04,
-            },
-            {
-                location: {
-                    x: 0.76,
-                    y: 0.7,
-                },
-                width: 0.04,
-                height: 0.16,
-            }
-        ],
-
         doors: [
             {
                 // isOneWay: true,
-                roomId: 1,
+                roomId: 3,
                 wall: 's',
                 location: 0.2,
+                key: 'redKey'
+            },
+            {
+                isOneWay: true,
+                roomId: 1,
+                wall: 'w',
+                location: 0.44,
             },
             {
                 // isOneWay: true,
-                roomId: 2,
-                wall: 'e',
-                location: 0.74,
-            },
-            {
-                // isOneWay: true,
-                roomId: 3,
+                roomId: 4,
                 wall: 'n',
                 location: 0.5,
                 key: 'blueKey'
@@ -51,25 +33,26 @@ rooms = [
         ],
 
         items: [
-            {
-                id: 'blueKey',
-                location: {
-                    x: 0.89,
-                    y: 0.84
-                }
-            }
-
         ]
     }, {
         id: 1,
         width: 0.9,
         height: 0.6,
 
+        doors: [
+            {
+                // isOneWay: true,
+                roomId: 2,
+                wall: 's',
+                location: 0.2,
+            }
+        ],
+
         portals: [
             {
                 location: {
-                    x: 0.8,
-                    y: 0.5
+                    x: 0.58,
+                    y: 0.84
                 },
                 destination: {
                     roomId: 0,
@@ -78,7 +61,33 @@ rooms = [
                 }
             }
         ],
+        walls: [
+            {
+                location: {
+                    x: 0.4,
+                    y: 0.68,
+                },
+                width: 0.6,
+                height: 0.06,
+            },
+            {
+                location: {
+                    x: 0.4,
+                    y: 0.7,
+                },
+                width: 0.04,
+                height: 0.24,
+            }
+        ],
+
         items: [
+            {
+                id: 'redKey',
+                location: {
+                    x: 0.89,
+                    y: 0.84
+                }
+            },
         ]
     }, {
         id: 2,
@@ -87,12 +96,6 @@ rooms = [
         items: [
         ],
         doors: [
-            // {
-            //     isOneWay: true,
-            //     roomId: 0,
-            //     wall: 'w',
-            //     location: 0.2,
-            // },
         ],
         portals: [
             {
@@ -101,15 +104,31 @@ rooms = [
                     y: 0.5
                 },
                 destination: {
-                    roomId: 0,
-                    x: 0.5,
-                    y: 0.5
+                    roomId: 1,
+                    x: 0.7,
+                    y: 0.82
                 }
             }
         ],
     },
     {
         id: 3,
+        width: 0.9,
+        height: 0.6,
+
+        items: [
+            {
+                id: 'blueKey',
+                location: {
+                    x: 0.4,
+                    y: 0.6
+                }
+            },
+        ]
+    },
+    {
+        id: 4,
+        level: 2,
         width: 0.9,
         height: 0.6,
     }
