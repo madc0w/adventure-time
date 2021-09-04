@@ -41,7 +41,7 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape, isPulling;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape, isPulling, portalSound;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -55,6 +55,7 @@ function load() {
 	initRooms = JSON.parse(JSON.stringify(rooms));
 	initCharacters = JSON.parse(JSON.stringify(characters));
 
+	portalSound = new Audio('sounds/portal.mp3');
 	levelUpSound = new Audio('sounds/level up.mp3');
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
@@ -1219,6 +1220,7 @@ function drawGame() {
 			setRoom(rooms.find(r => r.id == portal.destination.roomId));
 			state.player.x = portal.destination.x || 0.5;
 			state.player.y = portal.destination.y || 0.5;
+			play(portalSound);
 		}
 	}
 
