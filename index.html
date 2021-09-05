@@ -2,9 +2,12 @@
 <html>
 
 <head>
-	<title>Adventure Time</title>
+	<title>Adventure Quest</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Merienda:wght@700&display=swap" rel="stylesheet">
 	<link rel="preconnect" href="https://fonts.gstatic.com" />
 	<!-- <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet" /> -->
 	<link href="https://fonts.googleapis.com/css2?family=Jura:wght@300&display=swap" rel="stylesheet" />
@@ -35,23 +38,24 @@
 </head>
 
 <body onLoad="load();">
-	<!--
-		<div id="header">
-			Adventure Time!!!
-		</div> -->
-
-	<div id="game-container">
-		<canvas id="game-canvas"></canvas>
-		<canvas id="status-canvas"></canvas>
+	<div id="page-header">
+		<div id="page-header-text">Adventure Quest</div>
 	</div>
-	<div id="controls-conatiner">
-		<div id="level-conatiner" onClick="showLevelSelectionModal()">
-			Level
-			<div id="level"></div>
+
+	<div id="outer-container">
+		<div id="game-container">
+			<canvas id="game-canvas"></canvas>
+			<canvas id="status-canvas"></canvas>
 		</div>
-		<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
-		<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
-		<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
+		<div id="controls-conatiner">
+			<div id="level-conatiner" onClick="showLevelSelectionModal()">
+				Level
+				<div id="level"></div>
+			</div>
+			<div id="how-to-play" class="button" onClick="showModal('instructions-modal')">How to Play</div>
+			<div id="toggle-pause" class="button" onClick="togglePause()">Pause</div>
+			<div id="reset-game" class="button" onClick="showModal('reset-game-modal')">Reset Game</div>
+		</div>
 	</div>
 
 	<div id="level-selection-modal" class="hidden modal">

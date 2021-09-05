@@ -41,12 +41,12 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrape, isPulling, portalSound;
+let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrapeSound, isPulling, portalSound;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
-	canvas.width = Math.min(innerWidth * 0.86 - 28, innerHeight * 0.8 - 28);
+	canvas.width = Math.min(innerWidth * 0.86 - 28, innerHeight * 0.8 - 68);
 	canvas.height = canvas.width;
 	statusCanvas.width = canvas.width;
 	statusCanvas.height = innerHeight * 0.14;
@@ -60,7 +60,7 @@ function load() {
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
 	lockedDoorSound = new Audio('sounds/locked door.mp3');
-	rockScrape = new Audio('sounds/rock scrape.mp3');
+	rockScrapeSound = new Audio('sounds/rock scrape.mp3');
 	if (window.defaultRoomMusic) {
 		window.defaultRoomMusic = new Audio(`sounds/${window.defaultRoomMusic}`);
 	}
@@ -888,6 +888,7 @@ function drawGame() {
 							// console.log('pull left');
 							wall.location.x -= moveIncrement / roomWidth;
 							wall.location.x = Math.max(characters.player.width + margin, wall.location.x);
+							play(rockScrapeSound);
 						} else if (keysDown.ArrowRight &&
 							wall.location.x + wall.width < (state.player.x - characters.player.width / 2) + margin &&
 							wall.location.x + wall.width > (state.player.x - characters.player.width / 2) - margin &&
@@ -896,6 +897,7 @@ function drawGame() {
 							// console.log('pull right');
 							wall.location.x += moveIncrement / roomWidth;
 							wall.location.x = Math.min(1 - characters.player.width - margin - wall.width, wall.location.x);
+							play(rockScrapeSound);
 						} else if (keysDown.ArrowUp &&
 							wall.location.y < (state.player.y + characters.player.height / 2) + margin &&
 							wall.location.y > (state.player.y + characters.player.height / 2) - margin &&
@@ -904,6 +906,7 @@ function drawGame() {
 							// console.log('pull up');
 							wall.location.y -= moveIncrement / roomHeight;
 							wall.location.y = Math.max(characters.player.height + margin, wall.location.y);
+							play(rockScrapeSound);
 						} else if (keysDown.ArrowDown &&
 							wall.location.y + wall.height < (state.player.y - characters.player.height / 2) + margin &&
 							wall.location.y + wall.height > (state.player.y - characters.player.height / 2) - margin &&
@@ -912,6 +915,7 @@ function drawGame() {
 							// console.log('pull down');
 							wall.location.y += moveIncrement / roomHeight;
 							wall.location.y = Math.min(1 - characters.player.height - margin - wall.height, wall.location.y);
+							play(rockScrapeSound);
 						}
 					}
 				}
@@ -1183,7 +1187,7 @@ function drawGame() {
 				}
 
 				if (isMove) {
-					play(rockScrape);
+					play(rockScrapeSound);
 				} else if (isBlocked) {
 					state.player.x = prevPlayerLoc.x;
 					state.player.y = prevPlayerLoc.y;
@@ -2320,7 +2324,8 @@ function showLevelSelectionModal() {
 			html += `<tr><td>${level}</td><td>${best}</td></tr>`;
 		}
 	}
-	html += `<tr><td>${maxLevel + 1}</td><td>In progress...</td></tr>`;
+	const currentTime = new Date() - state.levelTimes[state.level - 1].start - state.pausedTime;
+	html += `<tr><td>${maxLevel + 1}</td><td>${formatTime(currentTime)} ... still in progress</td></tr>`;
 	table.innerHTML = html;
 	showModal('level-selection-modal');
 }

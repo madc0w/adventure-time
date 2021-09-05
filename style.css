@@ -3,9 +3,20 @@ body {
 	font-family: Lato;
 }
 
-#header {
-	font-size: 22px;
-	margin-bottom: 8px;
+#page-header {
+	font-family: Merienda;
+	color: #44993d;
+	font-size: 18px;
+	margin-bottom: 4px;
+	text-align: center;
+	background-color: #c1e5be;
+	border-radius: 8px;
+}
+
+#page-header-text {
+	transform: scale(3, 1);
+	width: 33%;
+	margin-left: 33%;
 }
 
 canvas {
