@@ -1128,36 +1128,35 @@ function drawGame() {
 					}
 				}
 
+				const left = wall.location.x;
+				const right = wall.location.x + wall.width;
+				const top = wall.location.y;
+				const bottom = wall.location.y + wall.height;
+				const wallCorners = [
+					{
+						// id: 'top-left',
+						x: left,
+						y: top,
+					}, {
+						// id: 'top-right',
+						x: right,
+						y: top,
+					}, {
+						// id: 'bottom-left',
+						x: left,
+						y: bottom,
+					}, {
+						// id: 'bottom-right',
+						x: right,
+						y: bottom,
+					}
+				];
 				outer: for (const _wall of state.room.walls || []) {
 					if (_wall != wall) {
-						const left = wall.location.x;
-						const right = wall.location.x + wall.width;
-						const top = wall.location.y;
-						const bottom = wall.location.y + wall.height;
-						const wallCorners = [
-							{
-								// id: 'top-left',
-								x: left,
-								y: top,
-							}, {
-								// id: 'top-right',
-								x: right,
-								y: top,
-							}, {
-								// id: 'bottom-left',
-								x: left,
-								y: bottom,
-							}, {
-								// id: 'bottom-right',
-								x: right,
-								y: bottom,
-							}
-						];
-
 						for (const corner of wallCorners) {
 							// console.log('corner', corner);
-							if (corner.x > _wall.location.x && corner.x < _wall.location.x + _wall.width &&
-								corner.y > _wall.location.y && corner.y < _wall.location.y + _wall.height) {
+							if (corner.x >= _wall.location.x && corner.x <= _wall.location.x + _wall.width &&
+								corner.y >= _wall.location.y && corner.y <= _wall.location.y + _wall.height) {
 								isMove = false;
 								isBlocked = true;
 								wall.location.x = prevWallLocation.x;
@@ -1167,12 +1166,12 @@ function drawGame() {
 						}
 
 						// now check for corners on opposite sides of the wall!
-						if ((wallCorners[0].x < _wall.location.x && wallCorners[1].x > _wall.location.x + _wall.width && (
-							(wallCorners[0].y < _wall.location.y + _wall.height && wallCorners[0].y > _wall.location.y) ||
-							(wallCorners[2].y < _wall.location.y + _wall.height && wallCorners[2].y > _wall.location.y))) ||
-							(wallCorners[0].y < _wall.location.y && wallCorners[2].y > _wall.location.y + _wall.height && (
-								(wallCorners[0].x < _wall.location.x + _wall.width && wallCorners[0].x > _wall.location.x) ||
-								(wallCorners[1].x < _wall.location.x + _wall.width && wallCorners[1].x > _wall.location.x)))) {
+						if ((wallCorners[0].x <= _wall.location.x && wallCorners[1].x >= _wall.location.x + _wall.width && (
+							(wallCorners[0].y <= _wall.location.y + _wall.height && wallCorners[0].y >= _wall.location.y) ||
+							(wallCorners[2].y <= _wall.location.y + _wall.height && wallCorners[2].y >= _wall.location.y))) ||
+							(wallCorners[0].y <= _wall.location.y && wallCorners[2].y >= _wall.location.y + _wall.height && (
+								(wallCorners[0].x <= _wall.location.x + _wall.width && wallCorners[0].x >= _wall.location.x) ||
+								(wallCorners[1].x <= _wall.location.x + _wall.width && wallCorners[1].x >= _wall.location.x)))) {
 							// console.log(state.t, 'player y intersect: opposite sides ');
 							isMove = false;
 							isBlocked = true;

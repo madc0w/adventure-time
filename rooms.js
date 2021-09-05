@@ -6,34 +6,83 @@ rooms = [
     {
         id: 0,
         level: 1,
-        width: 0.9,
-        height: 0.6,
 
-        doors: [
+        width: .96,
+        height: .96,
+        walls: [
             {
-                // isOneWay: true,
-                roomId: 3,
-                wall: 's',
-                location: 0.2,
-                key: 'redKey'
+                isMovable: true,
+                location: {
+                    x: 0.0,
+                    y: 0.0,
+                },
+                width: 0.18,
+                height: 0.18,
             },
             {
-                isOneWay: true,
-                roomId: 1,
-                wall: 'w',
-                location: 0.44,
+                isMovable: true,
+                location: {
+                    x: 0.2,
+                    y: 0.2,
+                },
+                width: 0.18,
+                height: 0.18,
             },
             {
-                // isOneWay: true,
-                roomId: 4,
-                wall: 'n',
-                location: 0.5,
-                key: 'blueKey'
-            }
-        ],
-
-        items: [
+                isMovable: true,
+                location: {
+                    x: 0.0,
+                    y: 0.2,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
+            {
+                isMovable: true,
+                location: {
+                    x: 0.2,
+                    y: 0.0,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
         ]
+
+
+        // width: 0.9,
+        // height: 0.6,
+
+        // doors: [
+        //     {
+        //         // isOneWay: true,
+        //         roomId: 3,
+        //         wall: 's',
+        //         location: 0.2,
+        //         key: 'redKey'
+        //     },
+        //     {
+        //         isOneWay: true,
+        //         roomId: 1,
+        //         wall: 'w',
+        //         location: 0.44,
+        //     },
+        //     {
+        //         // isOneWay: true,
+        //         roomId: 4,
+        //         wall: 'n',
+        //         location: 0.5,
+        //         key: 'blueKey'
+        //     },
+        //     {
+        //         // isOneWay: true,
+        //         roomId: 5,
+        //         wall: 'e',
+        //         location: 0.5,
+        //     }
+        // ],
+
+        // items: [
+        // ]
     }, {
         id: 1,
         width: 0.9,
@@ -131,5 +180,48 @@ rooms = [
         level: 2,
         width: 0.9,
         height: 0.6,
-    }
+    },
+    {
+        id: 5,
+        width: .96,
+        height: .96,
+        walls: [
+            {
+                isMovable: true,
+                location: {
+                    x: 0.0,
+                    y: 0.0,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
+            {
+                isMovable: true,
+                location: {
+                    x: 0.2,
+                    y: 0.2,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
+            {
+                isMovable: true,
+                location: {
+                    x: 0.0,
+                    y: 0.2,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
+            {
+                isMovable: true,
+                location: {
+                    x: 0.2,
+                    y: 0.0,
+                },
+                width: 0.18,
+                height: 0.18,
+            },
+        ]
+    },
 ];
