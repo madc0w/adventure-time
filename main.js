@@ -880,41 +880,53 @@ function drawGame() {
 						// console.log(wall.location.y > (state.player.y + characters.player.height / 2) - margin);
 						// console.log(left > wall.location.x && left < wall.location.x + wall.width);
 						// console.log(right > wall.location.x && right < wall.location.x + wall.width);
+						let testLoc = {
+							x: wall.location.x,
+							y: wall.location.y
+						};
+						let isMove;
 						if (keysDown.ArrowLeft &&
 							wall.location.x < (state.player.x + characters.player.width / 2) + margin &&
 							wall.location.x > (state.player.x + characters.player.width / 2) - margin &&
 							((top > wall.location.y && top < wall.location.y + wall.height) ||
 								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
 							// console.log('pull left');
-							wall.location.x -= moveIncrement / roomWidth;
-							wall.location.x = Math.max(characters.player.width + margin, wall.location.x);
-							play(rockScrapeSound);
+							isMove = true;
+							testLoc.x -= moveIncrement / roomWidth;
+							testLoc.x = Math.max(characters.player.width + margin, testLoc.x);
 						} else if (keysDown.ArrowRight &&
 							wall.location.x + wall.width < (state.player.x - characters.player.width / 2) + margin &&
 							wall.location.x + wall.width > (state.player.x - characters.player.width / 2) - margin &&
 							((top > wall.location.y && top < wall.location.y + wall.height) ||
 								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
 							// console.log('pull right');
-							wall.location.x += moveIncrement / roomWidth;
-							wall.location.x = Math.min(1 - characters.player.width - margin - wall.width, wall.location.x);
-							play(rockScrapeSound);
+							isMove = true;
+							testLoc.x += moveIncrement / roomWidth;
+							testLoc.x = Math.min(1 - characters.player.width - margin - wall.width, testLoc.x);
 						} else if (keysDown.ArrowUp &&
 							wall.location.y < (state.player.y + characters.player.height / 2) + margin &&
 							wall.location.y > (state.player.y + characters.player.height / 2) - margin &&
 							((left > wall.location.x && left < wall.location.x + wall.width) ||
 								(right > wall.location.x && right < wall.location.x + wall.width))) {
 							// console.log('pull up');
-							wall.location.y -= moveIncrement / roomHeight;
-							wall.location.y = Math.max(characters.player.height + margin, wall.location.y);
-							play(rockScrapeSound);
+							isMove = true;
+							testLoc.y -= moveIncrement / roomHeight;
+							testLoc.y = Math.max(characters.player.height + margin, testLoc.y);
 						} else if (keysDown.ArrowDown &&
 							wall.location.y + wall.height < (state.player.y - characters.player.height / 2) + margin &&
 							wall.location.y + wall.height > (state.player.y - characters.player.height / 2) - margin &&
 							((left > wall.location.x && left < wall.location.x + wall.width) ||
 								(right > wall.location.x && right < wall.location.x + wall.width))) {
 							// console.log('pull down');
-							wall.location.y += moveIncrement / roomHeight;
-							wall.location.y = Math.min(1 - characters.player.height - margin - wall.height, wall.location.y);
+							isMove = true;
+							testLoc.y += moveIncrement / roomHeight;
+							testLoc.y = Math.min(1 - characters.player.height - margin - wall.height, testLoc.y);
+						}
+						// console.log('isMove', isMove);
+						if (isMove && testBounds(wall, testLoc, wall.width, wall.height)) {
+							// console.log('wall.location', wall.location);
+							// console.log('testLoc', testLoc);
+							wall.location = testLoc;
 							play(rockScrapeSound);
 						}
 					}
@@ -2350,4 +2362,46 @@ function initState(room) {
 function drawPoint(loc, color) {
 	const p = toScreen(loc);
 	debugPoints.push({ p, color });
+}
+
+function testBounds(currWall, testLoc, width, height) {
+	if (!(testLoc.x < 0 || testLoc.y < 0 || testLoc.x + width >= state.room.width || testLoc.y + height >= state.room.height)) {
+		const left = testLoc.x;
+		const right = testLoc.x + currWall.width;
+		const top = testLoc.y;
+		const bottom = testLoc.y + currWall.height;
+		const corners = [
+			{
+				// id: 'top-left',
+				x: left,
+				y: top,
+			}, {
+				// id: 'top-right',
+				x: right,
+				y: top,
+			}, {
+				// id: 'bottom-left',
+				x: left,
+				y: bottom,
+			}, {
+				// id: 'bottom-right',
+				x: right,
+				y: bottom,
+			}
+		];
+
+		for (const wall of state.room.walls) {
+			if (wall != currWall) {
+				for (const corner of corners) {
+					if (corner.x >= wall.location.x && corner.x <= wall.location.x + wall.width &&
+						corner.y >= wall.location.y && corner.y <= wall.location.y + wall.height) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	// TODO check for opposite sides
+	return true;
 }

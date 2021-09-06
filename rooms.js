@@ -16,6 +16,23 @@ rooms = [
         width: 0.9,
         height: 0.6,
 
+        walls: [
+            {
+                location: {
+                    x: 0.02,
+                    y: 0.02,
+                },
+                ...movingBlock
+            },
+            {
+                location: {
+                    x: 0.2,
+                    y: 0.02,
+                },
+                ...movingBlock
+            },
+        ],
+
         doors: [
             {
                 // isOneWay: true,
