@@ -79,6 +79,7 @@ function load() {
 					assignFunctions(room, savedRoom);
 					room.items = savedRoom.items;
 					room.characters = savedRoom.characters;
+					room.walls = savedRoom.walls;
 
 					// console.log('savedRoom.width', savedRoom.width);
 					// console.log('room.width', room.width);
@@ -91,7 +92,7 @@ function load() {
 		setPaused(false);
 	}
 
-	setInterval(saveState, 2000);
+	setInterval(saveState, 1000);
 
 	for (const characterId in characters) {
 		const character = characters[characterId];
@@ -2398,10 +2399,21 @@ function testBounds(currWall, testLoc, width, height) {
 						return false;
 					}
 				}
+
+				// now check for corners on opposite sides of the wall!
+				if ((corners[0].x <= wall.location.x && corners[1].x >= wall.location.x + wall.width && (
+					(corners[0].y <= wall.location.y + wall.height && corners[0].y >= wall.location.y) ||
+					(corners[2].y <= wall.location.y + wall.height && corners[2].y >= wall.location.y))) ||
+					(corners[0].y <= wall.location.y && corners[2].y >= wall.location.y + wall.height && (
+						(corners[0].x <= wall.location.x + wall.width && corners[0].x >= wall.location.x) ||
+						(corners[1].x <= wall.location.x + wall.width && corners[1].x >= wall.location.x)))) {
+					// console.log(state.t, 'player y intersect: opposite sides ');
+					return false;
+				}
+
 			}
 		}
 	}
 
-	// TODO check for opposite sides
 	return true;
 }
