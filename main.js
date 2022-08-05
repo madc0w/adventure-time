@@ -10,10 +10,10 @@ const doorSize = 0.15;
 const doorThreshold = 0.04;
 const doorwaySize = {
 	width: 0.012,
-	height: 0.024
+	height: 0.024,
 };
 const wallWidth = 0.02;
-const moveIncrement = 0.006;
+const moveIncrement = 0.008;
 const itemTakeDistance = 0.1;
 const numTakeItemAnimSteps = 12;
 const numCharacterDieAnimSteps = 148;
@@ -41,7 +41,26 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
-let state, throughDoor, canvas, ctx, statusCanvas, statusCtx, portalImage, attackMotion, clickSound, roomMusic, dreamSound, lockedDoorSound, didUserInteract, initRooms, initCharacters, levelUpSound, isAiming, rockScrapeSound, isPulling, portalSound;
+let state,
+	throughDoor,
+	canvas,
+	ctx,
+	statusCanvas,
+	statusCtx,
+	portalImage,
+	attackMotion,
+	clickSound,
+	roomMusic,
+	dreamSound,
+	lockedDoorSound,
+	didUserInteract,
+	initRooms,
+	initCharacters,
+	levelUpSound,
+	isAiming,
+	rockScrapeSound,
+	isPulling,
+	portalSound;
 
 function load() {
 	canvas = document.getElementById('game-canvas');
@@ -69,13 +88,16 @@ function load() {
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
 		if (state.room) {
-			state.room = rooms.find(r => r.id == state.room.id);
+			state.room = rooms.find((r) => r.id == state.room.id);
 			state.room.doors = rooms[state.room.id].doors;
-			assignFunctions(rooms.find(r => r.id == state.room.id), state.room);
+			assignFunctions(
+				rooms.find((r) => r.id == state.room.id),
+				state.room
+			);
 			if (localStorage.rooms) {
 				const savedRooms = JSON.parse(localStorage.rooms);
 				for (const savedRoom of savedRooms) {
-					const room = rooms.find(r => r.id == savedRoom.id);
+					const room = rooms.find((r) => r.id == savedRoom.id);
 					assignFunctions(room, savedRoom);
 					room.items = savedRoom.items;
 					room.characters = savedRoom.characters;
@@ -113,12 +135,17 @@ function load() {
 			if (['wielding', 'attack'].includes(key)) {
 				for (const weaponName in characters[characterId][key] || {}) {
 					characterFrames[characterId][key][weaponName] = {};
-					for (const direction in characters[characterId][key][weaponName] || {}) {
+					for (const direction in characters[characterId][key][weaponName] ||
+						{}) {
 						characterFrames[characterId][key][weaponName][direction] = [];
-						for (const fileName of characters[characterId][key][weaponName][direction] || []) {
+						for (const fileName of characters[characterId][key][weaponName][
+							direction
+						] || []) {
 							const img = new Image();
 							img.src = `img/charactes/${fileName}`;
-							characterFrames[characterId][key][weaponName][direction].push(img);
+							characterFrames[characterId][key][weaponName][direction].push(
+								img
+							);
 						}
 					}
 				}
@@ -151,7 +178,7 @@ function load() {
 
 	document.addEventListener('keydown', onKeyDown);
 	document.addEventListener('keyup', onKeyUp);
-	document.addEventListener('mousedown', e => {
+	document.addEventListener('mousedown', (e) => {
 		didUserInteract = true;
 	});
 
@@ -181,7 +208,7 @@ function load() {
 
 	for (const room of rooms) {
 		for (const door of room.doors || []) {
-			door.room = rooms.find(r => r.id == door.roomId);
+			door.room = rooms.find((r) => r.id == door.roomId);
 		}
 		for (const sound in room.sounds || {}) {
 			// console.log('sounds/${room.sounds[sound]}', `sounds/${room.sounds[sound]}`);
@@ -195,7 +222,7 @@ function load() {
 				n: 's',
 				s: 'n',
 				e: 'w',
-				w: 'e'
+				w: 'e',
 			}[door.wall];
 			const location = door.location;
 
@@ -206,7 +233,7 @@ function load() {
 					door.room.doors = [];
 				}
 				// console.log(door.room.doors.find(d => d.room == room));
-				if (!door.room.doors.find(d => d.room == room)) {
+				if (!door.room.doors.find((d) => d.room == room)) {
 					const oppositeDoor = {
 						room,
 						wall,
@@ -288,13 +315,31 @@ function drawStatus() {
 	const fontSize = 0.2 * statusCanvas.height;
 	statusCtx.font = `${fontSize}px ${fontFamily}`;
 	statusCtx.fillStyle = '#000';
-	statusCtx.fillText('Health', 0.02 * statusCanvas.width, 0.24 * statusCanvas.height);
-	statusCtx.fillText('Weapons', 0.02 * statusCanvas.width, 0.58 * statusCanvas.height);
+	statusCtx.fillText(
+		'Health',
+		0.02 * statusCanvas.width,
+		0.24 * statusCanvas.height
+	);
+	statusCtx.fillText(
+		'Weapons',
+		0.02 * statusCanvas.width,
+		0.58 * statusCanvas.height
+	);
 
 	statusCtx.fillStyle = '#444';
-	statusCtx.fillRect(0.24 * statusCanvas.width - 4, 0.14 * statusCanvas.height - 4, 0.6 * statusCanvas.width + 8, 0.1 * statusCanvas.height + 8);
+	statusCtx.fillRect(
+		0.24 * statusCanvas.width - 4,
+		0.14 * statusCanvas.height - 4,
+		0.6 * statusCanvas.width + 8,
+		0.1 * statusCanvas.height + 8
+	);
 	statusCtx.fillStyle = '#b44';
-	statusCtx.fillRect(0.24 * statusCanvas.width, 0.14 * statusCanvas.height, 0.6 * state.player.health * statusCanvas.width, 0.1 * statusCanvas.height);
+	statusCtx.fillRect(
+		0.24 * statusCanvas.width,
+		0.14 * statusCanvas.height,
+		0.6 * state.player.health * statusCanvas.width,
+		0.1 * statusCanvas.height
+	);
 
 	let i = 0;
 	for (const id in state.inventory) {
@@ -323,35 +368,54 @@ function drawGame() {
 	{
 		// room background
 		const roomBackground = new Image();
-		roomBackground.src = `img/rooms/${state.room.backgroundImage || defaultRoomBackground}`;
-		const x = (1 - roomWidth) * canvas.width / 2;
-		const y = (1 - roomHeight) * canvas.height / 2;
-		ctx.drawImage(roomBackground, x, y, roomWidth * canvas.width, roomHeight * canvas.height);
+		roomBackground.src = `img/rooms/${
+			state.room.backgroundImage || defaultRoomBackground
+		}`;
+		const x = ((1 - roomWidth) * canvas.width) / 2;
+		const y = ((1 - roomHeight) * canvas.height) / 2;
+		ctx.drawImage(
+			roomBackground,
+			x,
+			y,
+			roomWidth * canvas.width,
+			roomHeight * canvas.height
+		);
 	}
 	{
 		// wall
 		ctx.strokeStyle = state.room.wallColor || wallColor;
 		ctx.lineWidth = canvas.width * wallWidth;
 		ctx.beginPath();
-		const x = (1 - roomWidth) * canvas.width / 2;
-		const y = (1 - roomHeight) * canvas.height / 2;
+		const x = ((1 - roomWidth) * canvas.width) / 2;
+		const y = ((1 - roomHeight) * canvas.height) / 2;
 		ctx.rect(x, y, roomWidth * canvas.width, roomHeight * canvas.height);
 		ctx.stroke();
 	}
 	// room walls
 	for (const wall of state.room.walls || []) {
-		const x = (1 - roomWidth) / 2 + (wall.location.x * roomWidth);
-		const y = (1 - roomHeight) / 2 + (wall.location.y * roomHeight);
+		const x = (1 - roomWidth) / 2 + wall.location.x * roomWidth;
+		const y = (1 - roomHeight) / 2 + wall.location.y * roomHeight;
 		const width = roomWidth * wall.width;
 		const height = roomHeight * wall.height;
 		if (wall.background) {
 			const image = new Image();
 			image.src = `img/rooms/${wall.background}`;
-			ctx.drawImage(image, x * canvas.width, y * canvas.height, width * canvas.width, height * canvas.height);
+			ctx.drawImage(
+				image,
+				x * canvas.width,
+				y * canvas.height,
+				width * canvas.width,
+				height * canvas.height
+			);
 		} else {
 			ctx.fillStyle = wall.color || roomWallColor;
 			ctx.beginPath();
-			ctx.rect(x * canvas.width, y * canvas.height, width * canvas.width, height * canvas.height);
+			ctx.rect(
+				x * canvas.width,
+				y * canvas.height,
+				width * canvas.width,
+				height * canvas.height
+			);
 			ctx.fill();
 		}
 	}
@@ -360,9 +424,16 @@ function drawGame() {
 	for (const portal of state.room.portals || []) {
 		const loc = toScreen(portal.location, {
 			width: portalSize,
-			height: portalSize
+			height: portalSize,
 		});
-		portalImage && ctx.drawImage(portalImage, loc.x, loc.y, portalSize * canvas.width, portalSize * canvas.height);
+		portalImage &&
+			ctx.drawImage(
+				portalImage,
+				loc.x,
+				loc.y,
+				portalSize * canvas.width,
+				portalSize * canvas.height
+			);
 	}
 
 	// items
@@ -371,18 +442,25 @@ function drawGame() {
 		let size = item.size;
 		if (item.image.height != 0) {
 			const loc = toScreen(roomItem.location, {
-				width: size * item.image.width / item.image.height,
-				height: size
+				width: (size * item.image.width) / item.image.height,
+				height: size,
 			});
 			if (roomItem.animStep) {
-				size -= roomItem.animStep * item.size / 16;
-				loc.x += (item.size - size) * canvas.width / 2;
-				loc.y += (item.size - size) * canvas.height / 2;
-				ctx.globalAlpha = (numTakeItemAnimSteps - roomItem.animStep) / numTakeItemAnimSteps;
+				size -= (roomItem.animStep * item.size) / 16;
+				loc.x += ((item.size - size) * canvas.width) / 2;
+				loc.y += ((item.size - size) * canvas.height) / 2;
+				ctx.globalAlpha =
+					(numTakeItemAnimSteps - roomItem.animStep) / numTakeItemAnimSteps;
 			}
 			// console.log(item.image.width / item.image.height);
 			if (size > 0) {
-				ctx.drawImage(item.image, loc.x, loc.y, (size * item.image.width / item.image.height) * canvas.width, size * canvas.height);
+				ctx.drawImage(
+					item.image,
+					loc.x,
+					loc.y,
+					((size * item.image.width) / item.image.height) * canvas.width,
+					size * canvas.height
+				);
 			}
 			ctx.globalAlpha = 1;
 		}
@@ -395,7 +473,8 @@ function drawGame() {
 			const character = characters[roomCharacter.id];
 
 			if (!state.isGameOver) {
-				if (roomCharacter.motion != 'attackFrames' &&
+				if (
+					roomCharacter.motion != 'attackFrames' &&
 					character.attackMetrics &&
 					Math.random() < character.attackMetrics.prob &&
 					distance(roomCharacter) < character.attackMetrics.range &&
@@ -404,7 +483,10 @@ function drawGame() {
 					roomCharacter.motion = 'attackPrepFrames';
 					animate(roomCharacter);
 					setTimeout(() => {
-						if (distance(roomCharacter) < character.attackMetrics.range && roomCharacter.motion != 'dieFrames') {
+						if (
+							distance(roomCharacter) < character.attackMetrics.range &&
+							roomCharacter.motion != 'dieFrames'
+						) {
 							roomCharacter.motion = 'attackFrames';
 							animate(roomCharacter);
 							state.player.health -= character.attackMetrics.strength;
@@ -446,31 +528,64 @@ function drawGame() {
 				}
 
 				// console.log('4 roomCharacter.location', roomCharacter.location);
-				if (roomCharacter.location.x < 0 || roomCharacter.location.x > 1 - (character.width / roomWidth)) {
+				if (
+					roomCharacter.location.x < 0 ||
+					roomCharacter.location.x > 1 - character.width / roomWidth
+				) {
 					if (roomCharacter.vel) {
 						roomCharacter.vel.x *= -1;
 					}
 					// roomCharacter.velInversionTime.x = now;
 				}
-				if (roomCharacter.location.y < 0 || roomCharacter.location.y > 1 - (character.height / roomHeight)) {
+				if (
+					roomCharacter.location.y < 0 ||
+					roomCharacter.location.y > 1 - character.height / roomHeight
+				) {
 					if (roomCharacter.vel) {
 						roomCharacter.vel.y *= -1;
 					}
 				}
 
-				roomCharacter.location.y = Math.min(1 - (character.height / roomHeight) + character.height / (2 * roomHeight), roomCharacter.location.y);
-				roomCharacter.location.y = Math.max(character.height / (2 * roomHeight), roomCharacter.location.y);
-				roomCharacter.location.x = Math.min(1 - (character.width / roomWidth) + character.width / (2 * roomWidth), roomCharacter.location.x);
-				roomCharacter.location.x = Math.max(character.width / (2 * roomWidth), roomCharacter.location.x);
+				roomCharacter.location.y = Math.min(
+					1 -
+						character.height / roomHeight +
+						character.height / (2 * roomHeight),
+					roomCharacter.location.y
+				);
+				roomCharacter.location.y = Math.max(
+					character.height / (2 * roomHeight),
+					roomCharacter.location.y
+				);
+				roomCharacter.location.x = Math.min(
+					1 - character.width / roomWidth + character.width / (2 * roomWidth),
+					roomCharacter.location.x
+				);
+				roomCharacter.location.x = Math.max(
+					character.width / (2 * roomWidth),
+					roomCharacter.location.x
+				);
 
-				const playerWidth = characterIntersectionLeeway * (characters.player.width / roomWidth) / 2;
-				const playerHeight = characterIntersectionLeeway * (characters.player.height / roomHeight) / 2;
-				const characterWidth = characterIntersectionLeeway * (character.width / roomWidth) / 2;
-				const characterHeight = characterIntersectionLeeway * (character.height / roomHeight) / 2;
-				if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
-					state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
-					state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
-					state.player.y - playerHeight < roomCharacter.location.y + characterHeight
+				const playerWidth =
+					(characterIntersectionLeeway *
+						(characters.player.width / roomWidth)) /
+					2;
+				const playerHeight =
+					(characterIntersectionLeeway *
+						(characters.player.height / roomHeight)) /
+					2;
+				const characterWidth =
+					(characterIntersectionLeeway * (character.width / roomWidth)) / 2;
+				const characterHeight =
+					(characterIntersectionLeeway * (character.height / roomHeight)) / 2;
+				if (
+					state.player.x + playerWidth >
+						roomCharacter.location.x - characterWidth &&
+					state.player.x - playerWidth <
+						roomCharacter.location.x + characterWidth &&
+					state.player.y + playerHeight >
+						roomCharacter.location.y - characterHeight &&
+					state.player.y - playerHeight <
+						roomCharacter.location.y + characterHeight
 				) {
 					roomCharacter.location.x = prevCharacterLoc.x;
 					roomCharacter.location.y = prevCharacterLoc.y;
@@ -478,14 +593,21 @@ function drawGame() {
 
 				// check for intersection with room walls
 				{
-					const left = roomCharacter.location.x - (character.width / roomWidth) / 2;
-					const right = roomCharacter.location.x + (character.width / roomWidth) / 2;
-					const top = roomCharacter.location.y - (character.height / roomHeight) / 2;
-					const bottom = roomCharacter.location.y + (character.height / roomHeight) / 2;
-					const prevLeft = prevCharacterLoc.x - (character.width / roomWidth) / 2;
-					const prevRight = prevCharacterLoc.x + (character.width / roomWidth) / 2;
-					const prevTop = prevCharacterLoc.y - (character.height / roomHeight) / 2;
-					const prevBottom = prevCharacterLoc.y + (character.height / roomHeight) / 2;
+					const left =
+						roomCharacter.location.x - character.width / roomWidth / 2;
+					const right =
+						roomCharacter.location.x + character.width / roomWidth / 2;
+					const top =
+						roomCharacter.location.y - character.height / roomHeight / 2;
+					const bottom =
+						roomCharacter.location.y + character.height / roomHeight / 2;
+					const prevLeft = prevCharacterLoc.x - character.width / roomWidth / 2;
+					const prevRight =
+						prevCharacterLoc.x + character.width / roomWidth / 2;
+					const prevTop =
+						prevCharacterLoc.y - character.height / roomHeight / 2;
+					const prevBottom =
+						prevCharacterLoc.y + character.height / roomHeight / 2;
 					const characterCorners = [
 						{
 							// id: 'top-left',
@@ -493,36 +615,48 @@ function drawGame() {
 							y: top,
 							prevX: prevLeft,
 							prevY: prevTop,
-						}, {
+						},
+						{
 							// id: 'top-right',
 							x: right,
 							y: top,
 							prevX: prevRight,
 							prevY: prevTop,
-						}, {
+						},
+						{
 							// id: 'bottom-left',
 							x: left,
 							y: bottom,
 							prevX: prevLeft,
 							prevY: prevBottom,
-						}, {
+						},
+						{
 							// id: 'bottom-right',
 							x: right,
 							y: bottom,
 							prevX: prevRight,
 							prevY: prevBottom,
-						}
+						},
 					];
 					for (const wall of state.room.walls || []) {
 						let isXCollision, isYCollision;
 						for (const corner of characterCorners) {
-							if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
-								corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
-
-								if (corner.prevX > wall.location.x && corner.prevX < wall.location.x + wall.width) {
+							if (
+								corner.x > wall.location.x &&
+								corner.x < wall.location.x + wall.width &&
+								corner.y > wall.location.y &&
+								corner.y < wall.location.y + wall.height
+							) {
+								if (
+									corner.prevX > wall.location.x &&
+									corner.prevX < wall.location.x + wall.width
+								) {
 									isYCollision = true;
 									// console.log(state.t, 'y intersect');
-								} else if (corner.prevY > wall.location.y && corner.prevY < wall.location.y + wall.height) {
+								} else if (
+									corner.prevY > wall.location.y &&
+									corner.prevY < wall.location.y + wall.height
+								) {
 									isXCollision = true;
 									// console.log(state.t, 'x intersect');
 									// } else if (!isXCollision && !isYCollision) {
@@ -537,18 +671,26 @@ function drawGame() {
 						}
 
 						// now check for corners on opposite sides of the wall!
-						if (left < wall.location.x && right > wall.location.x + wall.width && (
-							(top < wall.location.y + wall.height && top > wall.location.y) ||
-							(bottom < wall.location.y + wall.height && bottom > wall.location.y))) {
+						if (
+							left < wall.location.x &&
+							right > wall.location.x + wall.width &&
+							((top < wall.location.y + wall.height && top > wall.location.y) ||
+								(bottom < wall.location.y + wall.height &&
+									bottom > wall.location.y))
+						) {
 							// console.log(state.t, 'y intersect: opposite sides ');
 							isYCollision = true;
-						} else if (top < wall.location.y && bottom > wall.location.y + wall.height && (
-							(left < wall.location.x + wall.width && left > wall.location.x) ||
-							(right < wall.location.x + wall.width && right > wall.location.x))) {
+						} else if (
+							top < wall.location.y &&
+							bottom > wall.location.y + wall.height &&
+							((left < wall.location.x + wall.width &&
+								left > wall.location.x) ||
+								(right < wall.location.x + wall.width &&
+									right > wall.location.x))
+						) {
 							// console.log(state.t, 'x intersect: opposite sides ');
 							isXCollision = true;
 						}
-
 
 						// // just stick to the wall.  not so good.
 						// if (isYCollision || isXCollision) {
@@ -558,55 +700,73 @@ function drawGame() {
 
 						if (isYCollision) {
 							// console.log('isYCollision');
-							roomCharacter.location.y = wall.location.y - (character.height / roomHeight) / 2;
+							roomCharacter.location.y =
+								wall.location.y - character.height / roomHeight / 2;
 							if (prevCharacterLoc.y > wall.location.y + wall.height) {
 								// console.log('prevCharacterLoc.y > wall.location.y + wall.height', prevCharacterLoc.y, wall.location.y, wall.height);
-								roomCharacter.location.y += wall.height + (character.height / roomHeight);
+								roomCharacter.location.y +=
+									wall.height + character.height / roomHeight;
 							}
 						}
 						if (isXCollision) {
 							// console.log('isXCollision');
-							roomCharacter.location.x = wall.location.x - (character.width / roomWidth) / 2;
+							roomCharacter.location.x =
+								wall.location.x - character.width / roomWidth / 2;
 							if (prevCharacterLoc.x > wall.location.x + wall.width) {
 								// console.log('prevCharacterLoc.x > wall.location.x + wall.width', prevCharacterLoc.x, wall.location.x, wall.width);
-								roomCharacter.location.x += wall.width + (character.width / roomWidth);
+								roomCharacter.location.x +=
+									wall.width + character.width / roomWidth;
 							}
 						}
 					}
 
 					// double check
 					{
-						const left = roomCharacter.location.x - (character.width / roomWidth) / 2;
-						const right = roomCharacter.location.x + (character.width / roomWidth) / 2;
-						const top = roomCharacter.location.y - (character.height / roomHeight) / 2;
-						const bottom = roomCharacter.location.y + (character.height / roomHeight) / 2;
+						const left =
+							roomCharacter.location.x - character.width / roomWidth / 2;
+						const right =
+							roomCharacter.location.x + character.width / roomWidth / 2;
+						const top =
+							roomCharacter.location.y - character.height / roomHeight / 2;
+						const bottom =
+							roomCharacter.location.y + character.height / roomHeight / 2;
 						const characterCorners = [
 							{
 								id: 'top-left',
 								x: left,
 								y: top,
-							}, {
+							},
+							{
 								id: 'top-right',
 								x: right,
 								y: top,
-							}, {
+							},
+							{
 								id: 'bottom-left',
 								x: left,
 								y: bottom,
-							}, {
+							},
+							{
 								id: 'bottom-right',
 								x: right,
 								y: bottom,
-							}
+							},
 						];
 
 						outer: for (const wall of state.room.walls || []) {
 							for (const corner of characterCorners) {
-								const isXCollision = corner.x > wall.location.x && corner.x < wall.location.x + wall.width;
-								const isYCollision = corner.y > wall.location.y && corner.y < wall.location.y + wall.height;
+								const isXCollision =
+									corner.x > wall.location.x &&
+									corner.x < wall.location.x + wall.width;
+								const isYCollision =
+									corner.y > wall.location.y &&
+									corner.y < wall.location.y + wall.height;
 								if (isXCollision && isYCollision) {
 									// console.error(state.t, 'still intersecting!', corner);
-									if (Math.abs(corner.prevX - wall.location.x) > Math.abs(corner.prevY - wall.location.y)) {
+									if (
+										Math.abs(corner.prevX - wall.location.x) >
+										Math.abs(corner.prevY - wall.location.y)
+									) {
 										roomCharacter.location.x = prevCharacterLoc.x;
 									} else {
 										roomCharacter.location.y = prevCharacterLoc.y;
@@ -625,13 +785,21 @@ function drawGame() {
 				if (!roomCharacter.baseLoc) {
 					roomCharacter.baseLoc = {
 						x: roomCharacter.location.x,
-						y: roomCharacter.location.y
+						y: roomCharacter.location.y,
 					};
 				}
 				// console.log('roomCharacter.baseLoc', roomCharacter.baseLoc);
-				roomCharacter.location.x = roomCharacter.baseLoc.x + character.width * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * roomWidth);
-				roomCharacter.location.y = roomCharacter.baseLoc.y + character.height * roomCharacter.animStep / (2 * numCharacterDieAnimSteps * roomHeight);
-				ctx.globalAlpha = (numCharacterDieAnimSteps - roomCharacter.animStep) / numCharacterDieAnimSteps;
+				roomCharacter.location.x =
+					roomCharacter.baseLoc.x +
+					(character.width * roomCharacter.animStep) /
+						(2 * numCharacterDieAnimSteps * roomWidth);
+				roomCharacter.location.y =
+					roomCharacter.baseLoc.y +
+					(character.height * roomCharacter.animStep) /
+						(2 * numCharacterDieAnimSteps * roomHeight);
+				ctx.globalAlpha =
+					(numCharacterDieAnimSteps - roomCharacter.animStep) /
+					numCharacterDieAnimSteps;
 				size = 1 - roomCharacter.animStep / numCharacterDieAnimSteps;
 				// console.log('size ', size);
 			}
@@ -641,17 +809,20 @@ function drawGame() {
 			const imageId = makeImageId(roomCharacter);
 			if (roomCharacter.rotation) {
 				// debug(roomCharacter.rotation);
-				imageLoc = toScreen({
-					x: roomCharacter.location.x + character.width / 2,
-					y: roomCharacter.location.y + character.height / 2
-				}, character);
+				imageLoc = toScreen(
+					{
+						x: roomCharacter.location.x + character.width / 2,
+						y: roomCharacter.location.y + character.height / 2,
+					},
+					character
+				);
 				ctx.save();
 				ctx.translate(imageLoc.x, imageLoc.y);
 				ctx.rotate(roomCharacter.rotation);
 				ctx.drawImage(
 					characterImages[imageId],
-					-character.width * canvas.width / 2,
-					-character.height * canvas.height / 2,
+					(-character.width * canvas.width) / 2,
+					(-character.height * canvas.height) / 2,
 					size * character.width * canvas.width,
 					size * character.height * canvas.height
 				);
@@ -684,8 +855,18 @@ function drawGame() {
 					}
 					ctx.fillStyle = '#0000dd' + alphaHex;
 					ctx.beginPath();
-					ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * r);
-					ctx.arc(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius, canvas.width * r, 0, 2 * Math.PI, false);
+					ctx.moveTo(
+						imageLoc.x + (character.width * canvas.width) / 2,
+						imageLoc.y - canvas.width * r
+					);
+					ctx.arc(
+						imageLoc.x + (character.width * canvas.width) / 2,
+						imageLoc.y - canvas.width * healthIndicatorRadius,
+						canvas.width * r,
+						0,
+						2 * Math.PI,
+						false
+					);
 					ctx.fill();
 				}
 
@@ -693,20 +874,32 @@ function drawGame() {
 				ctx.fillStyle = '#444';
 				ctx.beginPath();
 				ctx.arc(
-					imageLoc.x + (character.width * canvas.width / 2),
+					imageLoc.x + (character.width * canvas.width) / 2,
 					imageLoc.y - canvas.width * healthIndicatorRadius,
-					canvas.width * healthIndicatorRadius, 0, 2 * Math.PI
+					canvas.width * healthIndicatorRadius,
+					0,
+					2 * Math.PI
 				);
 				ctx.fill();
 
 				ctx.fillStyle = '#f00';
 				ctx.beginPath();
-				ctx.moveTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
+				ctx.moveTo(
+					imageLoc.x + (character.width * canvas.width) / 2,
+					imageLoc.y - canvas.width * healthIndicatorRadius
+				);
 				ctx.arc(
-					imageLoc.x + (character.width * canvas.width / 2),
+					imageLoc.x + (character.width * canvas.width) / 2,
 					imageLoc.y - canvas.width * healthIndicatorRadius,
-					0.8 * canvas.width * healthIndicatorRadius, 0, roomCharacter.health * Math.PI * 2, false);
-				ctx.lineTo(imageLoc.x + (character.width * canvas.width / 2), imageLoc.y - canvas.width * healthIndicatorRadius);
+					0.8 * canvas.width * healthIndicatorRadius,
+					0,
+					roomCharacter.health * Math.PI * 2,
+					false
+				);
+				ctx.lineTo(
+					imageLoc.x + (character.width * canvas.width) / 2,
+					imageLoc.y - canvas.width * healthIndicatorRadius
+				);
 				ctx.fill();
 			}
 
@@ -722,22 +915,22 @@ function drawGame() {
 			let x, y, width, height;
 			if (door.wall == 'w') {
 				x = ((1 - roomWidth - wallWidth) / 2) * canvas.width - 1;
-				y = ((1 - roomHeight) / 2 + (door.location * roomHeight)) * canvas.height;
+				y = ((1 - roomHeight) / 2 + door.location * roomHeight) * canvas.height;
 				width = wallWidth * canvas.width + 1;
 				height = doorSize * canvas.height;
 			} else if (door.wall == 'e') {
 				x = ((1 + roomWidth - wallWidth) / 2) * canvas.width;
-				y = ((1 - roomHeight) / 2 + (door.location * roomHeight)) * canvas.height;
+				y = ((1 - roomHeight) / 2 + door.location * roomHeight) * canvas.height;
 				width = wallWidth * canvas.width + 1;
 				height = doorSize * canvas.height;
 			} else if (door.wall == 'n') {
 				// console.log('ctx.fillStyle ', ctx.fillStyle);
-				x = ((1 - roomWidth) / 2 + (door.location * roomWidth)) * canvas.width;
-				y = (1 - roomHeight - wallWidth) * canvas.height / 2 - 1;
+				x = ((1 - roomWidth) / 2 + door.location * roomWidth) * canvas.width;
+				y = ((1 - roomHeight - wallWidth) * canvas.height) / 2 - 1;
 				height = wallWidth * canvas.height + 1;
 				width = doorSize * canvas.width;
 			} else if (door.wall == 's') {
-				x = ((1 - roomWidth) / 2 + (door.location * roomWidth)) * canvas.width;
+				x = ((1 - roomWidth) / 2 + door.location * roomWidth) * canvas.width;
 				y = ((1 + roomHeight - wallWidth) / 2) * canvas.height;
 				height = wallWidth * canvas.height;
 				width = doorSize * canvas.width;
@@ -757,26 +950,26 @@ function drawGame() {
 				x += (door.wall == 'w' ? 1 : -1) * wallWidth * canvas.width;
 				ctx.fillRect(
 					x,
-					y - (doorwaySize.width * canvas.height),
+					y - doorwaySize.width * canvas.height,
 					doorwaySize.height * canvas.width,
 					doorwaySize.width * canvas.width
 				);
 				ctx.fillRect(
 					x,
-					y + (doorSize * canvas.height),
+					y + doorSize * canvas.height,
 					doorwaySize.height * canvas.width,
 					doorwaySize.width * canvas.width
 				);
 			} else {
 				y += (door.wall == 'n' ? 1 : -1) * wallWidth * canvas.height;
 				ctx.fillRect(
-					x - (doorwaySize.width * canvas.width),
+					x - doorwaySize.width * canvas.width,
 					y,
 					doorwaySize.width * canvas.width,
 					doorwaySize.height * canvas.width
 				);
 				ctx.fillRect(
-					x + (doorSize * canvas.width),
+					x + doorSize * canvas.width,
 					y,
 					doorwaySize.width * canvas.width,
 					doorwaySize.height * canvas.width
@@ -795,20 +988,33 @@ function drawGame() {
 			if (duration > items.invisibilityPotion.duration) {
 				state.player.isInvisible = false;
 			} else if (duration >= 0.88 * items.invisibilityPotion.duration) {
-				ctx.globalAlpha = 0.45 + 0.25 * Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 8);
+				ctx.globalAlpha =
+					0.45 +
+					0.25 *
+						Math.sin((duration - 0.8 * items.invisibilityPotion.duration) / 8);
 			} else {
 				ctx.globalAlpha = 0.5;
 			}
 		}
-		ctx.drawImage(characterImages.player, loc.x, loc.y, characters.player.width * canvas.width, characters.player.height * canvas.height);
+		ctx.drawImage(
+			characterImages.player,
+			loc.x,
+			loc.y,
+			characters.player.width * canvas.width,
+			characters.player.height * canvas.height
+		);
 		ctx.globalAlpha = 1;
 
 		// ctx.fillStyle = '#f00';
 		// ctx.fillRect(loc.x, loc.y, 4, 4);
 	}
 
-	if (keysDown.A && state.player.wielding && items[state.player.wielding].projectile &&
-		state.player.motion == 'idleFrames') {
+	if (
+		keysDown.A &&
+		state.player.wielding &&
+		items[state.player.wielding].projectile &&
+		state.player.motion == 'idleFrames'
+	) {
 		// !(keysDown.ArrowDown || keysDown.ArrowUp || keysDown.ArrowLeft || keysDown.ArrowRight)
 		aim();
 	}
@@ -857,13 +1063,16 @@ function drawGame() {
 		inc /= Math.sqrt(2);
 	}
 
-	if (keysDown.ArrowLeft || keysDown.ArrowRight || keysDown.ArrowUp || keysDown.ArrowDown) {
+	if (
+		keysDown.ArrowLeft ||
+		keysDown.ArrowRight ||
+		keysDown.ArrowUp ||
+		keysDown.ArrowDown
+	) {
 		if (isAiming) {
 			const direction = keysDown.ArrowLeft || keysDown.ArrowDown ? -1 : 1;
-			state.aimAngle += direction * Math.PI / 32;
-
+			state.aimAngle += (direction * Math.PI) / 32;
 		} else {
-
 			if (keysDown.P) {
 				for (const wall of state.room.walls || []) {
 					if (wall.isMovable) {
@@ -883,45 +1092,76 @@ function drawGame() {
 						// console.log(right > wall.location.x && right < wall.location.x + wall.width);
 						let testLoc = {
 							x: wall.location.x,
-							y: wall.location.y
+							y: wall.location.y,
 						};
 						let isMove;
-						if (keysDown.ArrowLeft &&
-							wall.location.x < (state.player.x + characters.player.width / 2) + margin &&
-							wall.location.x > (state.player.x + characters.player.width / 2) - margin &&
+						if (
+							keysDown.ArrowLeft &&
+							wall.location.x <
+								state.player.x + characters.player.width / 2 + margin &&
+							wall.location.x >
+								state.player.x + characters.player.width / 2 - margin &&
 							((top > wall.location.y && top < wall.location.y + wall.height) ||
-								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
+								(bottom > wall.location.y &&
+									bottom < wall.location.y + wall.height))
+						) {
 							// console.log('pull left');
 							isMove = true;
 							testLoc.x -= moveIncrement / roomWidth;
 							testLoc.x = Math.max(characters.player.width + margin, testLoc.x);
-						} else if (keysDown.ArrowRight &&
-							wall.location.x + wall.width < (state.player.x - characters.player.width / 2) + margin &&
-							wall.location.x + wall.width > (state.player.x - characters.player.width / 2) - margin &&
+						} else if (
+							keysDown.ArrowRight &&
+							wall.location.x + wall.width <
+								state.player.x - characters.player.width / 2 + margin &&
+							wall.location.x + wall.width >
+								state.player.x - characters.player.width / 2 - margin &&
 							((top > wall.location.y && top < wall.location.y + wall.height) ||
-								(bottom > wall.location.y && bottom < wall.location.y + wall.height))) {
+								(bottom > wall.location.y &&
+									bottom < wall.location.y + wall.height))
+						) {
 							// console.log('pull right');
 							isMove = true;
 							testLoc.x += moveIncrement / roomWidth;
-							testLoc.x = Math.min(1 - characters.player.width - margin - wall.width, testLoc.x);
-						} else if (keysDown.ArrowUp &&
-							wall.location.y < (state.player.y + characters.player.height / 2) + margin &&
-							wall.location.y > (state.player.y + characters.player.height / 2) - margin &&
-							((left > wall.location.x && left < wall.location.x + wall.width) ||
-								(right > wall.location.x && right < wall.location.x + wall.width))) {
+							testLoc.x = Math.min(
+								1 - characters.player.width - margin - wall.width,
+								testLoc.x
+							);
+						} else if (
+							keysDown.ArrowUp &&
+							wall.location.y <
+								state.player.y + characters.player.height / 2 + margin &&
+							wall.location.y >
+								state.player.y + characters.player.height / 2 - margin &&
+							((left > wall.location.x &&
+								left < wall.location.x + wall.width) ||
+								(right > wall.location.x &&
+									right < wall.location.x + wall.width))
+						) {
 							// console.log('pull up');
 							isMove = true;
 							testLoc.y -= moveIncrement / roomHeight;
-							testLoc.y = Math.max(characters.player.height + margin, testLoc.y);
-						} else if (keysDown.ArrowDown &&
-							wall.location.y + wall.height < (state.player.y - characters.player.height / 2) + margin &&
-							wall.location.y + wall.height > (state.player.y - characters.player.height / 2) - margin &&
-							((left > wall.location.x && left < wall.location.x + wall.width) ||
-								(right > wall.location.x && right < wall.location.x + wall.width))) {
+							testLoc.y = Math.max(
+								characters.player.height + margin,
+								testLoc.y
+							);
+						} else if (
+							keysDown.ArrowDown &&
+							wall.location.y + wall.height <
+								state.player.y - characters.player.height / 2 + margin &&
+							wall.location.y + wall.height >
+								state.player.y - characters.player.height / 2 - margin &&
+							((left > wall.location.x &&
+								left < wall.location.x + wall.width) ||
+								(right > wall.location.x &&
+									right < wall.location.x + wall.width))
+						) {
 							// console.log('pull down');
 							isMove = true;
 							testLoc.y += moveIncrement / roomHeight;
-							testLoc.y = Math.min(1 - characters.player.height - margin - wall.height, testLoc.y);
+							testLoc.y = Math.min(
+								1 - characters.player.height - margin - wall.height,
+								testLoc.y
+							);
 						}
 						// console.log('isMove', isMove);
 						if (isMove && testBounds(wall, testLoc, wall.width, wall.height)) {
@@ -938,10 +1178,15 @@ function drawGame() {
 				const edge = characters.player.width / (2 * roomWidth);
 				state.player.x -= inc / roomWidth;
 				if (state.player.x <= edge) {
-					const playerPos = state.player.y - characters.player.height / (2 * roomHeight);
-					for (const door of (state.room.doors || []).filter(d => d.wall == 'w')) {
+					const playerPos =
+						state.player.y - characters.player.height / (2 * roomHeight);
+					for (const door of (state.room.doors || []).filter(
+						(d) => d.wall == 'w'
+					)) {
 						const y1 = door.location;
-						const y2 = door.location + (doorSize - characters.player.height) / roomHeight;
+						const y2 =
+							door.location +
+							(doorSize - characters.player.height) / roomHeight;
 						if (playerPos >= y1 && playerPos <= y2) {
 							throughDoor = door;
 							break;
@@ -955,13 +1200,22 @@ function drawGame() {
 			if (keysDown.ArrowRight) {
 				const x = state.player.x;
 				state.player.x += inc / roomWidth;
-				const playerEdge = state.player.x * roomWidth - characters.player.width / 2 + (1 - roomWidth) / 2 + characters.player.width;
+				const playerEdge =
+					state.player.x * roomWidth -
+					characters.player.width / 2 +
+					(1 - roomWidth) / 2 +
+					characters.player.width;
 				const edge = (1 + roomWidth) / 2;
 				if (playerEdge >= edge) {
-					const playerPos = state.player.y - characters.player.height / (2 * roomHeight);
-					for (const door of (state.room.doors || []).filter(d => d.wall == 'e')) {
+					const playerPos =
+						state.player.y - characters.player.height / (2 * roomHeight);
+					for (const door of (state.room.doors || []).filter(
+						(d) => d.wall == 'e'
+					)) {
 						const y1 = door.location;
-						const y2 = door.location + (doorSize - characters.player.height) / roomHeight;
+						const y2 =
+							door.location +
+							(doorSize - characters.player.height) / roomHeight;
 						if (playerPos >= y1 && playerPos <= y2) {
 							throughDoor = door;
 							break;
@@ -976,10 +1230,15 @@ function drawGame() {
 				const edge = characters.player.height / (2 * roomHeight);
 				state.player.y -= inc / roomHeight;
 				if (state.player.y <= edge) {
-					const playerPos = state.player.x - characters.player.width / (2 * roomWidth);
-					for (const door of (state.room.doors || []).filter(d => d.wall == 'n')) {
+					const playerPos =
+						state.player.x - characters.player.width / (2 * roomWidth);
+					for (const door of (state.room.doors || []).filter(
+						(d) => d.wall == 'n'
+					)) {
 						const x1 = door.location;
-						const x2 = door.location + (doorSize - 0.8 * characters.player.width) / roomWidth;
+						const x2 =
+							door.location +
+							(doorSize - 0.8 * characters.player.width) / roomWidth;
 						if (playerPos >= x1 && playerPos <= x2) {
 							throughDoor = door;
 							break;
@@ -993,13 +1252,22 @@ function drawGame() {
 			if (keysDown.ArrowDown) {
 				const y = state.player.y;
 				state.player.y += inc / roomHeight;
-				const playerEdge = state.player.y * roomHeight - characters.player.height / 2 + (1 - roomHeight) / 2 + characters.player.height;
+				const playerEdge =
+					state.player.y * roomHeight -
+					characters.player.height / 2 +
+					(1 - roomHeight) / 2 +
+					characters.player.height;
 				const edge = (1 + roomHeight) / 2;
 				if (playerEdge >= edge) {
-					const playerPos = state.player.x - characters.player.width / (2 * roomWidth);
-					for (const door of (state.room.doors || []).filter(d => d.wall == 's')) {
+					const playerPos =
+						state.player.x - characters.player.width / (2 * roomWidth);
+					for (const door of (state.room.doors || []).filter(
+						(d) => d.wall == 's'
+					)) {
 						const x1 = door.location;
-						const x2 = door.location + (doorSize - 0.8 * characters.player.width) / roomWidth;
+						const x2 =
+							door.location +
+							(doorSize - 0.8 * characters.player.width) / roomWidth;
 						if (playerPos >= x1 && playerPos <= x2) {
 							throughDoor = door;
 							break;
@@ -1023,16 +1291,26 @@ function drawGame() {
 
 	// check for intersection with other character
 	{
-		const playerWidth = characterIntersectionLeeway * (characters.player.width / roomWidth) / 2;
-		const playerHeight = characterIntersectionLeeway * (characters.player.height / roomHeight) / 2;
+		const playerWidth =
+			(characterIntersectionLeeway * (characters.player.width / roomWidth)) / 2;
+		const playerHeight =
+			(characterIntersectionLeeway * (characters.player.height / roomHeight)) /
+			2;
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
-			const characterWidth = characterIntersectionLeeway * (character.width / roomWidth) / 2;
-			const characterHeight = characterIntersectionLeeway * (character.height / roomHeight) / 2;
-			if (state.player.x + playerWidth > roomCharacter.location.x - characterWidth &&
-				state.player.x - playerWidth < roomCharacter.location.x + characterWidth &&
-				state.player.y + playerHeight > roomCharacter.location.y - characterHeight &&
-				state.player.y - playerHeight < roomCharacter.location.y + characterHeight
+			const characterWidth =
+				(characterIntersectionLeeway * (character.width / roomWidth)) / 2;
+			const characterHeight =
+				(characterIntersectionLeeway * (character.height / roomHeight)) / 2;
+			if (
+				state.player.x + playerWidth >
+					roomCharacter.location.x - characterWidth &&
+				state.player.x - playerWidth <
+					roomCharacter.location.x + characterWidth &&
+				state.player.y + playerHeight >
+					roomCharacter.location.y - characterHeight &&
+				state.player.y - playerHeight <
+					roomCharacter.location.y + characterHeight
 			) {
 				state.player.x = prevPlayerLoc.x;
 				state.player.y = prevPlayerLoc.y;
@@ -1048,14 +1326,15 @@ function drawGame() {
 
 	// check for intersection with room walls
 	{
-		const left = state.player.x - (characters.player.width / roomWidth) / 2;
-		const right = state.player.x + (characters.player.width / roomWidth) / 2;
-		const top = state.player.y - (characters.player.height / roomHeight) / 2;
-		const bottom = state.player.y + (characters.player.height / roomHeight) / 2;
-		const prevLeft = prevPlayerLoc.x - (characters.player.width / roomWidth) / 2;
-		const prevRight = prevPlayerLoc.x + (characters.player.width / roomWidth) / 2;
-		const prevTop = prevPlayerLoc.y - (characters.player.height / roomHeight) / 2;
-		const prevBottom = prevPlayerLoc.y + (characters.player.height / roomHeight) / 2;
+		const left = state.player.x - characters.player.width / roomWidth / 2;
+		const right = state.player.x + characters.player.width / roomWidth / 2;
+		const top = state.player.y - characters.player.height / roomHeight / 2;
+		const bottom = state.player.y + characters.player.height / roomHeight / 2;
+		const prevLeft = prevPlayerLoc.x - characters.player.width / roomWidth / 2;
+		const prevRight = prevPlayerLoc.x + characters.player.width / roomWidth / 2;
+		const prevTop = prevPlayerLoc.y - characters.player.height / roomHeight / 2;
+		const prevBottom =
+			prevPlayerLoc.y + characters.player.height / roomHeight / 2;
 		const playerCorners = [
 			{
 				id: 'top-left',
@@ -1063,37 +1342,49 @@ function drawGame() {
 				y: top,
 				prevX: prevLeft,
 				prevY: prevTop,
-			}, {
+			},
+			{
 				id: 'top-right',
 				x: right,
 				y: top,
 				prevX: prevRight,
 				prevY: prevTop,
-			}, {
+			},
+			{
 				id: 'bottom-left',
 				x: left,
 				y: bottom,
 				prevX: prevLeft,
 				prevY: prevBottom,
-			}, {
+			},
+			{
 				id: 'bottom-right',
 				x: right,
 				y: bottom,
 				prevX: prevRight,
 				prevY: prevBottom,
-			}
+			},
 		];
 		{
 			let isYCollision, isXCollision, wall;
 			outer: for (wall of state.room.walls || []) {
 				for (const corner of playerCorners) {
-					if (corner.x > wall.location.x && corner.x < wall.location.x + wall.width &&
-						corner.y > wall.location.y && corner.y < wall.location.y + wall.height) {
-
-						if (corner.prevX > wall.location.x && corner.prevX < wall.location.x + wall.width) {
+					if (
+						corner.x > wall.location.x &&
+						corner.x < wall.location.x + wall.width &&
+						corner.y > wall.location.y &&
+						corner.y < wall.location.y + wall.height
+					) {
+						if (
+							corner.prevX > wall.location.x &&
+							corner.prevX < wall.location.x + wall.width
+						) {
 							isYCollision = true;
 							break outer;
-						} else if (corner.prevY > wall.location.y && corner.prevY < wall.location.y + wall.height) {
+						} else if (
+							corner.prevY > wall.location.y &&
+							corner.prevY < wall.location.y + wall.height
+						) {
 							isXCollision = true;
 							break outer;
 						}
@@ -1101,15 +1392,25 @@ function drawGame() {
 				}
 
 				// now check for corners on opposite sides of the wall!
-				if (playerCorners[0].x < wall.location.x && playerCorners[1].x > wall.location.x + wall.width && (
-					(playerCorners[0].y < wall.location.y + wall.height && playerCorners[0].y > wall.location.y) ||
-					(playerCorners[2].y < wall.location.y + wall.height && playerCorners[2].y > wall.location.y))) {
+				if (
+					playerCorners[0].x < wall.location.x &&
+					playerCorners[1].x > wall.location.x + wall.width &&
+					((playerCorners[0].y < wall.location.y + wall.height &&
+						playerCorners[0].y > wall.location.y) ||
+						(playerCorners[2].y < wall.location.y + wall.height &&
+							playerCorners[2].y > wall.location.y))
+				) {
 					// console.log(state.t, 'player y intersect: opposite sides ');
 					isYCollision = true;
 					break outer;
-				} else if (playerCorners[0].y < wall.location.y && playerCorners[2].y > wall.location.y + wall.height && (
-					(playerCorners[0].x < wall.location.x + wall.width && playerCorners[0].x > wall.location.x) ||
-					(playerCorners[1].x < wall.location.x + wall.width && playerCorners[1].x > wall.location.x))) {
+				} else if (
+					playerCorners[0].y < wall.location.y &&
+					playerCorners[2].y > wall.location.y + wall.height &&
+					((playerCorners[0].x < wall.location.x + wall.width &&
+						playerCorners[0].x > wall.location.x) ||
+						(playerCorners[1].x < wall.location.x + wall.width &&
+							playerCorners[1].x > wall.location.x))
+				) {
 					// console.log(state.t, 'player x intersect: opposite sides');
 					isXCollision = true;
 					break outer;
@@ -1127,8 +1428,13 @@ function drawGame() {
 					// console.log('state.player.y ', state.player.y);
 					// console.log('prevPlayerLoc.y', prevPlayerLoc.y);
 					// console.log('state.player.y < prevPlayerLoc.y', state.player.y < prevPlayerLoc.y);
-					wall.location.y += (state.player.y < prevPlayerLoc.y ? -1 : 1) * moveIncrement / roomHeight;
-					if (wall.location.y < wallWidth / 2 || wall.location.y + wall.height > 1 - wallWidth / 2) {
+					wall.location.y +=
+						((state.player.y < prevPlayerLoc.y ? -1 : 1) * moveIncrement) /
+						roomHeight;
+					if (
+						wall.location.y < wallWidth / 2 ||
+						wall.location.y + wall.height > 1 - wallWidth / 2
+					) {
 						isBlocked = true;
 						wall.location.y = prevWallLocation.y;
 					} else {
@@ -1136,8 +1442,13 @@ function drawGame() {
 					}
 				}
 				if (isXCollision && state.player.x != prevPlayerLoc.x) {
-					wall.location.x += (state.player.x < prevPlayerLoc.x ? -1 : 1) * moveIncrement / roomWidth;
-					if (wall.location.x < wallWidth / 2 || wall.location.x + wall.width > 1 - wallWidth / 2) {
+					wall.location.x +=
+						((state.player.x < prevPlayerLoc.x ? -1 : 1) * moveIncrement) /
+						roomWidth;
+					if (
+						wall.location.x < wallWidth / 2 ||
+						wall.location.x + wall.width > 1 - wallWidth / 2
+					) {
 						isBlocked = true;
 						wall.location.x = prevWallLocation.x;
 					} else {
@@ -1154,26 +1465,33 @@ function drawGame() {
 						// id: 'top-left',
 						x: left,
 						y: top,
-					}, {
+					},
+					{
 						// id: 'top-right',
 						x: right,
 						y: top,
-					}, {
+					},
+					{
 						// id: 'bottom-left',
 						x: left,
 						y: bottom,
-					}, {
+					},
+					{
 						// id: 'bottom-right',
 						x: right,
 						y: bottom,
-					}
+					},
 				];
 				outer: for (const _wall of state.room.walls || []) {
 					if (_wall != wall) {
 						for (const corner of wallCorners) {
 							// console.log('corner', corner);
-							if (corner.x >= _wall.location.x && corner.x <= _wall.location.x + _wall.width &&
-								corner.y >= _wall.location.y && corner.y <= _wall.location.y + _wall.height) {
+							if (
+								corner.x >= _wall.location.x &&
+								corner.x <= _wall.location.x + _wall.width &&
+								corner.y >= _wall.location.y &&
+								corner.y <= _wall.location.y + _wall.height
+							) {
 								isMove = false;
 								isBlocked = true;
 								wall.location.x = prevWallLocation.x;
@@ -1183,12 +1501,20 @@ function drawGame() {
 						}
 
 						// now check for corners on opposite sides of the wall!
-						if ((wallCorners[0].x <= _wall.location.x && wallCorners[1].x >= _wall.location.x + _wall.width && (
-							(wallCorners[0].y <= _wall.location.y + _wall.height && wallCorners[0].y >= _wall.location.y) ||
-							(wallCorners[2].y <= _wall.location.y + _wall.height && wallCorners[2].y >= _wall.location.y))) ||
-							(wallCorners[0].y <= _wall.location.y && wallCorners[2].y >= _wall.location.y + _wall.height && (
-								(wallCorners[0].x <= _wall.location.x + _wall.width && wallCorners[0].x >= _wall.location.x) ||
-								(wallCorners[1].x <= _wall.location.x + _wall.width && wallCorners[1].x >= _wall.location.x)))) {
+						if (
+							(wallCorners[0].x <= _wall.location.x &&
+								wallCorners[1].x >= _wall.location.x + _wall.width &&
+								((wallCorners[0].y <= _wall.location.y + _wall.height &&
+									wallCorners[0].y >= _wall.location.y) ||
+									(wallCorners[2].y <= _wall.location.y + _wall.height &&
+										wallCorners[2].y >= _wall.location.y))) ||
+							(wallCorners[0].y <= _wall.location.y &&
+								wallCorners[2].y >= _wall.location.y + _wall.height &&
+								((wallCorners[0].x <= _wall.location.x + _wall.width &&
+									wallCorners[0].x >= _wall.location.x) ||
+									(wallCorners[1].x <= _wall.location.x + _wall.width &&
+										wallCorners[1].x >= _wall.location.x)))
+						) {
 							// console.log(state.t, 'player y intersect: opposite sides ');
 							isMove = false;
 							isBlocked = true;
@@ -1228,12 +1554,13 @@ function drawGame() {
 
 		// ctx.fillStyle = '#f00';
 		// ctx.fillRect(state.player.x * canvas.width, state.player.y * canvas.height, 2, 2);
-		if (state.player.x > portal.location.x - portalSize / 2 &&
+		if (
+			state.player.x > portal.location.x - portalSize / 2 &&
 			state.player.x < portal.location.x + portalSize / 2 &&
 			state.player.y > portal.location.y - portalSize / 2 &&
 			state.player.y < portal.location.y + portalSize / 2
 		) {
-			setRoom(rooms.find(r => r.id == portal.destination.roomId));
+			setRoom(rooms.find((r) => r.id == portal.destination.roomId));
 			state.player.x = portal.destination.x || 0.5;
 			state.player.y = portal.destination.y || 0.5;
 			play(portalSound);
@@ -1246,7 +1573,10 @@ function drawGame() {
 		const item = items[roomItem.id];
 		// console.log('item', item);
 		// console.log('state.inventory[item.id]', state.inventory[roomItem.id]);
-		if (item.image.height > 0 && (item.type != 'weapon' || !state.inventory[roomItem.id])) {
+		if (
+			item.image.height > 0 &&
+			(item.type != 'weapon' || !state.inventory[roomItem.id])
+		) {
 			const dist = distance(roomItem);
 			if (!roomItem.takeAnimIntervalId && dist < itemTakeDistance) {
 				const interval = 24;
@@ -1263,7 +1593,8 @@ function drawGame() {
 				}, interval * numTakeItemAnimSteps);
 				const item = items[roomItem.id];
 				const itemId = item.type == 'treasure' ? item.type : roomItem.id;
-				state.inventory[itemId] = (state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
+				state.inventory[itemId] =
+					(state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
 				// console.log('rooms[0].items.length', rooms[0].items.length);
 			}
@@ -1278,7 +1609,7 @@ function drawGame() {
 			n: 's',
 			s: 'n',
 			e: 'w',
-			w: 'e'
+			w: 'e',
 		}[throughDoor.wall];
 		const prevRoom = state.room;
 		setRoom(throughDoor.room);
@@ -1291,17 +1622,20 @@ function drawGame() {
 			if (oppositeWall == 's') {
 				state.player.y = 1 - characters.player.height / (2 * roomHeight);
 			} else if (oppositeWall == 'n') {
-				state.player.y = characters.player.height / (2 * roomHeight);;
+				state.player.y = characters.player.height / (2 * roomHeight);
 			} else if (oppositeWall == 'e') {
 				state.player.x = 1 - characters.player.width / (2 * roomWidth);
 			} else {
-				state.player.x = characters.player.width / (2 * roomHeight);;
+				state.player.x = characters.player.width / (2 * roomHeight);
 			}
 
-			const door = (state.room.doors || []).find(d => d.wall == oppositeWall && d.room.id == prevRoom.id);
+			const door = (state.room.doors || []).find(
+				(d) => d.wall == oppositeWall && d.room.id == prevRoom.id
+			);
 			if (['n', 's'].includes(oppositeWall)) {
 				if (door) {
-					state.player.x = door.location + (characters.player.width / roomWidth) / 2;
+					state.player.x =
+						door.location + characters.player.width / roomWidth / 2;
 				} else {
 					state.player.x = (1 - roomWidth * characters.player.width) / 2;
 				}
@@ -1311,7 +1645,8 @@ function drawGame() {
 				// console.log('oppositeWall ', oppositeWall);
 				// console.log('prevRoom', prevRoom);
 				if (door) {
-					state.player.y = door.location + (characters.player.height / roomHeight) / 2;
+					state.player.y =
+						door.location + characters.player.height / roomHeight / 2;
 				} else {
 					state.player.y = (1 - roomHeight * characters.player.height) / 2;
 				}
@@ -1329,7 +1664,7 @@ function drawGame() {
 		const size = item.size;
 		const imageLoc = toScreen({
 			x: projectile.loc.x,
-			y: projectile.loc.y
+			y: projectile.loc.y,
 			// }, {
 			// 	width: size * item.image.width / item.image.height,
 			// 	height: size * canvas.height
@@ -1337,22 +1672,30 @@ function drawGame() {
 		ctx.save();
 		ctx.translate(imageLoc.x, imageLoc.y);
 		ctx.rotate(projectile.angle);
-		const width = (size * item.image.width / item.image.height) * canvas.width / projectileSizeFactor;
-		const height = size * canvas.height / projectileSizeFactor;
+		const width =
+			(((size * item.image.width) / item.image.height) * canvas.width) /
+			projectileSizeFactor;
+		const height = (size * canvas.height) / projectileSizeFactor;
 		ctx.drawImage(
 			item.image,
 			projectile.loc.x,
 			projectile.loc.y,
 			width,
-			height,
+			height
 		);
 		ctx.restore();
 		projectile.loc.x += Math.cos(projectile.angle) * item.speed;
 		projectile.loc.y += Math.sin(projectile.angle) * item.speed;
 
 		const tip = {
-			x: imageLoc.x + Math.cos(projectile.angle) * width + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
-			y: imageLoc.y + Math.sin(projectile.angle) * width + Math.sin(projectile.angle + Math.PI / 2) * height / 2,
+			x:
+				imageLoc.x +
+				Math.cos(projectile.angle) * width +
+				(Math.cos(projectile.angle + Math.PI / 2) * height) / 2,
+			y:
+				imageLoc.y +
+				Math.sin(projectile.angle) * width +
+				(Math.sin(projectile.angle + Math.PI / 2) * height) / 2,
 		};
 		// const end = {
 		// 	x: imageLoc.x + Math.cos(projectile.angle + Math.PI / 2) * height / 2,
@@ -1360,22 +1703,24 @@ function drawGame() {
 		// };
 
 		let isWallHit;
-		if (tip.x > canvas.width * (1 - (1 - roomWidth) / 2) ||
-			tip.x < canvas.width * (1 - roomWidth) / 2 ||
+		if (
+			tip.x > canvas.width * (1 - (1 - roomWidth) / 2) ||
+			tip.x < (canvas.width * (1 - roomWidth)) / 2 ||
 			tip.y > canvas.height * (1 - (1 - roomHeight) / 2) ||
-			tip.y < canvas.height * (1 - roomHeight) / 2
+			tip.y < (canvas.height * (1 - roomHeight)) / 2
 		) {
 			isWallHit = true;
 		}
 		if (!isWallHit) {
 			for (const wall of state.room.walls || []) {
-				const x = ((1 - roomWidth) / 2 + (wall.location.x * roomWidth)) * canvas.width;
-				const y = ((1 - roomHeight) / 2 + (wall.location.y * roomHeight)) * canvas.height;
+				const x =
+					((1 - roomWidth) / 2 + wall.location.x * roomWidth) * canvas.width;
+				const y =
+					((1 - roomHeight) / 2 + wall.location.y * roomHeight) * canvas.height;
 				const width = roomWidth * wall.width * canvas.width;
 				const height = roomHeight * wall.height * canvas.height;
 
-				if (tip.x > x && tip.x < x + width &&
-					tip.y > y && tip.y < y + height) {
+				if (tip.x > x && tip.x < x + width && tip.y > y && tip.y < y + height) {
 					isWallHit = true;
 					break;
 				}
@@ -1390,19 +1735,27 @@ function drawGame() {
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
 			if (character.type == 'enemy') {
-				const left = roomCharacter.location.x - (character.width / roomWidth) / 2;
-				const top = roomCharacter.location.y - (character.height / roomHeight) / 2;
-				const right = roomCharacter.location.x + (character.width / roomWidth) / 2;
-				const bottom = roomCharacter.location.y + (character.height / roomHeight) / 2;
+				const left = roomCharacter.location.x - character.width / roomWidth / 2;
+				const top =
+					roomCharacter.location.y - character.height / roomHeight / 2;
+				const right =
+					roomCharacter.location.x + character.width / roomWidth / 2;
+				const bottom =
+					roomCharacter.location.y + character.height / roomHeight / 2;
 				const upperLeft = toScreen({
 					x: left,
-					y: top
+					y: top,
 				});
 				const lowerRight = toScreen({
 					x: right,
-					y: bottom
+					y: bottom,
 				});
-				if (tip.x > upperLeft.x && tip.x < lowerRight.x && tip.y > upperLeft.y && tip.y < lowerRight.y) {
+				if (
+					tip.x > upperLeft.x &&
+					tip.x < lowerRight.x &&
+					tip.y > upperLeft.y &&
+					tip.y < lowerRight.y
+				) {
 					injur(roomCharacter, item.damage / character.resilience);
 					state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
 					play(character.sounds.injured);
@@ -1426,7 +1779,6 @@ function drawGame() {
 		// ctx.beginPath();
 		// ctx.arc(end.x, end.y, 4, 0, Math.PI * 2);
 		// ctx.fill();
-
 	}
 }
 
@@ -1434,7 +1786,12 @@ function drawMap() {
 	{
 		// map background
 		ctx.fillStyle = mapBackgroundColor;
-		ctx.fillRect(canvas.width * mapMargin, canvas.height * mapMargin, canvas.width * (1 - 2 * mapMargin), canvas.height * (1 - 2 * mapMargin));
+		ctx.fillRect(
+			canvas.width * mapMargin,
+			canvas.height * mapMargin,
+			canvas.width * (1 - 2 * mapMargin),
+			canvas.height * (1 - 2 * mapMargin)
+		);
 	}
 	const mapped = [];
 
@@ -1448,15 +1805,17 @@ function drawMap() {
 			ctx.lineWidth = 2 * wallWidth * mapScale * canvas.width;
 			const width = getValue(room, 'width') * mapScale * canvas.width;
 			const height = getValue(room, 'height') * mapScale * canvas.height;
-			const x = - width / 2;
-			const y = - height / 2;
+			const x = -width / 2;
+			const y = -height / 2;
 			ctx.beginPath();
 			ctx.rect(x + offset.x, y + offset.y, width, height);
 			ctx.stroke();
 			// ctx.fillStyle = mapRoomColor;
 			// ctx.fillRect(x + offset.x, y + offset.y, width, height);
 			const roomBackground = new Image();
-			roomBackground.src = `img/rooms/${room.backgroundImage || defaultRoomBackground}`;
+			roomBackground.src = `img/rooms/${
+				room.backgroundImage || defaultRoomBackground
+			}`;
 			ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
 		}
 
@@ -1464,17 +1823,25 @@ function drawMap() {
 			door.p1 = {};
 			door.p2 = {};
 			if (['e', 'w'].includes(door.wall)) {
-				door.p1.y = (door.location - 1) * getValue(room, 'height') / 2 * mapScale * canvas.height;
+				door.p1.y =
+					(((door.location - 1) * getValue(room, 'height')) / 2) *
+					mapScale *
+					canvas.height;
 				door.p2.y = door.p1.y + doorSize * mapScale * canvas.height;
-				door.p1.x = door.p2.x = getValue(room, 'width') * mapScale * canvas.width / 2;
+				door.p1.x = door.p2.x =
+					(getValue(room, 'width') * mapScale * canvas.width) / 2;
 				if (door.wall == 'w') {
 					door.p1.x *= -1;
 					door.p2.x *= -1;
 				}
 			} else {
-				door.p1.x = (door.location - 1) * getValue(room, 'width') / 2 * mapScale * canvas.width;
+				door.p1.x =
+					(((door.location - 1) * getValue(room, 'width')) / 2) *
+					mapScale *
+					canvas.width;
 				door.p2.x = door.p1.x + doorSize * mapScale * canvas.width;
-				door.p1.y = door.p2.y = getValue(room, 'height') * mapScale * canvas.height / 2;
+				door.p1.y = door.p2.y =
+					(getValue(room, 'height') * mapScale * canvas.height) / 2;
 				if (door.wall == 'n') {
 					door.p1.y *= -1;
 					door.p2.y *= -1;
@@ -1494,7 +1861,8 @@ function drawMap() {
 
 		for (const door of room.doors || []) {
 			if (state.mappedRooms.includes(door.room.id)) {
-				let x = offset.x, y = offset.y;
+				let x = offset.x,
+					y = offset.y;
 				if (door.wall == 'n') {
 					y -= canvas.height * mapScale;
 				} else if (door.wall == 's') {
@@ -1505,7 +1873,8 @@ function drawMap() {
 					x += canvas.width * mapScale;
 				}
 				drawRoom(door.room, {
-					x, y
+					x,
+					y,
 				});
 			}
 		}
@@ -1513,7 +1882,7 @@ function drawMap() {
 
 	drawRoom(state.room, {
 		x: canvas.width / 2,
-		y: canvas.height / 2
+		y: canvas.height / 2,
 	});
 
 	// now draw all doors
@@ -1575,9 +1944,10 @@ function drawMap() {
 	}
 }
 
-
 function drawMerchantInteraction() {
-	document.getElementById('merchant-modal-init-content').classList.remove('hidden');
+	document
+		.getElementById('merchant-modal-init-content')
+		.classList.remove('hidden');
 	document.getElementById('merchant-modal-content').classList.add('hidden');
 	document.getElementById('merchant-modal').classList.remove('hidden');
 }
@@ -1628,7 +1998,7 @@ function drawInventory() {
 		numLines = 1;
 		html = '<tr><th>No items</th></tr>';
 	}
-	const spacerHeight = 280 - (numLines * 40);
+	const spacerHeight = 280 - numLines * 40;
 	html += `<tr id="inventory-spacer" style="height: ${spacerHeight}px;"></tr>`;
 	document.getElementById('inventory-table').innerHTML = html;
 }
@@ -1645,17 +2015,30 @@ function aim() {
 		ctx.strokeStyle = '#f00';
 		ctx.lineWidth = 6;
 		ctx.beginPath();
-		ctx.arc(loc.x, loc.y, 8 + canvas.height * characters.player.height / 2, 0, 2 * Math.PI);
+		ctx.arc(
+			loc.x,
+			loc.y,
+			8 + (canvas.height * characters.player.height) / 2,
+			0,
+			2 * Math.PI
+		);
 		ctx.stroke();
 
 		ctx.strokeStyle = '#444';
 		ctx.lineWidth = 16;
 		ctx.beginPath();
-		ctx.arc(loc.x, loc.y, 2 + canvas.height * characters.player.height / 2, state.aimAngle - Math.PI / 24, state.aimAngle + Math.PI / 24);
+		ctx.arc(
+			loc.x,
+			loc.y,
+			2 + (canvas.height * characters.player.height) / 2,
+			state.aimAngle - Math.PI / 24,
+			state.aimAngle + Math.PI / 24
+		);
 		ctx.stroke();
-
 	} else {
-		toast(`You\'re all out of ${projectile.label}!<br/> Try a different weapon.`);
+		toast(
+			`You\'re all out of ${projectile.label}!<br/> Try a different weapon.`
+		);
 	}
 }
 
@@ -1672,15 +2055,18 @@ function attack() {
 					angle = state.aimAngle;
 				} else {
 					// set angle = direction of player motion
-					const motionKeys = Object.keys(keysDown).filter(k => k.startsWith('Arrow')).sort().join();
+					const motionKeys = Object.keys(keysDown)
+						.filter((k) => k.startsWith('Arrow'))
+						.sort()
+						.join();
 					angle = {
-						'ArrowRight': 0,
+						ArrowRight: 0,
 						'ArrowDown,ArrowRight': 0.25,
-						'ArrowDown': 0.5,
+						ArrowDown: 0.5,
 						'ArrowDown,ArrowLeft': 0.75,
-						'ArrowLeft': 1,
+						ArrowLeft: 1,
 						'ArrowLeft,ArrowUp': 1.25,
-						'ArrowUp': 1.5,
+						ArrowUp: 1.5,
 						'ArrowRight,ArrowUp': 1.75,
 					}[motionKeys];
 					if (isNaN(angle)) {
@@ -1691,27 +2077,32 @@ function attack() {
 				}
 				play(items[projectile].sounds.launch);
 				// console.log('angle', angle);
+				console.log('state.player', state.player);
 				state.projectiles.push({
 					id: projectile,
 					loc: {
 						x: state.player.x,
 						y: state.player.y,
 					},
-					angle
+					angle,
 				});
 			} else {
-				toast(`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`);
+				toast(
+					`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`
+				);
 			}
 		} else {
 			const targetedCharacter = getTargetedCharacter();
 			if (targetedCharacter) {
-				attackMotion = targetedCharacter.location.x < state.player.x ? 'left' : 'right';
+				attackMotion =
+					targetedCharacter.location.x < state.player.x ? 'left' : 'right';
 				animate(state.player);
 				setTimeout(() => {
 					attackMotion = null;
 				}, weapon.resetTime);
 				const character = characters[targetedCharacter.id];
-				const weaponValue = state.inventory[state.player.wielding] / weapon.value;
+				const weaponValue =
+					state.inventory[state.player.wielding] / weapon.value;
 
 				if (weapon.sounds.hit) {
 					play(weapon.sounds.hit);
@@ -1722,7 +2113,10 @@ function attack() {
 					}, 200);
 				}
 
-				injur(targetedCharacter, weaponValue * weapon.damage / character.resilience);
+				injur(
+					targetedCharacter,
+					(weaponValue * weapon.damage) / character.resilience
+				);
 				state.inventory[state.player.wielding]--;
 				if (state.inventory[state.player.wielding] <= 0) {
 					delete state.inventory[state.player.wielding];
@@ -1750,7 +2144,7 @@ function injur(character, injuryValue) {
 			if (character.animStep >= numCharacterDieAnimSteps) {
 				clearInterval(character.deathAnimIntervalId);
 				if (room.characters) {
-					room.characters = room.characters.filter(c => c != character);
+					room.characters = room.characters.filter((c) => c != character);
 				}
 			}
 		}, interval);
@@ -1778,7 +2172,6 @@ function getTargetedCharacter() {
 	}
 	return closestCharacter;
 }
-
 
 function onKeyUp(e) {
 	// console.log('onKeyUp', e);
@@ -1829,7 +2222,9 @@ function onKeyUp(e) {
 		attack();
 		isAiming = false;
 	} else if (key == 'C') {
-		const weaponIds = Object.keys(state.inventory).filter(id => items[id].type == 'weapon');
+		const weaponIds = Object.keys(state.inventory).filter(
+			(id) => items[id].type == 'weapon'
+		);
 		let next, didSelect;
 		if (state.player.wielding) {
 			for (const id of weaponIds) {
@@ -1875,7 +2270,7 @@ function onKeyDown(e) {
 			ArrowLeft: 'left',
 			ArrowRight: 'right',
 			ArrowUp: 'up',
-			ArrowDown: 'down'
+			ArrowDown: 'down',
 		}[key];
 		if (motion && !isAiming) {
 			state.player.motion = motion;
@@ -1883,7 +2278,20 @@ function onKeyDown(e) {
 		}
 	}
 
-	if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Escape', 'M', 'I', 'A', 'C', 'P'].includes(key)) {
+	if (
+		[
+			'ArrowLeft',
+			'ArrowRight',
+			'ArrowUp',
+			'ArrowDown',
+			'Escape',
+			'M',
+			'I',
+			'A',
+			'C',
+			'P',
+		].includes(key)
+	) {
 		keysDown[key] = true;
 	}
 }
@@ -1891,7 +2299,8 @@ function onKeyDown(e) {
 function makeImageId(character) {
 	let imageId = character.id;
 	if (character.id != 'player') {
-		const id = character.imageId || (state.room.characters.indexOf(character) + 1);
+		const id =
+			character.imageId || state.room.characters.indexOf(character) + 1;
 		imageId += `-${state.room.id}-${id}`;
 		character.imageId = id;
 	}
@@ -1913,13 +2322,19 @@ function animate(character) {
 		let frames;
 		if (state.player.wielding && character.id == 'player' && !state.didDie) {
 			if (attackMotion) {
-				frames = characterFrames[character.id].attack[state.player.wielding][attackMotion];
+				frames =
+					characterFrames[character.id].attack[state.player.wielding][
+						attackMotion
+					];
 			} else {
-				if (!characterFrames[character.id].wielding[state.player.wielding][motion]) {
+				if (
+					!characterFrames[character.id].wielding[state.player.wielding][motion]
+				) {
 					// console.log(motion);
 					motion = 'left';
 				}
-				frames = characterFrames[character.id].wielding[state.player.wielding][motion];
+				frames =
+					characterFrames[character.id].wielding[state.player.wielding][motion];
 			}
 		} else {
 			frames = characterFrames[character.id][motion];
@@ -1937,9 +2352,15 @@ function animate(character) {
 	}
 
 	f();
-	animIntervalIds[imageId] = setInterval(f, characters[character.id].animInterval);
+	animIntervalIds[imageId] = setInterval(
+		f,
+		characters[character.id].animInterval
+	);
 
-	if (character.id == 'player' && ['left', 'right', 'up', 'down'].includes(motion)) {
+	if (
+		character.id == 'player' &&
+		['left', 'right', 'up', 'down'].includes(motion)
+	) {
 		play(characters.player.sounds.walk);
 		characters.player.sounds.walk.addEventListener('ended', function () {
 			if (['left', 'right', 'up', 'down'].includes(state.player.motion)) {
@@ -1952,15 +2373,28 @@ function animate(character) {
 function toScreen(loc, character) {
 	character = character || {
 		width: 0,
-		height: 0
+		height: 0,
 	};
-	if (isNaN(loc.x) || isNaN(loc.y) || isNaN(character.width) || isNaN(character.height)) {
+	if (
+		isNaN(loc.x) ||
+		isNaN(loc.y) ||
+		isNaN(character.width) ||
+		isNaN(character.height)
+	) {
 		console.error('toScreen loc', loc);
 		console.error('toScreen character', character);
 		throw new Error('toScreen: NaN detected!');
 	}
-	const x = ((loc.x * getValue(state.room, 'width')) - character.width / 2 + (1 - getValue(state.room, 'width')) / 2) * canvas.width;
-	const y = ((loc.y * getValue(state.room, 'height')) - character.height / 2 + (1 - getValue(state.room, 'height')) / 2) * canvas.height;
+	const x =
+		(loc.x * getValue(state.room, 'width') -
+			character.width / 2 +
+			(1 - getValue(state.room, 'width')) / 2) *
+		canvas.width;
+	const y =
+		(loc.y * getValue(state.room, 'height') -
+			character.height / 2 +
+			(1 - getValue(state.room, 'height')) / 2) *
+		canvas.height;
 	return { x, y };
 }
 
@@ -1993,7 +2427,9 @@ function setPaused(isPaused) {
 	const now = new Date().getTime();
 	if (isPaused) {
 		state.lastPausedTime = now;
-		document.getElementById('toggle-pause').innerHTML = state.didDie ? 'Play Again' : 'Resume';
+		document.getElementById('toggle-pause').innerHTML = state.didDie
+			? 'Play Again'
+			: 'Resume';
 	} else if (state.isPaused && state.lastPausedTime) {
 		state.pausedTime += now - state.lastPausedTime;
 	}
@@ -2010,7 +2446,7 @@ function togglePause() {
 				initState();
 				state.levelTimes = levelTimes;
 				// take player to init room of current level
-				const initRoom = initRooms.find(r => r.id == room.id);
+				const initRoom = initRooms.find((r) => r.id == room.id);
 				setRoom(initRoom, true);
 				saveState();
 				delete localStorage.rooms;
@@ -2020,7 +2456,9 @@ function togglePause() {
 		reset();
 	} else {
 		setPaused(!state.isPaused);
-		document.getElementById('toggle-pause').innerHTML = state.isPaused ? 'Resume' : 'Pause';
+		document.getElementById('toggle-pause').innerHTML = state.isPaused
+			? 'Resume'
+			: 'Pause';
 	}
 }
 
@@ -2046,7 +2484,7 @@ function dropItem(itemId) {
 		id: itemId,
 		location: {
 			x: state.player.x + (state.player.x > 0.16 ? -1 : 1) * 0.14,
-			y: state.player.y
+			y: state.player.y,
 		},
 		value,
 	});
@@ -2068,6 +2506,7 @@ function quaffPotion(itemId) {
 }
 
 function setRoom(room, isGameOver) {
+	console.log('room', room.id);
 	state.room = room;
 	// for (const id in animIntervalIds) {
 	// 	clearInterval(animIntervalIds[id]);
@@ -2082,7 +2521,8 @@ function setRoom(room, isGameOver) {
 		play(room.sounds.enter);
 	}
 	roomMusic && roomMusic.pause();
-	roomMusic = (room.sounds && rooms[room.id].sounds.ambient) || window.defaultRoomMusic;
+	roomMusic =
+		(room.sounds && rooms[room.id].sounds.ambient) || window.defaultRoomMusic;
 	// console.log('setRoom roomMusic ', roomMusic);
 	if (room.level) {
 		const now = new Date().getTime();
@@ -2096,7 +2536,8 @@ function setRoom(room, isGameOver) {
 			state.levelTimes[state.level].start = now;
 			if (state.level > 1 && !isGameOver) {
 				state.levelTimes[state.level - 1].end = now;
-				const completionTime = now - state.levelTimes[state.level - 1].start - state.pausedTime;
+				const completionTime =
+					now - state.levelTimes[state.level - 1].start - state.pausedTime;
 				const best = state.levelTimes[state.level - 1].best;
 				if (!best || completionTime < best) {
 					state.levelTimes[state.level - 1].best = completionTime;
@@ -2114,12 +2555,14 @@ function showMerchantSelection(type) {
 	const initContent = document.getElementById('merchant-modal-init-content');
 	initContent.classList.add('hidden');
 
-	let html = `<div id="player-treasure-amount">Your treasure: ${moneySymbol} ${state.inventory.treasure || 0}</div > `;
+	let html = `<div id="player-treasure-amount">Your treasure: ${moneySymbol} ${
+		state.inventory.treasure || 0
+	}</div > `;
 
 	html += '<div class="table-container">';
 	html += '<table>';
 	if (type == 'buy') {
-		const merchant = state.room.characters.find(c => c.id == 'merchant');
+		const merchant = state.room.characters.find((c) => c.id == 'merchant');
 		html += '<tr><th></th><th>Item</th><th>Value</th><th></th></tr>';
 		for (const itemId of merchant.itemsForSale) {
 			const item = items[itemId];
@@ -2154,7 +2597,7 @@ function showMerchantSelection(type) {
 					if (item.type == 'weapon') {
 						value *= state.inventory[itemId] / item.value;
 					} else if (item.type == 'projectile') {
-						value = state.inventory[itemId] * item.cost / item.value;
+						value = (state.inventory[itemId] * item.cost) / item.value;
 					}
 					value = Math.ceil(value);
 					html += '<tr>';
@@ -2176,7 +2619,8 @@ function showMerchantSelection(type) {
 		}
 
 		if (numWeapons == 0) {
-			html += '<tr><th>You don\'t appear to be carrying any weapons...</th></tr>';
+			html +=
+				"<tr><th>You don't appear to be carrying any weapons...</th></tr>";
 		} else {
 			let hasDamagedWeapon;
 			for (const itemId in state.inventory) {
@@ -2187,7 +2631,8 @@ function showMerchantSelection(type) {
 				}
 			}
 			if (hasDamagedWeapon) {
-				html += '<tr><th></th><th>Item</th><th>Condition</th><th>Cost</th><th></th></tr>';
+				html +=
+					'<tr><th></th><th>Item</th><th>Condition</th><th>Cost</th><th></th></tr>';
 			}
 			for (const itemId in state.inventory) {
 				const item = items[itemId];
@@ -2202,7 +2647,8 @@ function showMerchantSelection(type) {
 				}
 			}
 			if (!hasDamagedWeapon) {
-				html += '<tr><th>All your weapons are in excellent condition!<br/> There\'s nothing for me to repair here.</th></tr>';
+				html +=
+					"<tr><th>All your weapons are in excellent condition!<br/> There's nothing for me to repair here.</th></tr>";
 			}
 		}
 	}
@@ -2215,7 +2661,7 @@ function showMerchantSelection(type) {
 function repairItem(itemId) {
 	const item = items[itemId];
 	if (item.repairCost > (state.inventory.treasure || 0)) {
-		toast('Sorry, you can\'t afford my fee. Come back with more money!');
+		toast("Sorry, you can't afford my fee. Come back with more money!");
 	} else {
 		play(characters.merchant.sounds.repair);
 		state.inventory.treasure -= item.repairCost;
@@ -2251,14 +2697,17 @@ function sellItem(itemId, value) {
 function buyItem(itemId) {
 	const item = items[itemId];
 	if (item.cost > (state.inventory.treasure || 0)) {
-		toast('Sorry, you can\'t afford that. Come back with more money!');
+		toast("Sorry, you can't afford that. Come back with more money!");
 	} else {
 		if (item.type == 'weapon' && state.inventory[itemId] > 0) {
-			toast('It looks like you\'re already carrying one of those.<br/> Maybe you\'d like to sell me yours first?');
+			toast(
+				"It looks like you're already carrying one of those.<br/> Maybe you'd like to sell me yours first?"
+			);
 		} else {
 			play(characters.merchant.sounds.buy);
 			state.inventory.treasure -= item.cost;
-			state.inventory[itemId] = (state.inventory[itemId] || 0) + (item.value || 1);
+			state.inventory[itemId] =
+				(state.inventory[itemId] || 0) + (item.value || 1);
 			toast('Sold! It has been a pleasure doing business.');
 			showMerchantSelection('buy');
 		}
@@ -2337,8 +2786,11 @@ function showLevelSelectionModal() {
 			html += `<tr><td>${level}</td><td>${best}</td></tr>`;
 		}
 	}
-	const currentTime = new Date() - state.levelTimes[state.level - 1].start - state.pausedTime;
-	html += `<tr><td>${maxLevel + 1}</td><td>${formatTime(currentTime)} ... still in progress</td></tr>`;
+	const currentTime =
+		new Date() - state.levelTimes[state.level - 1].start - state.pausedTime;
+	html += `<tr><td>${maxLevel + 1}</td><td>${formatTime(
+		currentTime
+	)} ... still in progress</td></tr>`;
 	table.innerHTML = html;
 	showModal('level-selection-modal');
 }
@@ -2366,7 +2818,14 @@ function drawPoint(loc, color) {
 }
 
 function testBounds(currWall, testLoc, width, height) {
-	if (!(testLoc.x < 0 || testLoc.y < 0 || testLoc.x + width >= state.room.width || testLoc.y + height >= state.room.height)) {
+	if (
+		!(
+			testLoc.x < 0 ||
+			testLoc.y < 0 ||
+			testLoc.x + width >= state.room.width ||
+			testLoc.y + height >= state.room.height
+		)
+	) {
 		const left = testLoc.x;
 		const right = testLoc.x + currWall.width;
 		const top = testLoc.y;
@@ -2376,41 +2835,55 @@ function testBounds(currWall, testLoc, width, height) {
 				// id: 'top-left',
 				x: left,
 				y: top,
-			}, {
+			},
+			{
 				// id: 'top-right',
 				x: right,
 				y: top,
-			}, {
+			},
+			{
 				// id: 'bottom-left',
 				x: left,
 				y: bottom,
-			}, {
+			},
+			{
 				// id: 'bottom-right',
 				x: right,
 				y: bottom,
-			}
+			},
 		];
 
 		for (const wall of state.room.walls) {
 			if (wall != currWall) {
 				for (const corner of corners) {
-					if (corner.x >= wall.location.x && corner.x <= wall.location.x + wall.width &&
-						corner.y >= wall.location.y && corner.y <= wall.location.y + wall.height) {
+					if (
+						corner.x >= wall.location.x &&
+						corner.x <= wall.location.x + wall.width &&
+						corner.y >= wall.location.y &&
+						corner.y <= wall.location.y + wall.height
+					) {
 						return false;
 					}
 				}
 
 				// now check for corners on opposite sides of the wall!
-				if ((corners[0].x <= wall.location.x && corners[1].x >= wall.location.x + wall.width && (
-					(corners[0].y <= wall.location.y + wall.height && corners[0].y >= wall.location.y) ||
-					(corners[2].y <= wall.location.y + wall.height && corners[2].y >= wall.location.y))) ||
-					(corners[0].y <= wall.location.y && corners[2].y >= wall.location.y + wall.height && (
-						(corners[0].x <= wall.location.x + wall.width && corners[0].x >= wall.location.x) ||
-						(corners[1].x <= wall.location.x + wall.width && corners[1].x >= wall.location.x)))) {
+				if (
+					(corners[0].x <= wall.location.x &&
+						corners[1].x >= wall.location.x + wall.width &&
+						((corners[0].y <= wall.location.y + wall.height &&
+							corners[0].y >= wall.location.y) ||
+							(corners[2].y <= wall.location.y + wall.height &&
+								corners[2].y >= wall.location.y))) ||
+					(corners[0].y <= wall.location.y &&
+						corners[2].y >= wall.location.y + wall.height &&
+						((corners[0].x <= wall.location.x + wall.width &&
+							corners[0].x >= wall.location.x) ||
+							(corners[1].x <= wall.location.x + wall.width &&
+								corners[1].x >= wall.location.x)))
+				) {
 					// console.log(state.t, 'player y intersect: opposite sides ');
 					return false;
 				}
-
 			}
 		}
 	}
