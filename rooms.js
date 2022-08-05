@@ -223,6 +223,15 @@ rooms = [
 		level: 2,
 		width: 0.9,
 		height: 0.6,
+		items: [
+			{
+				id: 'superTreasure',
+				location: {
+					x: 0.5,
+					y: 0.2,
+				},
+			},
+		],
 	},
 	{
 		id: 5,
