@@ -91,6 +91,7 @@ canvas {
 
 #instructions-modal {
 	width: 420px;
+	height: 480px;
 }
 
 #instructions-modal .button {
@@ -106,6 +107,10 @@ canvas {
 
 #instructions-modal table td {
 	padding: 8px;
+}
+
+#instructions-modal table td.key {
+	font-weight: bold;
 }
 
 .table-container {

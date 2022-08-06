@@ -2178,7 +2178,7 @@ function onKeyUp(e) {
 	if (e.code != 'Tab' && e.key != 'Alt') {
 		didUserInteract = true;
 	}
-	if (state.didDie && e.code != 'Escape') {
+	if (state.didDie && !['Enter', 'Escape'].includes(e.code)) {
 		return;
 	}
 
@@ -2207,6 +2207,8 @@ function onKeyUp(e) {
 		animate(state.player);
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 		closeModals();
+	} else if (key == 'H') {
+		showModal('instructions-modal');
 	} else if (key == 'I') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
@@ -2218,7 +2220,7 @@ function onKeyUp(e) {
 		drawInventory();
 	} else if (key == 'P') {
 		isPulling = false;
-	} else if (key == 'A') {
+	} else if (['A', ' '].includes(key)) {
 		attack();
 		isAiming = false;
 	} else if (key == 'C') {
@@ -2249,7 +2251,7 @@ function onKeyUp(e) {
 		}
 
 		animate(state.player);
-	} else if (key == 'Escape') {
+	} else if (['Enter', 'Escape'].includes(key)) {
 		drawFunc = drawGame;
 		closeModals();
 	}
@@ -2285,6 +2287,7 @@ function onKeyDown(e) {
 			'ArrowUp',
 			'ArrowDown',
 			'Escape',
+			'Enter',
 			'M',
 			'I',
 			'A',
