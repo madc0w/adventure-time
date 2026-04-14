@@ -143,7 +143,6 @@ rooms = [
 		id: 2,
 		width: 0.9,
 		height: 0.6,
-		items: [],
 		doors: [],
 		portals: [
 			{

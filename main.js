@@ -41,6 +41,7 @@ const animFrameNums = {};
 const characterImages = {};
 const portalFrames = [];
 const debugPoints = [];
+const imageCache = {};
 let state,
 	throughDoor,
 	canvas,
@@ -92,7 +93,7 @@ function load() {
 			state.room.doors = rooms[state.room.id].doors;
 			assignFunctions(
 				rooms.find((r) => r.id == state.room.id),
-				state.room
+				state.room,
 			);
 			if (localStorage.rooms) {
 				const savedRooms = JSON.parse(localStorage.rooms);
@@ -144,7 +145,7 @@ function load() {
 							const img = new Image();
 							img.src = `img/charactes/${fileName}`;
 							characterFrames[characterId][key][weaponName][direction].push(
-								img
+								img,
 							);
 						}
 					}
@@ -318,12 +319,12 @@ function drawStatus() {
 	statusCtx.fillText(
 		'Health',
 		0.02 * statusCanvas.width,
-		0.24 * statusCanvas.height
+		0.24 * statusCanvas.height,
 	);
 	statusCtx.fillText(
 		'Weapons',
 		0.02 * statusCanvas.width,
-		0.58 * statusCanvas.height
+		0.58 * statusCanvas.height,
 	);
 
 	statusCtx.fillStyle = '#444';
@@ -331,14 +332,14 @@ function drawStatus() {
 		0.24 * statusCanvas.width - 4,
 		0.14 * statusCanvas.height - 4,
 		0.6 * statusCanvas.width + 8,
-		0.1 * statusCanvas.height + 8
+		0.1 * statusCanvas.height + 8,
 	);
 	statusCtx.fillStyle = '#b44';
 	statusCtx.fillRect(
 		0.24 * statusCanvas.width,
 		0.14 * statusCanvas.height,
 		0.6 * state.player.health * statusCanvas.width,
-		0.1 * statusCanvas.height
+		0.1 * statusCanvas.height,
 	);
 
 	let i = 0;
@@ -367,10 +368,14 @@ function drawGame() {
 	const roomHeight = getValue(state.room, 'height');
 	{
 		// room background
-		const roomBackground = new Image();
-		roomBackground.src = `img/rooms/${
+		const bgSrc = `img/rooms/${
 			state.room.backgroundImage || defaultRoomBackground
 		}`;
+		if (!imageCache[bgSrc]) {
+			imageCache[bgSrc] = new Image();
+			imageCache[bgSrc].src = bgSrc;
+		}
+		const roomBackground = imageCache[bgSrc];
 		const x = ((1 - roomWidth) * canvas.width) / 2;
 		const y = ((1 - roomHeight) * canvas.height) / 2;
 		ctx.drawImage(
@@ -378,7 +383,7 @@ function drawGame() {
 			x,
 			y,
 			roomWidth * canvas.width,
-			roomHeight * canvas.height
+			roomHeight * canvas.height,
 		);
 	}
 	{
@@ -398,14 +403,17 @@ function drawGame() {
 		const width = roomWidth * wall.width;
 		const height = roomHeight * wall.height;
 		if (wall.background) {
-			const image = new Image();
-			image.src = `img/rooms/${wall.background}`;
+			const wallSrc = `img/rooms/${wall.background}`;
+			if (!imageCache[wallSrc]) {
+				imageCache[wallSrc] = new Image();
+				imageCache[wallSrc].src = wallSrc;
+			}
 			ctx.drawImage(
-				image,
+				imageCache[wallSrc],
 				x * canvas.width,
 				y * canvas.height,
 				width * canvas.width,
-				height * canvas.height
+				height * canvas.height,
 			);
 		} else {
 			ctx.fillStyle = wall.color || roomWallColor;
@@ -414,7 +422,7 @@ function drawGame() {
 				x * canvas.width,
 				y * canvas.height,
 				width * canvas.width,
-				height * canvas.height
+				height * canvas.height,
 			);
 			ctx.fill();
 		}
@@ -432,7 +440,7 @@ function drawGame() {
 				loc.x,
 				loc.y,
 				portalSize * canvas.width,
-				portalSize * canvas.height
+				portalSize * canvas.height,
 			);
 	}
 
@@ -459,7 +467,7 @@ function drawGame() {
 					loc.x,
 					loc.y,
 					((size * item.image.width) / item.image.height) * canvas.width,
-					size * canvas.height
+					size * canvas.height,
 				);
 			}
 			ctx.globalAlpha = 1;
@@ -550,19 +558,19 @@ function drawGame() {
 					1 -
 						character.height / roomHeight +
 						character.height / (2 * roomHeight),
-					roomCharacter.location.y
+					roomCharacter.location.y,
 				);
 				roomCharacter.location.y = Math.max(
 					character.height / (2 * roomHeight),
-					roomCharacter.location.y
+					roomCharacter.location.y,
 				);
 				roomCharacter.location.x = Math.min(
 					1 - character.width / roomWidth + character.width / (2 * roomWidth),
-					roomCharacter.location.x
+					roomCharacter.location.x,
 				);
 				roomCharacter.location.x = Math.max(
 					character.width / (2 * roomWidth),
-					roomCharacter.location.x
+					roomCharacter.location.x,
 				);
 
 				const playerWidth =
@@ -814,7 +822,7 @@ function drawGame() {
 						x: roomCharacter.location.x + character.width / 2,
 						y: roomCharacter.location.y + character.height / 2,
 					},
-					character
+					character,
 				);
 				ctx.save();
 				ctx.translate(imageLoc.x, imageLoc.y);
@@ -824,7 +832,7 @@ function drawGame() {
 					(-character.width * canvas.width) / 2,
 					(-character.height * canvas.height) / 2,
 					size * character.width * canvas.width,
-					size * character.height * canvas.height
+					size * character.height * canvas.height,
 				);
 				ctx.restore();
 			} else {
@@ -836,7 +844,7 @@ function drawGame() {
 					imageLoc.x,
 					imageLoc.y,
 					size * character.width * canvas.width,
-					size * character.height * canvas.height
+					size * character.height * canvas.height,
 				);
 			}
 			ctx.globalAlpha = 1;
@@ -857,7 +865,7 @@ function drawGame() {
 					ctx.beginPath();
 					ctx.moveTo(
 						imageLoc.x + (character.width * canvas.width) / 2,
-						imageLoc.y - canvas.width * r
+						imageLoc.y - canvas.width * r,
 					);
 					ctx.arc(
 						imageLoc.x + (character.width * canvas.width) / 2,
@@ -865,7 +873,7 @@ function drawGame() {
 						canvas.width * r,
 						0,
 						2 * Math.PI,
-						false
+						false,
 					);
 					ctx.fill();
 				}
@@ -878,7 +886,7 @@ function drawGame() {
 					imageLoc.y - canvas.width * healthIndicatorRadius,
 					canvas.width * healthIndicatorRadius,
 					0,
-					2 * Math.PI
+					2 * Math.PI,
 				);
 				ctx.fill();
 
@@ -886,7 +894,7 @@ function drawGame() {
 				ctx.beginPath();
 				ctx.moveTo(
 					imageLoc.x + (character.width * canvas.width) / 2,
-					imageLoc.y - canvas.width * healthIndicatorRadius
+					imageLoc.y - canvas.width * healthIndicatorRadius,
 				);
 				ctx.arc(
 					imageLoc.x + (character.width * canvas.width) / 2,
@@ -894,11 +902,11 @@ function drawGame() {
 					0.8 * canvas.width * healthIndicatorRadius,
 					0,
 					roomCharacter.health * Math.PI * 2,
-					false
+					false,
 				);
 				ctx.lineTo(
 					imageLoc.x + (character.width * canvas.width) / 2,
-					imageLoc.y - canvas.width * healthIndicatorRadius
+					imageLoc.y - canvas.width * healthIndicatorRadius,
 				);
 				ctx.fill();
 			}
@@ -952,13 +960,13 @@ function drawGame() {
 					x,
 					y - doorwaySize.width * canvas.height,
 					doorwaySize.height * canvas.width,
-					doorwaySize.width * canvas.width
+					doorwaySize.width * canvas.width,
 				);
 				ctx.fillRect(
 					x,
 					y + doorSize * canvas.height,
 					doorwaySize.height * canvas.width,
-					doorwaySize.width * canvas.width
+					doorwaySize.width * canvas.width,
 				);
 			} else {
 				y += (door.wall == 'n' ? 1 : -1) * wallWidth * canvas.height;
@@ -966,13 +974,13 @@ function drawGame() {
 					x - doorwaySize.width * canvas.width,
 					y,
 					doorwaySize.width * canvas.width,
-					doorwaySize.height * canvas.width
+					doorwaySize.height * canvas.width,
 				);
 				ctx.fillRect(
 					x + doorSize * canvas.width,
 					y,
 					doorwaySize.width * canvas.width,
-					doorwaySize.height * canvas.width
+					doorwaySize.height * canvas.width,
 				);
 			}
 		}
@@ -1001,7 +1009,7 @@ function drawGame() {
 			loc.x,
 			loc.y,
 			characters.player.width * canvas.width,
-			characters.player.height * canvas.height
+			characters.player.height * canvas.height,
 		);
 		ctx.globalAlpha = 1;
 
@@ -1010,7 +1018,7 @@ function drawGame() {
 	}
 
 	if (
-		keysDown.A &&
+		(keysDown.A || keysDown[' ']) &&
 		state.player.wielding &&
 		items[state.player.wielding].projectile &&
 		state.player.motion == 'idleFrames'
@@ -1124,7 +1132,7 @@ function drawGame() {
 							testLoc.x += moveIncrement / roomWidth;
 							testLoc.x = Math.min(
 								1 - characters.player.width - margin - wall.width,
-								testLoc.x
+								testLoc.x,
 							);
 						} else if (
 							keysDown.ArrowUp &&
@@ -1142,7 +1150,7 @@ function drawGame() {
 							testLoc.y -= moveIncrement / roomHeight;
 							testLoc.y = Math.max(
 								characters.player.height + margin,
-								testLoc.y
+								testLoc.y,
 							);
 						} else if (
 							keysDown.ArrowDown &&
@@ -1160,7 +1168,7 @@ function drawGame() {
 							testLoc.y += moveIncrement / roomHeight;
 							testLoc.y = Math.min(
 								1 - characters.player.height - margin - wall.height,
-								testLoc.y
+								testLoc.y,
 							);
 						}
 						// console.log('isMove', isMove);
@@ -1181,7 +1189,7 @@ function drawGame() {
 					const playerPos =
 						state.player.y - characters.player.height / (2 * roomHeight);
 					for (const door of (state.room.doors || []).filter(
-						(d) => d.wall == 'w'
+						(d) => d.wall == 'w',
 					)) {
 						const y1 = door.location;
 						const y2 =
@@ -1210,7 +1218,7 @@ function drawGame() {
 					const playerPos =
 						state.player.y - characters.player.height / (2 * roomHeight);
 					for (const door of (state.room.doors || []).filter(
-						(d) => d.wall == 'e'
+						(d) => d.wall == 'e',
 					)) {
 						const y1 = door.location;
 						const y2 =
@@ -1233,7 +1241,7 @@ function drawGame() {
 					const playerPos =
 						state.player.x - characters.player.width / (2 * roomWidth);
 					for (const door of (state.room.doors || []).filter(
-						(d) => d.wall == 'n'
+						(d) => d.wall == 'n',
 					)) {
 						const x1 = door.location;
 						const x2 =
@@ -1262,7 +1270,7 @@ function drawGame() {
 					const playerPos =
 						state.player.x - characters.player.width / (2 * roomWidth);
 					for (const door of (state.room.doors || []).filter(
-						(d) => d.wall == 's'
+						(d) => d.wall == 's',
 					)) {
 						const x1 = door.location;
 						const x2 =
@@ -1584,11 +1592,13 @@ function drawGame() {
 				roomItem.takeAnimIntervalId = setInterval(() => {
 					roomItem.animStep++;
 				}, interval);
-				const n = i;
 				setTimeout(() => {
 					// console.log('before state.room.items', state.room.items);
 					clearInterval(roomItem.takeAnimIntervalId);
-					state.room.items.splice(n, 1);
+					const idx = state.room.items.indexOf(roomItem);
+					if (idx !== -1) {
+						state.room.items.splice(idx, 1);
+					}
 					// console.log('after state.room.items', state.room.items);
 				}, interval * numTakeItemAnimSteps);
 				const item = items[roomItem.id];
@@ -1626,11 +1636,11 @@ function drawGame() {
 			} else if (oppositeWall == 'e') {
 				state.player.x = 1 - characters.player.width / (2 * roomWidth);
 			} else {
-				state.player.x = characters.player.width / (2 * roomHeight);
+				state.player.x = characters.player.width / (2 * roomWidth);
 			}
 
 			const door = (state.room.doors || []).find(
-				(d) => d.wall == oppositeWall && d.room.id == prevRoom.id
+				(d) => d.wall == oppositeWall && d.room.id == prevRoom.id,
 			);
 			if (['n', 's'].includes(oppositeWall)) {
 				if (door) {
@@ -1676,13 +1686,7 @@ function drawGame() {
 			(((size * item.image.width) / item.image.height) * canvas.width) /
 			projectileSizeFactor;
 		const height = (size * canvas.height) / projectileSizeFactor;
-		ctx.drawImage(
-			item.image,
-			projectile.loc.x,
-			projectile.loc.y,
-			width,
-			height
-		);
+		ctx.drawImage(item.image, -width / 2, -height / 2, width, height);
 		ctx.restore();
 		projectile.loc.x += Math.cos(projectile.angle) * item.speed;
 		projectile.loc.y += Math.sin(projectile.angle) * item.speed;
@@ -1790,7 +1794,7 @@ function drawMap() {
 			canvas.width * mapMargin,
 			canvas.height * mapMargin,
 			canvas.width * (1 - 2 * mapMargin),
-			canvas.height * (1 - 2 * mapMargin)
+			canvas.height * (1 - 2 * mapMargin),
 		);
 	}
 	const mapped = [];
@@ -2020,7 +2024,7 @@ function aim() {
 			loc.y,
 			8 + (canvas.height * characters.player.height) / 2,
 			0,
-			2 * Math.PI
+			2 * Math.PI,
 		);
 		ctx.stroke();
 
@@ -2032,12 +2036,12 @@ function aim() {
 			loc.y,
 			2 + (canvas.height * characters.player.height) / 2,
 			state.aimAngle - Math.PI / 24,
-			state.aimAngle + Math.PI / 24
+			state.aimAngle + Math.PI / 24,
 		);
 		ctx.stroke();
 	} else {
 		toast(
-			`You\'re all out of ${projectile.label}!<br/> Try a different weapon.`
+			`You\'re all out of ${projectile.label}!<br/> Try a different weapon.`,
 		);
 	}
 }
@@ -2053,6 +2057,9 @@ function attack() {
 				let angle;
 				if (isAiming) {
 					angle = state.aimAngle;
+					if (isNaN(angle)) {
+						return;
+					}
 				} else {
 					// set angle = direction of player motion
 					const motionKeys = Object.keys(keysDown)
@@ -2070,14 +2077,11 @@ function attack() {
 						'ArrowRight,ArrowUp': 1.75,
 					}[motionKeys];
 					if (isNaN(angle)) {
-						console.error('angle is NaN', motionKeys);
-					} else {
-						angle *= Math.PI;
+						return;
 					}
+					angle *= Math.PI;
 				}
 				play(items[projectile].sounds.launch);
-				// console.log('angle', angle);
-				console.log('state.player', state.player);
 				state.projectiles.push({
 					id: projectile,
 					loc: {
@@ -2088,7 +2092,7 @@ function attack() {
 				});
 			} else {
 				toast(
-					`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`
+					`You\'re all out of ${items[projectile].label}!<br/> Try a different weapon.`,
 				);
 			}
 		} else {
@@ -2115,7 +2119,7 @@ function attack() {
 
 				injur(
 					targetedCharacter,
-					(weaponValue * weapon.damage) / character.resilience
+					(weaponValue * weapon.damage) / character.resilience,
 				);
 				state.inventory[state.player.wielding]--;
 				if (state.inventory[state.player.wielding] <= 0) {
@@ -2186,9 +2190,12 @@ function onKeyUp(e) {
 		setTimeout(() => {
 			// console.log(roomMusic);
 			play(roomMusic);
-			roomMusic.addEventListener('ended', function () {
-				play(roomMusic);
-			});
+			if (!roomMusic._endHandler) {
+				roomMusic._endHandler = function () {
+					play(roomMusic);
+				};
+				roomMusic.addEventListener('ended', roomMusic._endHandler);
+			}
 		}, 20);
 	}
 
@@ -2225,7 +2232,7 @@ function onKeyUp(e) {
 		isAiming = false;
 	} else if (key == 'C') {
 		const weaponIds = Object.keys(state.inventory).filter(
-			(id) => items[id].type == 'weapon'
+			(id) => items[id].type == 'weapon',
 		);
 		let next, didSelect;
 		if (state.player.wielding) {
@@ -2259,6 +2266,9 @@ function onKeyUp(e) {
 
 function onKeyDown(e) {
 	// console.log('onKeyDown', e);
+	if (e.key == ' ') {
+		e.preventDefault();
+	}
 	if (state.didDie) {
 		return;
 	}
@@ -2293,6 +2303,7 @@ function onKeyDown(e) {
 			'A',
 			'C',
 			'P',
+			' ',
 		].includes(key)
 	) {
 		keysDown[key] = true;
@@ -2357,7 +2368,7 @@ function animate(character) {
 	f();
 	animIntervalIds[imageId] = setInterval(
 		f,
-		characters[character.id].animInterval
+		characters[character.id].animInterval,
 	);
 
 	if (
@@ -2365,11 +2376,17 @@ function animate(character) {
 		['left', 'right', 'up', 'down'].includes(motion)
 	) {
 		play(characters.player.sounds.walk);
-		characters.player.sounds.walk.addEventListener('ended', function () {
-			if (['left', 'right', 'up', 'down'].includes(state.player.motion)) {
-				play(characters.player.sounds.walk);
-			}
-		});
+		if (!characters.player.sounds.walk._walkEndHandler) {
+			characters.player.sounds.walk._walkEndHandler = function () {
+				if (['left', 'right', 'up', 'down'].includes(state.player.motion)) {
+					play(characters.player.sounds.walk);
+				}
+			};
+			characters.player.sounds.walk.addEventListener(
+				'ended',
+				characters.player.sounds.walk._walkEndHandler,
+			);
+		}
 	}
 }
 
@@ -2677,9 +2694,6 @@ function repairItem(itemId) {
 function sellItem(itemId, value) {
 	play(characters.merchant.sounds.sell);
 	let saleValue = value;
-	if (items[itemId].type == 'projectile') {
-		saleValue = items[itemId].cost / items[itemId].value;
-	}
 	state.inventory.treasure = (state.inventory.treasure || 0) + saleValue;
 
 	if (items[itemId].type == 'weapon') {
@@ -2704,7 +2718,7 @@ function buyItem(itemId) {
 	} else {
 		if (item.type == 'weapon' && state.inventory[itemId] > 0) {
 			toast(
-				"It looks like you're already carrying one of those.<br/> Maybe you'd like to sell me yours first?"
+				"It looks like you're already carrying one of those.<br/> Maybe you'd like to sell me yours first?",
 			);
 		} else {
 			play(characters.merchant.sounds.buy);
@@ -2789,10 +2803,13 @@ function showLevelSelectionModal() {
 			html += `<tr><td>${level}</td><td>${best}</td></tr>`;
 		}
 	}
-	const currentTime =
-		new Date() - state.levelTimes[state.level - 1].start - state.pausedTime;
+	const currentLevelTime =
+		state.levelTimes[state.level] || state.levelTimes[state.level - 1];
+	const currentTime = currentLevelTime
+		? new Date() - currentLevelTime.start - state.pausedTime
+		: 0;
 	html += `<tr><td>${maxLevel + 1}</td><td>${formatTime(
-		currentTime
+		currentTime,
 	)} ... still in progress</td></tr>`;
 	table.innerHTML = html;
 	showModal('level-selection-modal');

@@ -12,7 +12,7 @@ items = {
 	superTreasure: {
 		type: 'treasure',
 		image: 'treasure-06.png',
-		label: 'King\'s Treasure',
+		label: "King's Treasure",
 		value: 40,
 		size: 0.1,
 		sounds: {
@@ -36,7 +36,7 @@ items = {
 			draw: 'sword 01 draw.mp3',
 			pickup: 'sword pickup.mp3',
 			broken: 'broken weapon.mp3',
-		}
+		},
 	},
 	venomDagger: {
 		type: 'weapon',
@@ -60,7 +60,7 @@ items = {
 	electrosmasher: {
 		type: 'weapon',
 		image: 'electrosmasher.png',
-		label: 'Electrosmahser',
+		label: 'Electrosmasher',
 		size: 0.1,
 		range: 0.16, // proportion of canvas
 		damage: 0.5,
@@ -116,12 +116,12 @@ items = {
 			quaff: 'quaff potion.mp3',
 			pickup: 'pickup potion.mp3',
 		},
-		action: state => {
+		action: (state) => {
 			if (state.player.health < 1) {
 				state.player.health = Math.min(1, state.player.health + 0.12);
 				return true;
 			}
-		}
+		},
 	},
 	invisibilityPotion: {
 		type: 'potion',
@@ -134,13 +134,13 @@ items = {
 			quaff: 'quaff potion.mp3',
 			pickup: 'pickup potion.mp3',
 		},
-		action: state => {
+		action: (state) => {
 			if (!state.player.isInvisible) {
 				state.player.isInvisible = true;
 				state.player.invisibilityStart = state.t;
 				return true;
 			}
-		}
+		},
 	},
 	blueKey: {
 		type: 'key',
