@@ -1,0 +1,1649 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Adventure Quest - Room Editor</title>
+		<meta charset="utf-8" />
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				font-family: 'Segoe UI', Tahoma, sans-serif;
+				background: #1a1a2e;
+				color: #e0e0e0;
+				display: flex;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			/* Left Panel - Room List */
+			#room-list-panel {
+				width: 220px;
+				background: #16213e;
+				border-right: 2px solid #0f3460;
+				display: flex;
+				flex-direction: column;
+				flex-shrink: 0;
+			}
+			#room-list-panel h2 {
+				padding: 12px;
+				background: #0f3460;
+				font-size: 14px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+			#room-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: 8px;
+			}
+			.room-entry {
+				padding: 8px 12px;
+				margin-bottom: 4px;
+				background: #1a1a3e;
+				border-radius: 4px;
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				border: 2px solid transparent;
+				transition: all 0.15s;
+			}
+			.room-entry:hover {
+				background: #222255;
+			}
+			.room-entry.selected {
+				border-color: #e94560;
+				background: #222255;
+			}
+			.room-entry .room-label {
+				font-size: 13px;
+			}
+			.room-entry .room-id {
+				color: #888;
+				font-size: 11px;
+			}
+			.room-entry .delete-room {
+				background: none;
+				border: none;
+				color: #e94560;
+				cursor: pointer;
+				font-size: 16px;
+				padding: 0 4px;
+				opacity: 0.5;
+				transition: opacity 0.15s;
+			}
+			.room-entry .delete-room:hover {
+				opacity: 1;
+			}
+			#add-room-btn {
+				margin: 8px;
+				padding: 10px;
+				background: #e94560;
+				color: white;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				font-weight: bold;
+				font-size: 13px;
+			}
+			#add-room-btn:hover {
+				background: #c73650;
+			}
+
+			/* Center Panel - Visual Editor */
+			#center-panel {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
+			}
+			#toolbar {
+				background: #0f3460;
+				padding: 8px 16px;
+				display: flex;
+				gap: 8px;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+			#toolbar button,
+			#toolbar select,
+			#toolbar label {
+				font-size: 12px;
+			}
+			.toolbar-btn {
+				padding: 6px 14px;
+				background: #16213e;
+				color: #e0e0e0;
+				border: 1px solid #335;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 12px;
+			}
+			.toolbar-btn:hover {
+				background: #1a1a4e;
+			}
+			.toolbar-btn.active {
+				background: #e94560;
+				border-color: #e94560;
+			}
+			.toolbar-btn.export-btn {
+				background: #28a745;
+				border-color: #28a745;
+			}
+			.toolbar-btn.export-btn:hover {
+				background: #218838;
+			}
+			.toolbar-btn.import-btn {
+				background: #0d6efd;
+				border-color: #0d6efd;
+			}
+			.toolbar-btn.import-btn:hover {
+				background: #0b5ed7;
+			}
+			.toolbar-separator {
+				width: 1px;
+				height: 24px;
+				background: #335;
+			}
+			#canvas-container {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: #111;
+				overflow: hidden;
+				position: relative;
+			}
+			#room-canvas {
+				border: 2px solid #444;
+				cursor: crosshair;
+				background: #222;
+			}
+			#canvas-info {
+				position: absolute;
+				bottom: 8px;
+				left: 8px;
+				font-size: 11px;
+				color: #888;
+				background: rgba(0, 0, 0, 0.7);
+				padding: 4px 8px;
+				border-radius: 3px;
+			}
+
+			/* Right Panel - Properties */
+			#props-panel {
+				width: 340px;
+				background: #16213e;
+				border-left: 2px solid #0f3460;
+				overflow-y: auto;
+				flex-shrink: 0;
+			}
+			.props-section {
+				border-bottom: 1px solid #0f3460;
+				padding: 12px;
+			}
+			.props-section h3 {
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				color: #e94560;
+				margin-bottom: 8px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.props-section h3 button {
+				font-size: 11px;
+				padding: 2px 8px;
+				background: #e94560;
+				color: white;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+			}
+			.props-section h3 button:hover {
+				background: #c73650;
+			}
+			.prop-row {
+				display: flex;
+				align-items: center;
+				margin-bottom: 6px;
+				gap: 8px;
+			}
+			.prop-row label {
+				width: 90px;
+				font-size: 12px;
+				color: #aaa;
+				flex-shrink: 0;
+			}
+			.prop-row input,
+			.prop-row select {
+				flex: 1;
+				padding: 4px 6px;
+				background: #1a1a3e;
+				border: 1px solid #335;
+				color: #e0e0e0;
+				border-radius: 3px;
+				font-size: 12px;
+			}
+			.prop-row input[type='checkbox'] {
+				flex: none;
+				width: 16px;
+				height: 16px;
+			}
+
+			/* Sub-item lists */
+			.sub-item {
+				background: #1a1a3e;
+				border: 1px solid #335;
+				border-radius: 4px;
+				padding: 8px;
+				margin-bottom: 6px;
+				position: relative;
+			}
+			.sub-item .remove-btn {
+				position: absolute;
+				top: 4px;
+				right: 4px;
+				background: none;
+				border: none;
+				color: #e94560;
+				cursor: pointer;
+				font-size: 14px;
+				line-height: 1;
+			}
+			.sub-item .remove-btn:hover {
+				color: #ff6b81;
+			}
+			.sub-item .prop-row label {
+				width: 70px;
+			}
+
+			/* No room selected */
+			#no-room-msg {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				color: #555;
+				font-size: 18px;
+			}
+
+			/* Scrollbar */
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: #16213e;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #335;
+				border-radius: 4px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #448;
+			}
+
+			/* Legend */
+			#legend {
+				position: absolute;
+				top: 8px;
+				right: 8px;
+				background: rgba(0, 0, 0, 0.8);
+				padding: 8px 12px;
+				border-radius: 4px;
+				font-size: 11px;
+				line-height: 1.8;
+			}
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.legend-swatch {
+				width: 12px;
+				height: 12px;
+				border-radius: 2px;
+				display: inline-block;
+				border: 1px solid #555;
+			}
+
+			/* JSON modal */
+			#json-modal {
+				display: none;
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.7);
+				z-index: 100;
+				align-items: center;
+				justify-content: center;
+			}
+			#json-modal.visible {
+				display: flex;
+			}
+			#json-modal-content {
+				background: #1a1a2e;
+				border: 2px solid #0f3460;
+				border-radius: 8px;
+				padding: 20px;
+				width: 700px;
+				max-height: 80vh;
+				display: flex;
+				flex-direction: column;
+			}
+			#json-modal-content h3 {
+				margin-bottom: 12px;
+				color: #e94560;
+			}
+			#json-modal-content textarea {
+				flex: 1;
+				min-height: 400px;
+				background: #111;
+				color: #e0e0e0;
+				border: 1px solid #335;
+				padding: 12px;
+				font-family: 'Consolas', monospace;
+				font-size: 12px;
+				border-radius: 4px;
+				resize: none;
+			}
+			#json-modal-content .modal-buttons {
+				display: flex;
+				gap: 8px;
+				margin-top: 12px;
+				justify-content: flex-end;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- Left: Room List -->
+		<div id="room-list-panel">
+			<h2>Rooms</h2>
+			<div id="room-list"></div>
+			<button id="add-room-btn" onclick="addRoom()">+ New Room</button>
+		</div>
+
+		<!-- Center: Visual Editor -->
+		<div id="center-panel">
+			<div id="toolbar">
+				<button class="toolbar-btn import-btn" onclick="loadRoomsFile()">
+					📂 Load rooms.js
+				</button>
+				<button class="toolbar-btn export-btn" onclick="exportRooms()">
+					💾 Export rooms.js
+				</button>
+				<div class="toolbar-separator"></div>
+				<label style="font-size: 12px; color: #aaa">Tool:</label>
+				<select
+					id="tool-select"
+					onchange="setTool(this.value)"
+					style="
+						padding: 4px;
+						background: #1a1a3e;
+						color: #e0e0e0;
+						border: 1px solid #335;
+						border-radius: 3px;
+						font-size: 12px;
+					"
+				>
+					<option value="select">Select / Move</option>
+					<option value="wall">Draw Wall</option>
+					<option value="item">Place Item</option>
+					<option value="character">Place Character</option>
+					<option value="door">Place Door</option>
+					<option value="portal">Place Portal</option>
+				</select>
+				<select
+					id="item-select"
+					style="
+						display: none;
+						padding: 4px;
+						background: #1a1a3e;
+						color: #e0e0e0;
+						border: 1px solid #335;
+						border-radius: 3px;
+						font-size: 12px;
+					"
+				></select>
+				<select
+					id="char-select"
+					style="
+						display: none;
+						padding: 4px;
+						background: #1a1a3e;
+						color: #e0e0e0;
+						border: 1px solid #335;
+						border-radius: 3px;
+						font-size: 12px;
+					"
+				></select>
+				<select
+					id="wall-select"
+					style="
+						display: none;
+						padding: 4px;
+						background: #1a1a3e;
+						color: #e0e0e0;
+						border: 1px solid #335;
+						border-radius: 3px;
+						font-size: 12px;
+					"
+				></select>
+				<div class="toolbar-separator"></div>
+				<button class="toolbar-btn" onclick="viewJSON()">{ } View JSON</button>
+				<button class="toolbar-btn" onclick="duplicateRoom()">
+					⧉ Duplicate Room
+				</button>
+			</div>
+			<div id="canvas-container">
+				<canvas id="room-canvas" width="600" height="500"></canvas>
+				<div id="canvas-info">No room selected</div>
+				<div id="legend">
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #e94560"></span> Door
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #ffd700"></span> Item
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #00bcd4"></span>
+						Character
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #9c27b0"></span>
+						Portal
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #78909c"></span> Wall
+					</div>
+					<div class="legend-item">
+						<span class="legend-swatch" style="background: #ff9800"></span>
+						Moving Block
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Right: Properties -->
+		<div id="props-panel">
+			<div id="no-room-msg">Select or create a room</div>
+			<div id="props-content" style="display: none"></div>
+		</div>
+
+		<!-- JSON Modal -->
+		<div id="json-modal">
+			<div id="json-modal-content">
+				<h3>Room JSON</h3>
+				<textarea id="json-textarea" spellcheck="false"></textarea>
+				<div class="modal-buttons">
+					<button class="toolbar-btn" onclick="applyJSON()">
+						Apply Changes
+					</button>
+					<button class="toolbar-btn" onclick="closeJSONModal()">Cancel</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Hidden file input -->
+		<input
+			type="file"
+			id="file-input"
+			accept=".js"
+			style="display: none"
+			onchange="handleFileLoad(event)"
+		/>
+
+		<script>
+			// ============== DATA ==============
+			let rooms = [];
+			let selectedRoomIndex = -1;
+			let currentTool = 'select';
+			let dragTarget = null;
+			let dragOffset = { x: 0, y: 0 };
+			let wallDrawStart = null;
+
+			// Known items and characters (extracted from the game files)
+			const knownItems = [
+				'treasure',
+				'superTreasure',
+				'enchantedSword',
+				'venomDagger',
+				'electrosmasher',
+				'bow',
+				'arrow',
+				'healingPotion1',
+				'invisibilityPotion',
+				'blueKey',
+				'redKey',
+			];
+
+			const knownCharacters = ['megabug', 'zlakik', 'doomScreen', 'merchant'];
+
+			const wallDirections = ['n', 's', 'e', 'w'];
+
+			// ============== INIT ==============
+			window.onload = function () {
+				populateDropdowns();
+				setupCanvas();
+				// Auto-load rooms.js from same directory
+				fetch('rooms.js')
+					.then((r) => r.text())
+					.then((source) => {
+						parseRoomsJS(source);
+					})
+					.catch(() => {
+						renderRoomList();
+					});
+			};
+
+			function populateDropdowns() {
+				const itemSel = document.getElementById('item-select');
+				knownItems.forEach((id) => {
+					const opt = document.createElement('option');
+					opt.value = id;
+					opt.textContent = id;
+					itemSel.appendChild(opt);
+				});
+
+				const charSel = document.getElementById('char-select');
+				knownCharacters.forEach((id) => {
+					const opt = document.createElement('option');
+					opt.value = id;
+					opt.textContent = id;
+					charSel.appendChild(opt);
+				});
+
+				const wallSel = document.getElementById('wall-select');
+				wallDirections.forEach((d) => {
+					const opt = document.createElement('option');
+					opt.value = d;
+					opt.textContent = { n: 'North', s: 'South', e: 'East', w: 'West' }[d];
+					wallSel.appendChild(opt);
+				});
+			}
+
+			function setTool(tool) {
+				currentTool = tool;
+				document.getElementById('item-select').style.display =
+					tool === 'item' ? '' : 'none';
+				document.getElementById('char-select').style.display =
+					tool === 'character' ? '' : 'none';
+				document.getElementById('wall-select').style.display =
+					tool === 'door' ? '' : 'none';
+				drawRoom();
+			}
+
+			// ============== FILE I/O ==============
+			function loadRoomsFile() {
+				document.getElementById('file-input').click();
+			}
+
+			function handleFileLoad(event) {
+				const file = event.target.files[0];
+				if (!file) return;
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					parseRoomsJS(e.target.result);
+				};
+				reader.readAsText(file);
+				event.target.value = '';
+			}
+
+			function parseRoomsJS(source) {
+				try {
+					// Extract movingBlock if present
+					let movingBlockDef = null;
+					const movingBlockMatch = source.match(
+						/const\s+movingBlock\s*=\s*(\{[\s\S]*?\});/,
+					);
+					if (movingBlockMatch) {
+						try {
+							movingBlockDef = Function(
+								'"use strict"; return (' + movingBlockMatch[1] + ')',
+							)();
+						} catch (e) {
+							/* ignore */
+						}
+					}
+
+					// Extract the rooms array
+					const roomsMatch = source.match(/rooms\s*=\s*(\[[\s\S]*\]);?\s*$/);
+					if (!roomsMatch) {
+						alert(
+							'Could not find rooms array in file. Expected format: rooms = [...]',
+						);
+						return;
+					}
+
+					let roomsStr = roomsMatch[1];
+
+					// Replace ...movingBlock spreads with actual values
+					if (movingBlockDef) {
+						roomsStr = roomsStr.replace(/\.\.\.movingBlock,?/g, () => {
+							return (
+								Object.entries(movingBlockDef)
+									.map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+									.join(', ') + ','
+							);
+						});
+					}
+
+					// Remove trailing commas for valid JSON-like parsing
+					// Use Function constructor to evaluate as JS (supports unquoted keys, trailing commas)
+					const parsed = Function('"use strict"; return (' + roomsStr + ')')();
+
+					if (!Array.isArray(parsed)) {
+						alert('Parsed result is not an array');
+						return;
+					}
+
+					rooms = parsed;
+					selectedRoomIndex = rooms.length > 0 ? 0 : -1;
+					renderRoomList();
+					renderProps();
+					drawRoom();
+				} catch (err) {
+					alert('Error parsing rooms.js: ' + err.message);
+					console.error(err);
+				}
+			}
+
+			function exportRooms() {
+				let output = `defaultRoomBackground = 'granite stones texture.jpg';\n\n`;
+
+				// Check if any room uses movingBlock pattern
+				const hasMovingBlocks = rooms.some((r) =>
+					(r.walls || []).some((w) => w.isMovable),
+				);
+
+				if (hasMovingBlocks) {
+					output += `const movingBlock = {\n\tisMovable: true,\n\twidth: 0.16,\n\theight: 0.16,\n\tbackground: '20210613_144554.jpg',\n};\n\n`;
+				}
+
+				output += 'rooms = [\n';
+				rooms.forEach((room, ri) => {
+					output += '\t{\n';
+					output += `\t\tid: ${room.id},\n`;
+					if (room.level != null) output += `\t\tlevel: ${room.level},\n`;
+					output += `\t\twidth: ${room.width},\n`;
+					output += `\t\theight: ${room.height},\n`;
+					if (room.background)
+						output += `\t\tbackground: '${room.background}',\n`;
+					if (room.music) output += `\t\tmusic: '${room.music}',\n`;
+
+					// Walls
+					if (room.walls && room.walls.length > 0) {
+						output += `\t\twalls: [\n`;
+						room.walls.forEach((w) => {
+							if (
+								hasMovingBlocks &&
+								w.isMovable &&
+								w.width === 0.16 &&
+								w.height === 0.16
+							) {
+								output += `\t\t\t{\n`;
+								output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${w.location.x},\n\t\t\t\t\ty: ${w.location.y},\n\t\t\t\t},\n`;
+								output += `\t\t\t\t...movingBlock,\n`;
+								output += `\t\t\t},\n`;
+							} else if (hasMovingBlocks && w.isMovable) {
+								output += `\t\t\t{\n`;
+								output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${w.location.x},\n\t\t\t\t\ty: ${w.location.y},\n\t\t\t\t},\n`;
+								output += `\t\t\t\t...movingBlock,\n`;
+								if (w.width !== 0.16) output += `\t\t\t\twidth: ${w.width},\n`;
+								if (w.height !== 0.16)
+									output += `\t\t\t\theight: ${w.height},\n`;
+								output += `\t\t\t},\n`;
+							} else {
+								output += `\t\t\t{\n`;
+								output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${w.location.x},\n\t\t\t\t\ty: ${w.location.y},\n\t\t\t\t},\n`;
+								output += `\t\t\t\twidth: ${w.width},\n`;
+								output += `\t\t\t\theight: ${w.height},\n`;
+								if (w.background)
+									output += `\t\t\t\tbackground: '${w.background}',\n`;
+								if (w.isMovable) output += `\t\t\t\tisMovable: true,\n`;
+								output += `\t\t\t},\n`;
+							}
+						});
+						output += `\t\t],\n`;
+					}
+
+					// Doors
+					if (room.doors && room.doors.length > 0) {
+						output += `\t\tdoors: [\n`;
+						room.doors.forEach((d) => {
+							output += `\t\t\t{\n`;
+							if (d.isOneWay) output += `\t\t\t\tisOneWay: true,\n`;
+							output += `\t\t\t\troomId: ${d.roomId},\n`;
+							output += `\t\t\t\twall: '${d.wall}',\n`;
+							output += `\t\t\t\tlocation: ${d.location},\n`;
+							if (d.key) output += `\t\t\t\tkey: '${d.key}',\n`;
+							output += `\t\t\t},\n`;
+						});
+						output += `\t\t],\n`;
+					}
+
+					// Portals
+					if (room.portals && room.portals.length > 0) {
+						output += `\t\tportals: [\n`;
+						room.portals.forEach((p) => {
+							output += `\t\t\t{\n`;
+							output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${p.location.x},\n\t\t\t\t\ty: ${p.location.y},\n\t\t\t\t},\n`;
+							output += `\t\t\t\tdestination: {\n\t\t\t\t\troomId: ${p.destination.roomId},\n\t\t\t\t\tx: ${p.destination.x},\n\t\t\t\t\ty: ${p.destination.y},\n\t\t\t\t},\n`;
+							output += `\t\t\t},\n`;
+						});
+						output += `\t\t],\n`;
+					}
+
+					// Characters
+					if (room.characters && room.characters.length > 0) {
+						output += `\t\tcharacters: [\n`;
+						room.characters.forEach((c) => {
+							output += `\t\t\t{\n`;
+							output += `\t\t\t\tid: '${c.id}',\n`;
+							output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${c.location.x},\n\t\t\t\t\ty: ${c.location.y},\n\t\t\t\t},\n`;
+							if (c.itemsForSale && c.itemsForSale.length > 0) {
+								output += `\t\t\t\titemsForSale: [\n`;
+								c.itemsForSale.forEach((it) => {
+									output += `\t\t\t\t\t'${it}',\n`;
+								});
+								output += `\t\t\t\t],\n`;
+							}
+							output += `\t\t\t},\n`;
+						});
+						output += `\t\t],\n`;
+					}
+
+					// Items
+					if (room.items && room.items.length > 0) {
+						output += `\t\titems: [\n`;
+						room.items.forEach((it) => {
+							output += `\t\t\t{\n`;
+							output += `\t\t\t\tid: '${it.id}',\n`;
+							output += `\t\t\t\tlocation: {\n\t\t\t\t\tx: ${it.location.x},\n\t\t\t\t\ty: ${it.location.y},\n\t\t\t\t},\n`;
+							output += `\t\t\t},\n`;
+						});
+						output += `\t\t],\n`;
+					}
+
+					output += `\t},\n`;
+				});
+				output += '];\n';
+
+				const blob = new Blob([output], { type: 'text/javascript' });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = 'rooms.js';
+				a.click();
+				URL.revokeObjectURL(url);
+			}
+
+			// ============== ROOM LIST ==============
+			function renderRoomList() {
+				const list = document.getElementById('room-list');
+				list.innerHTML = '';
+				rooms.forEach((room, i) => {
+					const div = document.createElement('div');
+					div.className =
+						'room-entry' + (i === selectedRoomIndex ? ' selected' : '');
+					div.innerHTML = `
+			<span>
+				<span class="room-id">#${room.id}</span>
+				<span class="room-label">Room ${room.id}${room.level != null ? ' (L' + room.level + ')' : ''}</span>
+			</span>
+			<button class="delete-room" onclick="event.stopPropagation(); deleteRoom(${i})" title="Delete room">×</button>
+		`;
+					div.onclick = () => selectRoom(i);
+					list.appendChild(div);
+				});
+			}
+
+			function selectRoom(index) {
+				selectedRoomIndex = index;
+				renderRoomList();
+				renderProps();
+				drawRoom();
+			}
+
+			function addRoom() {
+				const nextId =
+					rooms.length > 0 ? Math.max(...rooms.map((r) => r.id)) + 1 : 0;
+				rooms.push({
+					id: nextId,
+					width: 0.9,
+					height: 0.6,
+					walls: [],
+					doors: [],
+					portals: [],
+					characters: [],
+					items: [],
+				});
+				selectRoom(rooms.length - 1);
+			}
+
+			function deleteRoom(index) {
+				if (!confirm(`Delete Room #${rooms[index].id}?`)) return;
+				rooms.splice(index, 1);
+				if (selectedRoomIndex >= rooms.length)
+					selectedRoomIndex = rooms.length - 1;
+				renderRoomList();
+				renderProps();
+				drawRoom();
+			}
+
+			function duplicateRoom() {
+				if (selectedRoomIndex < 0) return;
+				const src = rooms[selectedRoomIndex];
+				const nextId = Math.max(...rooms.map((r) => r.id)) + 1;
+				const copy = JSON.parse(JSON.stringify(src));
+				copy.id = nextId;
+				rooms.push(copy);
+				selectRoom(rooms.length - 1);
+			}
+
+			// ============== PROPERTIES PANEL ==============
+			function renderProps() {
+				const noMsg = document.getElementById('no-room-msg');
+				const content = document.getElementById('props-content');
+
+				if (selectedRoomIndex < 0 || !rooms[selectedRoomIndex]) {
+					noMsg.style.display = '';
+					content.style.display = 'none';
+					return;
+				}
+
+				noMsg.style.display = 'none';
+				content.style.display = '';
+				const room = rooms[selectedRoomIndex];
+
+				let html = '';
+
+				// Room Properties
+				html += `<div class="props-section">
+		<h3>Room #${room.id} Properties</h3>
+		<div class="prop-row"><label>ID</label><input type="number" value="${room.id}" onchange="updateRoomProp('id', parseInt(this.value))"></div>
+		<div class="prop-row"><label>Level</label><input type="number" value="${room.level ?? ''}" placeholder="(none)" onchange="updateRoomProp('level', this.value ? parseInt(this.value) : undefined)"></div>
+		<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.1" max="1" value="${room.width}" onchange="updateRoomProp('width', parseFloat(this.value))"></div>
+		<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.1" max="1" value="${room.height}" onchange="updateRoomProp('height', parseFloat(this.value))"></div>
+		<div class="prop-row"><label>Background</label><input type="text" value="${room.background || ''}" placeholder="(default)" onchange="updateRoomProp('background', this.value || undefined)"></div>
+		<div class="prop-row"><label>Music</label><input type="text" value="${room.music || ''}" placeholder="(default)" onchange="updateRoomProp('music', this.value || undefined)"></div>
+	</div>`;
+
+				// Doors
+				html += `<div class="props-section">
+		<h3>Doors (${(room.doors || []).length}) <button onclick="addDoor()">+ Add</button></h3>`;
+				(room.doors || []).forEach((d, i) => {
+					html += `<div class="sub-item">
+			<button class="remove-btn" onclick="removeDoor(${i})">×</button>
+			<div class="prop-row"><label>Room ID</label><input type="number" value="${d.roomId}" onchange="updateDoor(${i}, 'roomId', parseInt(this.value))"></div>
+			<div class="prop-row"><label>Wall</label>
+				<select onchange="updateDoor(${i}, 'wall', this.value)">
+					${wallDirections.map((w) => `<option value="${w}" ${d.wall === w ? 'selected' : ''}>${{ n: 'North', s: 'South', e: 'East', w: 'West' }[w]}</option>`).join('')}
+				</select>
+			</div>
+			<div class="prop-row"><label>Location</label><input type="number" step="0.01" min="0" max="1" value="${d.location}" onchange="updateDoor(${i}, 'location', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Key</label><input type="text" value="${d.key || ''}" placeholder="(none)" onchange="updateDoor(${i}, 'key', this.value || undefined)"></div>
+			<div class="prop-row"><label>One-way</label><input type="checkbox" ${d.isOneWay ? 'checked' : ''} onchange="updateDoor(${i}, 'isOneWay', this.checked || undefined)"></div>
+		</div>`;
+				});
+				html += `</div>`;
+
+				// Portals
+				html += `<div class="props-section">
+		<h3>Portals (${(room.portals || []).length}) <button onclick="addPortal()">+ Add</button></h3>`;
+				(room.portals || []).forEach((p, i) => {
+					html += `<div class="sub-item">
+			<button class="remove-btn" onclick="removePortal(${i})">×</button>
+			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${p.location.x}" onchange="updatePortal(${i}, 'location.x', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${p.location.y}" onchange="updatePortal(${i}, 'location.y', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Dest Room</label><input type="number" value="${p.destination.roomId}" onchange="updatePortal(${i}, 'destination.roomId', parseInt(this.value))"></div>
+			<div class="prop-row"><label>Dest X</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.x}" onchange="updatePortal(${i}, 'destination.x', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Dest Y</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.y}" onchange="updatePortal(${i}, 'destination.y', parseFloat(this.value))"></div>
+		</div>`;
+				});
+				html += `</div>`;
+
+				// Items
+				html += `<div class="props-section">
+		<h3>Items (${(room.items || []).length}) <button onclick="addItem()">+ Add</button></h3>`;
+				(room.items || []).forEach((it, i) => {
+					html += `<div class="sub-item">
+			<button class="remove-btn" onclick="removeItem(${i})">×</button>
+			<div class="prop-row"><label>ID</label>
+				<select onchange="updateItem(${i}, 'id', this.value)">
+					${knownItems.map((kid) => `<option value="${kid}" ${it.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
+					${!knownItems.includes(it.id) ? `<option value="${it.id}" selected>${it.id}</option>` : ''}
+				</select>
+			</div>
+			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${it.location.x}" onchange="updateItem(${i}, 'location.x', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${it.location.y}" onchange="updateItem(${i}, 'location.y', parseFloat(this.value))"></div>
+		</div>`;
+				});
+				html += `</div>`;
+
+				// Characters
+				html += `<div class="props-section">
+		<h3>Characters (${(room.characters || []).length}) <button onclick="addCharacter()">+ Add</button></h3>`;
+				(room.characters || []).forEach((c, i) => {
+					html += `<div class="sub-item">
+			<button class="remove-btn" onclick="removeCharacter(${i})">×</button>
+			<div class="prop-row"><label>ID</label>
+				<select onchange="updateCharacter(${i}, 'id', this.value)">
+					${knownCharacters.map((kid) => `<option value="${kid}" ${c.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
+					${!knownCharacters.includes(c.id) ? `<option value="${c.id}" selected>${c.id}</option>` : ''}
+				</select>
+			</div>
+			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${c.location.x}" onchange="updateCharacter(${i}, 'location.x', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${c.location.y}" onchange="updateCharacter(${i}, 'location.y', parseFloat(this.value))"></div>
+			${c.id === 'merchant' ? `<div class="prop-row"><label>Items Sale</label><input type="text" value="${(c.itemsForSale || []).join(', ')}" onchange="updateCharacter(${i}, 'itemsForSale', this.value.split(',').map(s=>s.trim()).filter(Boolean))"></div>` : ''}
+		</div>`;
+				});
+				html += `</div>`;
+
+				// Walls & Moving Blocks
+				html += `<div class="props-section">
+		<h3>Walls (${(room.walls || []).length}) <button onclick="addWall()">+ Add</button> <button onclick="addMovingBlock()">+ Moving Block</button></h3>`;
+				(room.walls || []).forEach((w, i) => {
+					const isMoving = w.isMovable;
+					html += `<div class="sub-item" style="${isMoving ? 'border-color:#ff9800;' : ''}">
+			<button class="remove-btn" onclick="removeWall(${i})">×</button>
+			<div style="font-size:11px;color:${isMoving ? '#ff9800' : '#78909c'};margin-bottom:4px;font-weight:bold;">${isMoving ? '⬛ Moving Block' : '🧱 Wall'}</div>
+			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${w.location.x}" onchange="updateWall(${i}, 'location.x', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${w.location.y}" onchange="updateWall(${i}, 'location.y', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.01" max="1" value="${w.width}" onchange="updateWall(${i}, 'width', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.01" max="1" value="${w.height}" onchange="updateWall(${i}, 'height', parseFloat(this.value))"></div>
+			<div class="prop-row"><label>Movable</label><input type="checkbox" ${isMoving ? 'checked' : ''} onchange="updateWall(${i}, 'isMovable', this.checked || undefined)"></div>
+			<div class="prop-row"><label>Background</label><input type="text" value="${w.background || ''}" placeholder="(none)" onchange="updateWall(${i}, 'background', this.value || undefined)"></div>
+		</div>`;
+				});
+				html += `</div>`;
+
+				content.innerHTML = html;
+				updateCanvasInfo();
+			}
+
+			// ============== UPDATE FUNCTIONS ==============
+			function updateRoomProp(key, value) {
+				if (selectedRoomIndex < 0) return;
+				const room = rooms[selectedRoomIndex];
+				if (value === undefined) {
+					delete room[key];
+				} else {
+					room[key] = value;
+				}
+				renderRoomList();
+				drawRoom();
+			}
+
+			function updateDoor(index, key, value) {
+				const door = rooms[selectedRoomIndex].doors[index];
+				if (value === undefined) delete door[key];
+				else door[key] = value;
+				drawRoom();
+			}
+			function addDoor() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.doors) room.doors = [];
+				room.doors.push({ roomId: 0, wall: 'n', location: 0.5 });
+				renderProps();
+				drawRoom();
+			}
+			function removeDoor(i) {
+				rooms[selectedRoomIndex].doors.splice(i, 1);
+				renderProps();
+				drawRoom();
+			}
+
+			function updatePortal(index, path, value) {
+				const portal = rooms[selectedRoomIndex].portals[index];
+				setNestedValue(portal, path, value);
+				drawRoom();
+			}
+			function addPortal() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.portals) room.portals = [];
+				room.portals.push({
+					location: { x: 0.5, y: 0.5 },
+					destination: { roomId: 0, x: 0.5, y: 0.5 },
+				});
+				renderProps();
+				drawRoom();
+			}
+			function removePortal(i) {
+				rooms[selectedRoomIndex].portals.splice(i, 1);
+				renderProps();
+				drawRoom();
+			}
+
+			function updateItem(index, path, value) {
+				const item = rooms[selectedRoomIndex].items[index];
+				setNestedValue(item, path, value);
+				drawRoom();
+			}
+			function addItem() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.items) room.items = [];
+				room.items.push({ id: 'treasure', location: { x: 0.5, y: 0.5 } });
+				renderProps();
+				drawRoom();
+			}
+			function removeItem(i) {
+				rooms[selectedRoomIndex].items.splice(i, 1);
+				renderProps();
+				drawRoom();
+			}
+
+			function updateCharacter(index, path, value) {
+				const ch = rooms[selectedRoomIndex].characters[index];
+				setNestedValue(ch, path, value);
+				drawRoom();
+			}
+			function addCharacter() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.characters) room.characters = [];
+				room.characters.push({ id: 'megabug', location: { x: 0.5, y: 0.5 } });
+				renderProps();
+				drawRoom();
+			}
+			function removeCharacter(i) {
+				rooms[selectedRoomIndex].characters.splice(i, 1);
+				renderProps();
+				drawRoom();
+			}
+
+			function updateWall(index, path, value) {
+				const wall = rooms[selectedRoomIndex].walls[index];
+				setNestedValue(wall, path, value);
+				renderProps();
+				drawRoom();
+			}
+			function addWall() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.walls) room.walls = [];
+				room.walls.push({
+					location: { x: 0.3, y: 0.3 },
+					width: 0.2,
+					height: 0.04,
+				});
+				renderProps();
+				drawRoom();
+			}
+			function addMovingBlock() {
+				const room = rooms[selectedRoomIndex];
+				if (!room.walls) room.walls = [];
+				room.walls.push({
+					location: { x: 0.3, y: 0.3 },
+					width: 0.16,
+					height: 0.16,
+					isMovable: true,
+					background: '20210613_144554.jpg',
+				});
+				renderProps();
+				drawRoom();
+			}
+			function removeWall(i) {
+				rooms[selectedRoomIndex].walls.splice(i, 1);
+				renderProps();
+				drawRoom();
+			}
+
+			function setNestedValue(obj, path, value) {
+				const parts = path.split('.');
+				let target = obj;
+				for (let i = 0; i < parts.length - 1; i++) {
+					target = target[parts[i]];
+				}
+				target[parts[parts.length - 1]] = value;
+			}
+
+			// ============== CANVAS ==============
+			const canvas = document.getElementById('room-canvas');
+			const ctx = canvas.getContext('2d');
+			let canvasScale = 1;
+			let roomOriginX = 0,
+				roomOriginY = 0;
+			let roomPixelW = 0,
+				roomPixelH = 0;
+
+			function setupCanvas() {
+				canvas.addEventListener('mousedown', onCanvasMouseDown);
+				canvas.addEventListener('mousemove', onCanvasMouseMove);
+				canvas.addEventListener('mouseup', onCanvasMouseUp);
+				canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+				resizeCanvas();
+				window.addEventListener('resize', resizeCanvas);
+			}
+
+			function resizeCanvas() {
+				const container = document.getElementById('canvas-container');
+				canvas.width = container.clientWidth - 20;
+				canvas.height = container.clientHeight - 20;
+				drawRoom();
+			}
+
+			function drawRoom() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				if (selectedRoomIndex < 0 || !rooms[selectedRoomIndex]) {
+					ctx.fillStyle = '#333';
+					ctx.font = '16px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText('No room selected', canvas.width / 2, canvas.height / 2);
+					return;
+				}
+
+				const room = rooms[selectedRoomIndex];
+				const rw = room.width;
+				const rh = room.height;
+
+				// Fit room into canvas with padding
+				const pad = 40;
+				const maxW = canvas.width - pad * 2;
+				const maxH = canvas.height - pad * 2;
+				canvasScale = Math.min(maxW / rw, maxH / rh);
+				roomPixelW = rw * canvasScale;
+				roomPixelH = rh * canvasScale;
+				roomOriginX = (canvas.width - roomPixelW) / 2;
+				roomOriginY = (canvas.height - roomPixelH) / 2;
+
+				// Room background
+				ctx.fillStyle = '#2a2a3a';
+				ctx.fillRect(roomOriginX, roomOriginY, roomPixelW, roomPixelH);
+				ctx.strokeStyle = '#555';
+				ctx.lineWidth = 2;
+				ctx.strokeRect(roomOriginX, roomOriginY, roomPixelW, roomPixelH);
+
+				// Grid
+				ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+				ctx.lineWidth = 1;
+				const gridStep = 0.1;
+				for (let gx = gridStep; gx < rw; gx += gridStep) {
+					const px = roomOriginX + gx * canvasScale;
+					ctx.beginPath();
+					ctx.moveTo(px, roomOriginY);
+					ctx.lineTo(px, roomOriginY + roomPixelH);
+					ctx.stroke();
+				}
+				for (let gy = gridStep; gy < rh; gy += gridStep) {
+					const py = roomOriginY + gy * canvasScale;
+					ctx.beginPath();
+					ctx.moveTo(roomOriginX, py);
+					ctx.lineTo(roomOriginX + roomPixelW, py);
+					ctx.stroke();
+				}
+
+				// Wall labels (N/S/E/W)
+				ctx.fillStyle = '#666';
+				ctx.font = '11px sans-serif';
+				ctx.textAlign = 'center';
+				ctx.fillText('N', roomOriginX + roomPixelW / 2, roomOriginY - 6);
+				ctx.fillText(
+					'S',
+					roomOriginX + roomPixelW / 2,
+					roomOriginY + roomPixelH + 14,
+				);
+				ctx.textAlign = 'left';
+				ctx.fillText('W', roomOriginX - 16, roomOriginY + roomPixelH / 2 + 4);
+				ctx.textAlign = 'right';
+				ctx.fillText(
+					'E',
+					roomOriginX + roomPixelW + 16,
+					roomOriginY + roomPixelH / 2 + 4,
+				);
+
+				// Walls
+				(room.walls || []).forEach((w, i) => {
+					const wx = roomOriginX + w.location.x * canvasScale;
+					const wy = roomOriginY + w.location.y * canvasScale;
+					const ww = w.width * canvasScale;
+					const wh = w.height * canvasScale;
+					ctx.fillStyle = w.isMovable
+						? 'rgba(255, 152, 0, 0.5)'
+						: 'rgba(120, 144, 156, 0.6)';
+					ctx.fillRect(wx, wy, ww, wh);
+					ctx.strokeStyle = w.isMovable ? '#ff9800' : '#78909c';
+					ctx.lineWidth = 1.5;
+					ctx.strokeRect(wx, wy, ww, wh);
+					ctx.fillStyle = '#fff';
+					ctx.font = '9px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText(w.isMovable ? 'MB' : 'W', wx + ww / 2, wy + wh / 2 + 3);
+				});
+
+				// Doors
+				(room.doors || []).forEach((d, i) => {
+					const doorSize = 16;
+					let dx, dy;
+					if (d.wall === 'n') {
+						dx = roomOriginX + d.location * roomPixelW;
+						dy = roomOriginY;
+					} else if (d.wall === 's') {
+						dx = roomOriginX + d.location * roomPixelW;
+						dy = roomOriginY + roomPixelH - doorSize;
+					} else if (d.wall === 'w') {
+						dx = roomOriginX;
+						dy = roomOriginY + d.location * roomPixelH;
+					} else {
+						dx = roomOriginX + roomPixelW - doorSize;
+						dy = roomOriginY + d.location * roomPixelH;
+					}
+					ctx.fillStyle = d.key ? '#ff4444' : '#e94560';
+					ctx.fillRect(
+						dx -
+							doorSize / 2 +
+							(d.wall === 'w' || d.wall === 'e' ? doorSize / 2 : 0),
+						dy -
+							doorSize / 2 +
+							(d.wall === 'n' || d.wall === 's' ? doorSize / 2 : 0),
+						d.wall === 'n' || d.wall === 's' ? doorSize : doorSize,
+						d.wall === 'e' || d.wall === 'w' ? doorSize : doorSize,
+					);
+					ctx.fillStyle = '#fff';
+					ctx.font = '9px sans-serif';
+					ctx.textAlign = 'center';
+					const labelX =
+						dx +
+						(d.wall === 'e' ? doorSize / 2 : d.wall === 'w' ? doorSize / 2 : 0);
+					const labelY =
+						dy +
+						(d.wall === 's'
+							? doorSize / 2
+							: d.wall === 'n'
+								? doorSize / 2
+								: 0) +
+						3;
+					ctx.fillText('→' + d.roomId, labelX, labelY);
+					if (d.key) {
+						ctx.fillStyle = '#ffd700';
+						ctx.font = '8px sans-serif';
+						ctx.fillText('🔑', labelX, labelY + 10);
+					}
+				});
+
+				// Items
+				(room.items || []).forEach((it, i) => {
+					const ix = roomOriginX + it.location.x * canvasScale;
+					const iy = roomOriginY + it.location.y * canvasScale;
+					ctx.beginPath();
+					ctx.arc(ix, iy, 8, 0, Math.PI * 2);
+					ctx.fillStyle = 'rgba(255, 215, 0, 0.7)';
+					ctx.fill();
+					ctx.strokeStyle = '#ffd700';
+					ctx.lineWidth = 1.5;
+					ctx.stroke();
+					ctx.fillStyle = '#000';
+					ctx.font = '8px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText(it.id.substring(0, 4), ix, iy + 3);
+				});
+
+				// Characters
+				(room.characters || []).forEach((c, i) => {
+					const cx = roomOriginX + c.location.x * canvasScale;
+					const cy = roomOriginY + c.location.y * canvasScale;
+					ctx.beginPath();
+					ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+					ctx.fillStyle = 'rgba(0, 188, 212, 0.5)';
+					ctx.fill();
+					ctx.strokeStyle = '#00bcd4';
+					ctx.lineWidth = 2;
+					ctx.stroke();
+					ctx.fillStyle = '#fff';
+					ctx.font = '9px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText(c.id.substring(0, 6), cx, cy + 3);
+				});
+
+				// Portals
+				(room.portals || []).forEach((p, i) => {
+					const px = roomOriginX + p.location.x * canvasScale;
+					const py = roomOriginY + p.location.y * canvasScale;
+					// Draw a diamond shape
+					ctx.beginPath();
+					ctx.moveTo(px, py - 10);
+					ctx.lineTo(px + 8, py);
+					ctx.lineTo(px, py + 10);
+					ctx.lineTo(px - 8, py);
+					ctx.closePath();
+					ctx.fillStyle = 'rgba(156, 39, 176, 0.5)';
+					ctx.fill();
+					ctx.strokeStyle = '#9c27b0';
+					ctx.lineWidth = 1.5;
+					ctx.stroke();
+					ctx.fillStyle = '#fff';
+					ctx.font = '8px sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText('P→' + p.destination.roomId, px, py + 3);
+				});
+
+				updateCanvasInfo();
+			}
+
+			function updateCanvasInfo() {
+				const info = document.getElementById('canvas-info');
+				if (selectedRoomIndex < 0 || !rooms[selectedRoomIndex]) {
+					info.textContent = 'No room selected';
+					return;
+				}
+				const room = rooms[selectedRoomIndex];
+				const counts = [
+					`${(room.walls || []).length} walls`,
+					`${(room.doors || []).length} doors`,
+					`${(room.items || []).length} items`,
+					`${(room.characters || []).length} chars`,
+					`${(room.portals || []).length} portals`,
+				].join(' | ');
+				info.textContent = `Room #${room.id} (${room.width} × ${room.height}) — ${counts}`;
+			}
+
+			// ============== CANVAS INTERACTION ==============
+			function canvasToRoom(e) {
+				const rect = canvas.getBoundingClientRect();
+				const mx = e.clientX - rect.left;
+				const my = e.clientY - rect.top;
+				const rx = (mx - roomOriginX) / canvasScale;
+				const ry = (my - roomOriginY) / canvasScale;
+				return {
+					mx,
+					my,
+					rx: Math.round(rx * 100) / 100,
+					ry: Math.round(ry * 100) / 100,
+				};
+			}
+
+			function findElementAt(rx, ry) {
+				if (selectedRoomIndex < 0) return null;
+				const room = rooms[selectedRoomIndex];
+				const threshold = 0.03;
+
+				// Check items
+				for (let i = 0; i < (room.items || []).length; i++) {
+					const it = room.items[i];
+					if (
+						Math.abs(it.location.x - rx) < threshold &&
+						Math.abs(it.location.y - ry) < threshold
+					) {
+						return { type: 'item', index: i, obj: it };
+					}
+				}
+				// Check characters
+				for (let i = 0; i < (room.characters || []).length; i++) {
+					const c = room.characters[i];
+					if (
+						Math.abs(c.location.x - rx) < threshold &&
+						Math.abs(c.location.y - ry) < threshold
+					) {
+						return { type: 'character', index: i, obj: c };
+					}
+				}
+				// Check portals
+				for (let i = 0; i < (room.portals || []).length; i++) {
+					const p = room.portals[i];
+					if (
+						Math.abs(p.location.x - rx) < threshold &&
+						Math.abs(p.location.y - ry) < threshold
+					) {
+						return { type: 'portal', index: i, obj: p };
+					}
+				}
+				// Check walls
+				for (let i = 0; i < (room.walls || []).length; i++) {
+					const w = room.walls[i];
+					if (
+						rx >= w.location.x &&
+						rx <= w.location.x + w.width &&
+						ry >= w.location.y &&
+						ry <= w.location.y + w.height
+					) {
+						return { type: 'wall', index: i, obj: w };
+					}
+				}
+				return null;
+			}
+
+			function onCanvasMouseDown(e) {
+				if (selectedRoomIndex < 0) return;
+				const { rx, ry } = canvasToRoom(e);
+				const room = rooms[selectedRoomIndex];
+
+				if (currentTool === 'select') {
+					const elem = findElementAt(rx, ry);
+					if (elem) {
+						dragTarget = elem;
+						if (elem.type === 'wall') {
+							dragOffset = {
+								x: rx - elem.obj.location.x,
+								y: ry - elem.obj.location.y,
+							};
+						} else if (elem.type === 'portal') {
+							dragOffset = {
+								x: rx - elem.obj.location.x,
+								y: ry - elem.obj.location.y,
+							};
+						} else {
+							dragOffset = {
+								x: rx - elem.obj.location.x,
+								y: ry - elem.obj.location.y,
+							};
+						}
+					}
+				} else if (currentTool === 'wall') {
+					wallDrawStart = { x: rx, y: ry };
+				} else if (currentTool === 'item') {
+					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+						if (!room.items) room.items = [];
+						room.items.push({
+							id: document.getElementById('item-select').value,
+							location: { x: rx, y: ry },
+						});
+						renderProps();
+						drawRoom();
+					}
+				} else if (currentTool === 'character') {
+					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+						if (!room.characters) room.characters = [];
+						room.characters.push({
+							id: document.getElementById('char-select').value,
+							location: { x: rx, y: ry },
+						});
+						renderProps();
+						drawRoom();
+					}
+				} else if (currentTool === 'door') {
+					// Determine which wall the click is closest to
+					const room = rooms[selectedRoomIndex];
+					const dists = {
+						n: ry,
+						s: room.height - ry,
+						w: rx,
+						e: room.width - rx,
+					};
+					let closestWall = 'n';
+					let minDist = Infinity;
+					for (const [wall, dist] of Object.entries(dists)) {
+						if (dist < minDist) {
+							minDist = dist;
+							closestWall = wall;
+						}
+					}
+					const loc =
+						closestWall === 'n' || closestWall === 's'
+							? rx / room.width
+							: ry / room.height;
+					if (!room.doors) room.doors = [];
+					room.doors.push({
+						roomId: 0,
+						wall: closestWall,
+						location: Math.round(loc * 100) / 100,
+					});
+					renderProps();
+					drawRoom();
+				} else if (currentTool === 'portal') {
+					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+						if (!room.portals) room.portals = [];
+						room.portals.push({
+							location: { x: rx, y: ry },
+							destination: { roomId: 0, x: 0.5, y: 0.5 },
+						});
+						renderProps();
+						drawRoom();
+					}
+				}
+			}
+
+			function onCanvasMouseMove(e) {
+				const { rx, ry } = canvasToRoom(e);
+
+				if (dragTarget && currentTool === 'select') {
+					const newX = Math.round((rx - dragOffset.x) * 100) / 100;
+					const newY = Math.round((ry - dragOffset.y) * 100) / 100;
+					if (dragTarget.type === 'wall') {
+						dragTarget.obj.location.x = newX;
+						dragTarget.obj.location.y = newY;
+					} else if (dragTarget.type === 'portal') {
+						dragTarget.obj.location.x = newX;
+						dragTarget.obj.location.y = newY;
+					} else {
+						dragTarget.obj.location.x = newX;
+						dragTarget.obj.location.y = newY;
+					}
+					drawRoom();
+				}
+
+				if (wallDrawStart && currentTool === 'wall') {
+					drawRoom();
+					// Preview wall being drawn
+					const x1 = roomOriginX + Math.min(wallDrawStart.x, rx) * canvasScale;
+					const y1 = roomOriginY + Math.min(wallDrawStart.y, ry) * canvasScale;
+					const w = Math.abs(rx - wallDrawStart.x) * canvasScale;
+					const h = Math.abs(ry - wallDrawStart.y) * canvasScale;
+					ctx.fillStyle = 'rgba(120, 144, 156, 0.3)';
+					ctx.fillRect(x1, y1, w, h);
+					ctx.strokeStyle = '#78909c';
+					ctx.lineWidth = 1;
+					ctx.setLineDash([4, 4]);
+					ctx.strokeRect(x1, y1, w, h);
+					ctx.setLineDash([]);
+				}
+			}
+
+			function onCanvasMouseUp(e) {
+				if (dragTarget) {
+					dragTarget = null;
+					renderProps();
+					drawRoom();
+					return;
+				}
+
+				if (wallDrawStart && currentTool === 'wall') {
+					const { rx, ry } = canvasToRoom(e);
+					const x = Math.round(Math.min(wallDrawStart.x, rx) * 100) / 100;
+					const y = Math.round(Math.min(wallDrawStart.y, ry) * 100) / 100;
+					const w = Math.round(Math.abs(rx - wallDrawStart.x) * 100) / 100;
+					const h = Math.round(Math.abs(ry - wallDrawStart.y) * 100) / 100;
+					if (w > 0.01 && h > 0.01) {
+						const room = rooms[selectedRoomIndex];
+						if (!room.walls) room.walls = [];
+						room.walls.push({ location: { x, y }, width: w, height: h });
+						renderProps();
+						drawRoom();
+					}
+					wallDrawStart = null;
+				}
+			}
+
+			// ============== JSON VIEW ==============
+			function viewJSON() {
+				if (selectedRoomIndex < 0) {
+					alert('Select a room first');
+					return;
+				}
+				const room = rooms[selectedRoomIndex];
+				document.getElementById('json-textarea').value = JSON.stringify(
+					room,
+					null,
+					2,
+				);
+				document.getElementById('json-modal').classList.add('visible');
+			}
+
+			function applyJSON() {
+				try {
+					const parsed = JSON.parse(
+						document.getElementById('json-textarea').value,
+					);
+					rooms[selectedRoomIndex] = parsed;
+					closeJSONModal();
+					renderRoomList();
+					renderProps();
+					drawRoom();
+				} catch (err) {
+					alert('Invalid JSON: ' + err.message);
+				}
+			}
+
+			function closeJSONModal() {
+				document.getElementById('json-modal').classList.remove('visible');
+			}
+
+			// Close modal on backdrop click
+			document
+				.getElementById('json-modal')
+				.addEventListener('click', function (e) {
+					if (e.target === this) closeJSONModal();
+				});
+
+			// ============== KEYBOARD SHORTCUTS ==============
+			document.addEventListener('keydown', function (e) {
+				if (
+					e.target.tagName === 'INPUT' ||
+					e.target.tagName === 'TEXTAREA' ||
+					e.target.tagName === 'SELECT'
+				)
+					return;
+
+				if (e.key === 'Delete' || e.key === 'Backspace') {
+					// Delete is handled by the remove buttons
+				}
+				// Ctrl+S = export
+				if (e.ctrlKey && e.key === 's') {
+					e.preventDefault();
+					exportRooms();
+				}
+				// Ctrl+O = load
+				if (e.ctrlKey && e.key === 'o') {
+					e.preventDefault();
+					loadRoomsFile();
+				}
+				// Number keys to switch tools
+				if (e.key === '1') {
+					document.getElementById('tool-select').value = 'select';
+					setTool('select');
+				}
+				if (e.key === '2') {
+					document.getElementById('tool-select').value = 'wall';
+					setTool('wall');
+				}
+				if (e.key === '3') {
+					document.getElementById('tool-select').value = 'item';
+					setTool('item');
+				}
+				if (e.key === '4') {
+					document.getElementById('tool-select').value = 'character';
+					setTool('character');
+				}
+				if (e.key === '5') {
+					document.getElementById('tool-select').value = 'door';
+					setTool('door');
+				}
+				if (e.key === '6') {
+					document.getElementById('tool-select').value = 'portal';
+					setTool('portal');
+				}
+			});
+		</script>
+	</body>
+</html>
