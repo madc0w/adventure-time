@@ -2427,7 +2427,15 @@ function debug(text) {
 function play(sound) {
 	if (sound && didUserInteract) {
 		try {
-			sound.play();
+			sound.currentTime = 0;
+			const promise = sound.play();
+			if (promise) {
+				promise.catch((e) => {
+					if (e.name !== 'AbortError') {
+						console.error(e);
+					}
+				});
+			}
 			return true;
 		} catch (e) {
 			console.error(e);
