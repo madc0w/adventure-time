@@ -23,6 +23,9 @@ const mapBackgroundColor = '#e2e2b1';
 const mapPassageColor = '#ccd';
 const mapMargin = 0.02;
 const mapScale = 0.24;
+let mapZoom = 1;
+let mapPan = { x: 0, y: 0 };
+let mapDrag = null;
 
 const portalSize = 0.12;
 const portalAnimInterval = 60;
@@ -181,6 +184,32 @@ function load() {
 	document.addEventListener('keyup', onKeyUp);
 	document.addEventListener('mousedown', (e) => {
 		didUserInteract = true;
+	});
+	canvas.addEventListener(
+		'wheel',
+		(e) => {
+			if (drawFunc === drawMap) {
+				e.preventDefault();
+				const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+				mapZoom = Math.max(0.3, Math.min(5, mapZoom * zoomFactor));
+			}
+		},
+		{ passive: false },
+	);
+	canvas.addEventListener('mousedown', (e) => {
+		if (drawFunc === drawMap) {
+			mapDrag = { x: e.clientX, y: e.clientY };
+		}
+	});
+	canvas.addEventListener('mousemove', (e) => {
+		if (mapDrag) {
+			mapPan.x += (e.clientX - mapDrag.x) / mapZoom;
+			mapPan.y += (e.clientY - mapDrag.y) / mapZoom;
+			mapDrag = { x: e.clientX, y: e.clientY };
+		}
+	});
+	document.addEventListener('mouseup', () => {
+		mapDrag = null;
 	});
 
 	for (const itemKey in items) {
@@ -1797,6 +1826,12 @@ function drawMap() {
 			canvas.height * (1 - 2 * mapMargin),
 		);
 	}
+
+	ctx.save();
+	ctx.translate(canvas.width / 2, canvas.height / 2);
+	ctx.scale(mapZoom, mapZoom);
+	ctx.translate(mapPan.x, mapPan.y);
+	ctx.translate(-canvas.width / 2, -canvas.height / 2);
 	const mapped = [];
 
 	function drawRoom(room, offset) {
@@ -1946,6 +1981,8 @@ function drawMap() {
 		const y = (canvas.height - height) / 2;
 		ctx.drawImage(characterFrames.player.idleFrames[0], x, y, width, height);
 	}
+
+	ctx.restore();
 }
 
 function drawMerchantInteraction() {
@@ -2212,6 +2249,10 @@ function onKeyUp(e) {
 	if (key == 'M') {
 		state.player.motion = 'idleFrames';
 		animate(state.player);
+		if (drawFunc == drawMap) {
+			mapZoom = 1;
+			mapPan = { x: 0, y: 0 };
+		}
 		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
 		closeModals();
 	} else if (key == 'H') {
