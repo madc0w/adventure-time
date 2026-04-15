@@ -118,7 +118,7 @@ items = {
 		},
 		action: (state) => {
 			if (state.player.health < 1) {
-				state.player.health = Math.min(1, state.player.health + 0.12);
+				state.player.health = Math.min(1, state.player.health + 0.2);
 				return true;
 			}
 		},

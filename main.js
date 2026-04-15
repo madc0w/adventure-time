@@ -30,7 +30,7 @@ let mapDrag = null;
 const portalSize = 0.12;
 const portalAnimInterval = 60;
 const numPortalFrames = 38;
-const roomWallColor = '#222';
+const roomWallColor = '#042';
 
 const fontFamily = 'Lato';
 // const fontFamily = 'Jura';
@@ -1856,6 +1856,56 @@ function drawMap() {
 				room.backgroundImage || defaultRoomBackground
 			}`;
 			ctx.drawImage(roomBackground, x + offset.x, y + offset.y, width, height);
+
+			// internal walls
+			for (const wall of room.walls || []) {
+				const wx = x + offset.x + wall.location.x * width;
+				const wy = y + offset.y + wall.location.y * height;
+				const ww = wall.width * width;
+				const wh = wall.height * height;
+				if (wall.background) {
+					const wallSrc = `img/rooms/${wall.background}`;
+					if (!imageCache[wallSrc]) {
+						imageCache[wallSrc] = new Image();
+						imageCache[wallSrc].src = wallSrc;
+					}
+					ctx.drawImage(imageCache[wallSrc], wx, wy, ww, wh);
+				} else {
+					ctx.fillStyle = wall.color || roomWallColor;
+					ctx.fillRect(wx, wy, ww, wh);
+				}
+			}
+
+			// items
+			for (const roomItem of room.items || []) {
+				const item = items[roomItem.id];
+				if (item && item.image && item.image.width) {
+					const itemSize = item.size || 0.1;
+					const iw =
+						((itemSize * item.image.width) / item.image.height) * width;
+					const ih = itemSize * height;
+					const ix = x + offset.x + roomItem.location.x * width - iw / 2;
+					const iy = y + offset.y + roomItem.location.y * height - ih / 2;
+					ctx.drawImage(item.image, ix, iy, iw, ih);
+				}
+			}
+
+			// characters
+			for (const roomCharacter of room.characters || []) {
+				const character = characters[roomCharacter.id];
+				if (character && characterFrames[roomCharacter.id]) {
+					const cw = character.width * mapScale * canvas.width;
+					const ch = character.height * mapScale * canvas.height;
+					const cx = x + offset.x + roomCharacter.location.x * width - cw / 2;
+					const cy = y + offset.y + roomCharacter.location.y * height - ch / 2;
+					const img =
+						characterImages[roomCharacter.id] ||
+						characterFrames[roomCharacter.id].idleFrames[0];
+					if (img) {
+						ctx.drawImage(img, cx, cy, cw, ch);
+					}
+				}
+			}
 		}
 
 		for (const door of room.doors || []) {
