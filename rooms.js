@@ -1,6 +1,4 @@
 defaultRoomBackground = 'granite stones texture.jpg';
-// defaultWallBackground = 'pavers.jpg';
-// defaultRoomMusic = 'holy grail theme.mp3';
 
 const movingBlock = {
 	isMovable: true,
@@ -15,10 +13,8 @@ rooms = [
 		level: 1,
 		width: 0.9,
 		height: 0.6,
-		walls: [],
 		doors: [
 			{
-				// isOneWay: true,
 				roomId: 3,
 				wall: 's',
 				location: 0.2,
@@ -31,43 +27,47 @@ rooms = [
 				location: 0.44,
 			},
 			{
-				// isOneWay: true,
 				roomId: 4,
 				wall: 'n',
 				location: 0.5,
 				key: 'blueKey',
 			},
 			{
-				// isOneWay: true,
 				roomId: 5,
 				wall: 'e',
 				location: 0.5,
 			},
 		],
-		// items: [
-		// 	{
-		// 		id: 'enchantedSword',
-		// 		location: {
-		// 			x: 0.9,
-		// 			y: 0.9,
-		// 		},
-		// 	},
-		// ],
 	},
 	{
 		id: 1,
 		width: 0.9,
 		height: 0.6,
-
+		walls: [
+			{
+				location: {
+					x: 0.4,
+					y: 0.68,
+				},
+				width: 0.6,
+				height: 0.06,
+			},
+			{
+				location: {
+					x: 0.4,
+					y: 0.7,
+				},
+				width: 0.04,
+				height: 0.16,
+			},
+		],
 		doors: [
 			{
-				// isOneWay: true,
 				roomId: 2,
 				wall: 's',
 				location: 0.2,
 			},
 		],
-
 		portals: [
 			{
 				location: {
@@ -95,24 +95,6 @@ rooms = [
 					x: 0.4,
 					y: 0.4,
 				},
-			},
-		],
-		walls: [
-			{
-				location: {
-					x: 0.4,
-					y: 0.68,
-				},
-				width: 0.6,
-				height: 0.06,
-			},
-			{
-				location: {
-					x: 0.4,
-					y: 0.7,
-				},
-				width: 0.04,
-				height: 0.16,
 			},
 		],
 		items: [
@@ -143,7 +125,6 @@ rooms = [
 		id: 2,
 		width: 0.9,
 		height: 0.6,
-		doors: [],
 		portals: [
 			{
 				location: {
@@ -192,7 +173,6 @@ rooms = [
 		id: 3,
 		width: 0.9,
 		height: 0.6,
-
 		items: [
 			{
 				id: 'blueKey',
@@ -220,14 +200,21 @@ rooms = [
 	{
 		id: 4,
 		level: 2,
-		width: 0.9,
+		width: 0.27,
 		height: 0.6,
+		doors: [
+			{
+				roomId: 7,
+				wall: 'n',
+				location: 0.3,
+			},
+		],
 		items: [
 			{
 				id: 'superTreasure',
 				location: {
-					x: 0.5,
-					y: 0.2,
+					x: 0.08,
+					y: 0.15,
 				},
 			},
 		],
@@ -236,9 +223,39 @@ rooms = [
 		id: 5,
 		width: 0.96,
 		height: 0.96,
+		walls: [
+			{
+				location: {
+					x: 0.4,
+					y: 0.02,
+				},
+				...movingBlock,
+			},
+			{
+				location: {
+					x: 0.6,
+					y: 0.02,
+				},
+				...movingBlock,
+			},
+			{
+				location: {
+					x: 0.02,
+					y: 0.2,
+				},
+				...movingBlock,
+			},
+			{
+				location: {
+					x: 0.2,
+					y: 0.2,
+				},
+				...movingBlock,
+				width: 0.24,
+			},
+		],
 		doors: [
 			{
-				// isOneWay: true,
 				roomId: 6,
 				wall: 'e',
 				location: 0.2,
@@ -276,37 +293,6 @@ rooms = [
 				},
 			},
 		],
-		walls: [
-			{
-				location: {
-					x: 0.4,
-					y: 0.02,
-				},
-				...movingBlock,
-			},
-			{
-				location: {
-					x: 0.6,
-					y: 0.02,
-				},
-				...movingBlock,
-			},
-			{
-				location: {
-					x: 0.02,
-					y: 0.2,
-				},
-				...movingBlock,
-			},
-			{
-				location: {
-					x: 0.2,
-					y: 0.2,
-				},
-				...movingBlock,
-				width: 0.24,
-			},
-		],
 	},
 	{
 		id: 6,
@@ -317,7 +303,7 @@ rooms = [
 				id: 'merchant',
 				location: {
 					x: 0.5,
-					y: 0.0,
+					y: 0,
 				},
 				itemsForSale: [
 					'enchantedSword',
@@ -337,5 +323,85 @@ rooms = [
 				},
 			},
 		],
+	},
+	{
+		id: 7,
+		width: 0.9,
+		height: 0.6,
+		doors: [
+			{
+				roomId: 8,
+				wall: 'e',
+				location: 0.15,
+			},
+			{
+				roomId: 9,
+				wall: 'n',
+				location: 0.77,
+			},
+		],
+		characters: [
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.17,
+					y: 0.32,
+				},
+			},
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.64,
+					y: 0.24,
+				},
+			},
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.58,
+					y: 0.54,
+				},
+			},
+			{
+				id: 'zlakik',
+				location: {
+					x: 0.28,
+					y: 0.47,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'healingPotion1',
+				location: {
+					x: 0.07,
+					y: 0.06,
+				},
+			},
+			{
+				id: 'treasure',
+				location: {
+					x: 0.21,
+					y: 0.05,
+				},
+			},
+			{
+				id: 'healingPotion1',
+				location: {
+					x: 0.12,
+					y: 0.11,
+				},
+			},
+		],
+	},
+	{
+		id: 8,
+		width: 0.9,
+		height: 0.6,
+	},
+	{
+		id: 9,
+		width: 0.9,
+		height: 0.6,
 	},
 ];
