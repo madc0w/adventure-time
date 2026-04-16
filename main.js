@@ -91,6 +91,9 @@ function load() {
 	initState();
 	if (localStorage.state) {
 		state = JSON.parse(localStorage.state);
+		if (!state.kills) {
+			state.kills = {};
+		}
 		if (state.room) {
 			state.room = rooms.find((r) => r.id == state.room.id);
 			state.room.doors = rooms[state.room.id].doors;
@@ -509,13 +512,12 @@ function drawGame() {
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
 
-			if (!state.isGameOver) {
+			if (!state.isGameOver && roomCharacter.motion != 'dieFrames') {
 				if (
 					roomCharacter.motion != 'attackFrames' &&
 					character.attackMetrics &&
 					Math.random() < character.attackMetrics.prob &&
-					distance(roomCharacter) < character.attackMetrics.range &&
-					roomCharacter.motion != 'dieFrames'
+					distance(roomCharacter) < character.attackMetrics.range
 				) {
 					roomCharacter.motion = 'attackPrepFrames';
 					animate(roomCharacter);
@@ -615,6 +617,7 @@ function drawGame() {
 				const characterHeight =
 					(characterIntersectionLeeway * (character.height / roomHeight)) / 2;
 				if (
+					roomCharacter.motion != 'dieFrames' &&
 					state.player.x + playerWidth >
 						roomCharacter.location.x - characterWidth &&
 					state.player.x - playerWidth <
@@ -1335,6 +1338,7 @@ function drawGame() {
 			2;
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
+			if (roomCharacter.motion == 'dieFrames') continue;
 			const characterWidth =
 				(characterIntersectionLeeway * (character.width / roomWidth)) / 2;
 			const characterHeight =
@@ -1767,7 +1771,7 @@ function drawGame() {
 
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
-			if (character.type == 'enemy') {
+			if (character.type == 'enemy' && roomCharacter.motion != 'dieFrames') {
 				const left = roomCharacter.location.x - character.width / roomWidth / 2;
 				const top =
 					roomCharacter.location.y - character.height / roomHeight / 2;
@@ -2094,6 +2098,46 @@ function drawInventory() {
 	document.getElementById('inventory-table').innerHTML = html;
 }
 
+function toggleMap() {
+	state.player.motion = 'idleFrames';
+	animate(state.player);
+	if (drawFunc == drawMap) {
+		mapZoom = 1;
+		mapPan = { x: 0, y: 0 };
+	}
+	drawFunc = drawFunc == drawMap ? drawGame : drawMap;
+	closeModals();
+}
+
+function toggleInventory() {
+	state.player.motion = 'idleFrames';
+	animate(state.player);
+	closeModals();
+	if (!state.isPaused) {
+		togglePause();
+	}
+	drawInventory();
+}
+
+function showKills() {
+	closeModals();
+	play(clickSound);
+	setPaused(true);
+	let html = '<tr><th>Name</th><th>Kills</th></tr>';
+	let hasKills = false;
+	for (const id in state.kills) {
+		if (state.kills[id] > 0) {
+			hasKills = true;
+			html += `<tr><td>${id}</td><td>${state.kills[id]}</td></tr>`;
+		}
+	}
+	if (!hasKills) {
+		html = '<tr><th>No kills yet</th></tr>';
+	}
+	document.getElementById('kills-table').innerHTML = html;
+	document.getElementById('kills-modal').classList.remove('hidden');
+}
+
 function aim() {
 	const weapon = items[state.player.wielding];
 	const projectile = items[weapon.projectile];
@@ -2220,12 +2264,16 @@ function attack() {
 }
 
 function injur(character, injuryValue) {
+	const wasAlive = character.health > 0;
 	character.health -= injuryValue;
-	if (character.health <= 0) {
+	if (character.health <= 0 && wasAlive) {
 		// die
 		character.motion = 'dieFrames';
 		animate(character);
 		play(characters[character.id].sounds.die);
+		if (characters[character.id].type == 'enemy') {
+			state.kills[character.id] = (state.kills[character.id] || 0) + 1;
+		}
 
 		const interval = 24;
 		character.animStep = 0;
@@ -2252,7 +2300,7 @@ function getTargetedCharacter() {
 	// console.log(weapon);
 	for (const roomCharacter of state.room.characters || []) {
 		const character = characters[roomCharacter.id];
-		if (character.type == 'enemy') {
+		if (character.type == 'enemy' && roomCharacter.motion != 'dieFrames') {
 			const dist = distance(roomCharacter);
 			// console.log(dist);
 			if ((!minDist || dist < minDist) && dist <= weapon.range) {
@@ -2297,25 +2345,11 @@ function onKeyUp(e) {
 	}
 
 	if (key == 'M') {
-		state.player.motion = 'idleFrames';
-		animate(state.player);
-		if (drawFunc == drawMap) {
-			mapZoom = 1;
-			mapPan = { x: 0, y: 0 };
-		}
-		drawFunc = drawFunc == drawMap ? drawGame : drawMap;
-		closeModals();
+		toggleMap();
 	} else if (key == 'H') {
 		showModal('instructions-modal');
 	} else if (key == 'I') {
-		state.player.motion = 'idleFrames';
-		animate(state.player);
-		closeModals();
-		if (!state.isPaused) {
-			togglePause();
-		}
-		// drawFunc = drawFunc == drawInventory ? drawGame : drawInventory;
-		drawInventory();
+		toggleInventory();
 	} else if (key == 'P') {
 		isPulling = false;
 	} else if (['A', ' '].includes(key)) {
@@ -2925,6 +2959,7 @@ function initState(room) {
 			motion: 'idleFrames',
 		},
 		inventory: {},
+		kills: {},
 		room,
 		t: 0,
 		pausedTime: 0,

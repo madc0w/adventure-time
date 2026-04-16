@@ -38,6 +38,15 @@ rooms = [
 				location: 0.5,
 			},
 		],
+		characters: [
+			{
+				id: 'voidWraith',
+				location: {
+					x: 0.11,
+					y: 0.08,
+				},
+			},
+		],
 	},
 	{
 		id: 1,

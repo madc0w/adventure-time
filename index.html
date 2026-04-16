@@ -122,6 +122,10 @@
 					Level
 					<div id="level"></div>
 				</div>
+				<div class="button" onClick="toggleMap()">Map</div>
+				<div class="button" onClick="toggleInventory()">Inventory</div>
+				<div class="button" onClick="showKills()">Kills</div>
+				<hr class="controls-separator" />
 				<div
 					id="how-to-play"
 					class="button"
@@ -156,6 +160,15 @@
 			<hr />
 			<div class="table-container">
 				<table id="inventory-table"></table>
+			</div>
+			<div class="button" onClick="closeModals()">OK</div>
+		</div>
+
+		<div id="kills-modal" class="hidden modal">
+			<div class="header">Kills</div>
+			<hr />
+			<div class="table-container">
+				<table id="kills-table"></table>
 			</div>
 			<div class="button" onClick="closeModals()">OK</div>
 		</div>

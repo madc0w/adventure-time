@@ -505,46 +505,15 @@
 			let dragOffset = { x: 0, y: 0 };
 			let wallDrawStart = null;
 
-			// Known items and characters (extracted from the game files)
-			const knownItems = [
-				'treasure',
-				'superTreasure',
-				'enchantedSword',
-				'venomDagger',
-				'electrosmasher',
-				'bow',
-				'arrow',
-				'healingPotion1',
-				'invisibilityPotion',
-				'blueKey',
-				'redKey',
-			];
+			let knownItems = [];
 
-			const knownCharacters = ['megabug', 'zlakik', 'doomScreen', 'merchant'];
+			let knownCharacters = [];
 
 			const wallDirections = ['n', 's', 'e', 'w'];
 
-			// Image path mappings
-			const itemImages = {
-				treasure: 'img/items/treasure-05.png',
-				superTreasure: 'img/items/treasure-06.png',
-				enchantedSword: 'img/items/enchanted sword.png',
-				venomDagger: 'img/items/venom dagger.png',
-				electrosmasher: 'img/items/electrosmasher.png',
-				bow: 'img/items/bow.png',
-				arrow: 'img/items/arrow.png',
-				healingPotion1: 'img/items/healing potion 01.png',
-				invisibilityPotion: 'img/items/invisibility potion.png',
-				blueKey: 'img/items/key 01.png',
-				redKey: 'img/items/key 02.png',
-			};
+			let itemImages = {};
 
-			const characterImages = {
-				megabug: 'img/charactes/megabug v2 01.png',
-				zlakik: 'img/charactes/zlakik 01.png',
-				doomScreen: 'img/charactes/doom screen standing 01.png',
-				merchant: 'img/charactes/merchant 01.png',
-			};
+			let characterImages = {};
 
 			const doorImages = {
 				horizontal: 'img/rooms/door horizontal.png',
@@ -557,7 +526,7 @@
 				if (!imageCache[src]) {
 					const img = new Image();
 					img.src = src;
-					img.onload = () => drawRoom();
+					img.onload = drawRoom;
 					imageCache[src] = img;
 				}
 				return imageCache[src];
@@ -565,9 +534,40 @@
 
 			// ============== INIT ==============
 			window.onload = function () {
-				populateDropdowns();
 				setupCanvas();
-				// Auto-load rooms.js via script tag (works with file:// protocol)
+				loadScript('items.js', function () {
+					if (typeof items !== 'undefined') {
+						knownItems = Object.keys(items);
+						for (const [id, item] of Object.entries(items)) {
+							if (item.image) {
+								itemImages[id] = 'img/items/' + item.image;
+							}
+						}
+					}
+					loadScript('characters.js', function () {
+						if (typeof characters !== 'undefined') {
+							knownCharacters = Object.keys(characters);
+							for (const [id, char] of Object.entries(characters)) {
+								if (char.idleFrames && char.idleFrames.length > 0) {
+									characterImages[id] = 'img/charactes/' + char.idleFrames[0];
+								}
+							}
+						}
+						populateDropdowns();
+						loadRooms();
+					});
+				});
+			};
+
+			function loadScript(src, callback) {
+				const script = document.createElement('script');
+				script.src = src;
+				script.onload = callback;
+				script.onerror = callback;
+				document.head.appendChild(script);
+			}
+
+			function loadRooms() {
 				const script = document.createElement('script');
 				script.src = 'rooms.js';
 				script.onload = function () {
@@ -582,7 +582,7 @@
 					renderRoomList();
 				};
 				document.head.appendChild(script);
-			};
+			}
 
 			function populateDropdowns() {
 				const itemSel = document.getElementById('item-select');
@@ -835,12 +835,12 @@
 					div.className =
 						'room-entry' + (i === selectedRoomIndex ? ' selected' : '');
 					div.innerHTML = `
-			<span>
-				<span class="room-id">#${room.id}</span>
-				<span class="room-label">Room ${room.id}${room.level != null ? ' (L' + room.level + ')' : ''}</span>
-			</span>
-			<button class="delete-room" onclick="event.stopPropagation(); deleteRoom(${i})" title="Delete room">×</button>
-		`;
+						<span>
+							<span class="room-id">#${room.id}</span>
+							<span class="room-label">Room ${room.id}${room.level != null ? ' (L' + room.level + ')' : ''}</span>
+						</span>
+						<button class="delete-room" onclick="event.stopPropagation(); deleteRoom(${i})" title="Delete room">×</button>
+					`;
 					div.onclick = () => selectRoom(i);
 					list.appendChild(div);
 				});
@@ -908,101 +908,101 @@
 
 				// Room Properties
 				html += `<div class="props-section">
-		<h3>Room #${room.id} Properties</h3>
-		<div class="prop-row"><label>ID</label><input type="number" value="${room.id}" onchange="updateRoomProp('id', parseInt(this.value))"></div>
-		<div class="prop-row"><label>Level</label><input type="number" value="${room.level ?? ''}" placeholder="(none)" onchange="updateRoomProp('level', this.value ? parseInt(this.value) : undefined)"></div>
-		<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.1" max="1" value="${room.width}" onchange="updateRoomProp('width', parseFloat(this.value))"></div>
-		<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.1" max="1" value="${room.height}" onchange="updateRoomProp('height', parseFloat(this.value))"></div>
-		<div class="prop-row"><label>Background</label><input type="text" value="${room.background || ''}" placeholder="(default)" onchange="updateRoomProp('background', this.value || undefined)"></div>
-		<div class="prop-row"><label>Music</label><input type="text" value="${room.music || ''}" placeholder="(default)" onchange="updateRoomProp('music', this.value || undefined)"></div>
-	</div>`;
+					<h3>Room #${room.id} Properties</h3>
+					<div class="prop-row"><label>ID</label><input type="number" value="${room.id}" onchange="updateRoomProp('id', parseInt(this.value))"></div>
+					<div class="prop-row"><label>Level</label><input type="number" value="${room.level ?? ''}" placeholder="(none)" onchange="updateRoomProp('level', this.value ? parseInt(this.value) : undefined)"></div>
+					<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.1" max="1" value="${room.width}" onchange="updateRoomProp('width', parseFloat(this.value))"></div>
+					<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.1" max="1" value="${room.height}" onchange="updateRoomProp('height', parseFloat(this.value))"></div>
+					<div class="prop-row"><label>Background</label><input type="text" value="${room.background || ''}" placeholder="(default)" onchange="updateRoomProp('background', this.value || undefined)"></div>
+					<div class="prop-row"><label>Music</label><input type="text" value="${room.music || ''}" placeholder="(default)" onchange="updateRoomProp('music', this.value || undefined)"></div>
+				</div>`;
 
 				// Doors
 				html += `<div class="props-section">
-		<h3>Doors (${(room.doors || []).length}) <button onclick="addDoor()">+ Add</button></h3>`;
+					<h3>Doors (${(room.doors || []).length}) <button onclick="addDoor()">+ Add</button></h3>`;
 				(room.doors || []).forEach((d, i) => {
 					html += `<div class="sub-item">
-			<button class="remove-btn" onclick="removeDoor(${i})">×</button>
-			<div class="prop-row"><label>Room ID</label><input type="number" value="${d.roomId}" onchange="updateDoor(${i}, 'roomId', parseInt(this.value))"></div>
-			<div class="prop-row"><label>Wall</label>
-				<select onchange="updateDoor(${i}, 'wall', this.value)">
-					${wallDirections.map((w) => `<option value="${w}" ${d.wall === w ? 'selected' : ''}>${{ n: 'North', s: 'South', e: 'East', w: 'West' }[w]}</option>`).join('')}
-				</select>
-			</div>
-			<div class="prop-row"><label>Location</label><input type="number" step="0.01" min="0" max="1" value="${d.location}" onchange="updateDoor(${i}, 'location', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Key</label><input type="text" value="${d.key || ''}" placeholder="(none)" onchange="updateDoor(${i}, 'key', this.value || undefined)"></div>
-			<div class="prop-row"><label>One-way</label><input type="checkbox" ${d.isOneWay ? 'checked' : ''} onchange="updateDoor(${i}, 'isOneWay', this.checked || undefined)"></div>
-		</div>`;
+						<button class="remove-btn" onclick="removeDoor(${i})">×</button>
+						<div class="prop-row"><label>Room ID</label><input type="number" value="${d.roomId}" onchange="updateDoor(${i}, 'roomId', parseInt(this.value))"></div>
+						<div class="prop-row"><label>Wall</label>
+							<select onchange="updateDoor(${i}, 'wall', this.value)">
+								${wallDirections.map((w) => `<option value="${w}" ${d.wall === w ? 'selected' : ''}>${{ n: 'North', s: 'South', e: 'East', w: 'West' }[w]}</option>`).join('')}
+							</select>
+						</div>
+						<div class="prop-row"><label>Location</label><input type="number" step="0.01" min="0" max="1" value="${d.location}" onchange="updateDoor(${i}, 'location', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Key</label><input type="text" value="${d.key || ''}" placeholder="(none)" onchange="updateDoor(${i}, 'key', this.value || undefined)"></div>
+						<div class="prop-row"><label>One-way</label><input type="checkbox" ${d.isOneWay ? 'checked' : ''} onchange="updateDoor(${i}, 'isOneWay', this.checked || undefined)"></div>
+					</div>`;
 				});
 				html += `</div>`;
 
 				// Portals
 				html += `<div class="props-section">
-		<h3>Portals (${(room.portals || []).length}) <button onclick="addPortal()">+ Add</button></h3>`;
+					<h3>Portals (${(room.portals || []).length}) <button onclick="addPortal()">+ Add</button></h3>`;
 				(room.portals || []).forEach((p, i) => {
 					html += `<div class="sub-item">
-			<button class="remove-btn" onclick="removePortal(${i})">×</button>
-			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${p.location.x}" onchange="updatePortal(${i}, 'location.x', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${p.location.y}" onchange="updatePortal(${i}, 'location.y', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Dest Room</label><input type="number" value="${p.destination.roomId}" onchange="updatePortal(${i}, 'destination.roomId', parseInt(this.value))"></div>
-			<div class="prop-row"><label>Dest X</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.x}" onchange="updatePortal(${i}, 'destination.x', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Dest Y</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.y}" onchange="updatePortal(${i}, 'destination.y', parseFloat(this.value))"></div>
-		</div>`;
+						<button class="remove-btn" onclick="removePortal(${i})">×</button>
+						<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${p.location.x}" onchange="updatePortal(${i}, 'location.x', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${p.location.y}" onchange="updatePortal(${i}, 'location.y', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Dest Room</label><input type="number" value="${p.destination.roomId}" onchange="updatePortal(${i}, 'destination.roomId', parseInt(this.value))"></div>
+						<div class="prop-row"><label>Dest X</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.x}" onchange="updatePortal(${i}, 'destination.x', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Dest Y</label><input type="number" step="0.01" min="0" max="1" value="${p.destination.y}" onchange="updatePortal(${i}, 'destination.y', parseFloat(this.value))"></div>
+					</div>`;
 				});
 				html += `</div>`;
 
 				// Items
 				html += `<div class="props-section">
-		<h3>Items (${(room.items || []).length}) <button onclick="addItem()">+ Add</button></h3>`;
+					<h3>Items (${(room.items || []).length}) <button onclick="addItem()">+ Add</button></h3>`;
 				(room.items || []).forEach((it, i) => {
 					html += `<div class="sub-item">
-			<button class="remove-btn" onclick="removeItem(${i})">×</button>
-			<div class="prop-row"><label>ID</label>
-				<select onchange="updateItem(${i}, 'id', this.value)">
-					${knownItems.map((kid) => `<option value="${kid}" ${it.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
-					${!knownItems.includes(it.id) ? `<option value="${it.id}" selected>${it.id}</option>` : ''}
-				</select>
-			</div>
-			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${it.location.x}" onchange="updateItem(${i}, 'location.x', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${it.location.y}" onchange="updateItem(${i}, 'location.y', parseFloat(this.value))"></div>
-		</div>`;
+						<button class="remove-btn" onclick="removeItem(${i})">×</button>
+						<div class="prop-row"><label>ID</label>
+							<select onchange="updateItem(${i}, 'id', this.value)">
+								${knownItems.map((kid) => `<option value="${kid}" ${it.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
+								${!knownItems.includes(it.id) ? `<option value="${it.id}" selected>${it.id}</option>` : ''}
+							</select>
+						</div>
+						<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${it.location.x}" onchange="updateItem(${i}, 'location.x', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${it.location.y}" onchange="updateItem(${i}, 'location.y', parseFloat(this.value))"></div>
+					</div>`;
 				});
 				html += `</div>`;
 
 				// Characters
 				html += `<div class="props-section">
-		<h3>Characters (${(room.characters || []).length}) <button onclick="addCharacter()">+ Add</button></h3>`;
+					<h3>Characters (${(room.characters || []).length}) <button onclick="addCharacter()">+ Add</button></h3>`;
 				(room.characters || []).forEach((c, i) => {
 					html += `<div class="sub-item">
-			<button class="remove-btn" onclick="removeCharacter(${i})">×</button>
-			<div class="prop-row"><label>ID</label>
-				<select onchange="updateCharacter(${i}, 'id', this.value)">
-					${knownCharacters.map((kid) => `<option value="${kid}" ${c.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
-					${!knownCharacters.includes(c.id) ? `<option value="${c.id}" selected>${c.id}</option>` : ''}
-				</select>
-			</div>
-			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${c.location.x}" onchange="updateCharacter(${i}, 'location.x', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${c.location.y}" onchange="updateCharacter(${i}, 'location.y', parseFloat(this.value))"></div>
-			${c.id === 'merchant' ? `<div class="prop-row"><label>Items Sale</label><input type="text" value="${(c.itemsForSale || []).join(', ')}" onchange="updateCharacter(${i}, 'itemsForSale', this.value.split(',').map(s=>s.trim()).filter(Boolean))"></div>` : ''}
-		</div>`;
+						<button class="remove-btn" onclick="removeCharacter(${i})">×</button>
+						<div class="prop-row"><label>ID</label>
+							<select onchange="updateCharacter(${i}, 'id', this.value)">
+								${knownCharacters.map((kid) => `<option value="${kid}" ${c.id === kid ? 'selected' : ''}>${kid}</option>`).join('')}
+								${!knownCharacters.includes(c.id) ? `<option value="${c.id}" selected>${c.id}</option>` : ''}
+							</select>
+						</div>
+						<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${c.location.x}" onchange="updateCharacter(${i}, 'location.x', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${c.location.y}" onchange="updateCharacter(${i}, 'location.y', parseFloat(this.value))"></div>
+						${c.id === 'merchant' ? `<div class="prop-row"><label>Items Sale</label><input type="text" value="${(c.itemsForSale || []).join(', ')}" onchange="updateCharacter(${i}, 'itemsForSale', this.value.split(',').map(s=>s.trim()).filter(Boolean))"></div>` : ''}
+					</div>`;
 				});
 				html += `</div>`;
 
 				// Walls & Moving Blocks
 				html += `<div class="props-section">
-		<h3>Walls (${(room.walls || []).length}) <button onclick="addWall()">+ Add</button> <button onclick="addMovingBlock()">+ Moving Block</button></h3>`;
+					<h3>Walls (${(room.walls || []).length}) <button onclick="addWall()">+ Add</button> <button onclick="addMovingBlock()">+ Moving Block</button></h3>`;
 				(room.walls || []).forEach((w, i) => {
 					const isMoving = w.isMovable;
 					html += `<div class="sub-item" style="${isMoving ? 'border-color:#ff9800;' : ''}">
-			<button class="remove-btn" onclick="removeWall(${i})">×</button>
-			<div style="font-size:11px;color:${isMoving ? '#ff9800' : '#78909c'};margin-bottom:4px;font-weight:bold;">${isMoving ? '⬛ Moving Block' : '🧱 Wall'}</div>
-			<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${w.location.x}" onchange="updateWall(${i}, 'location.x', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${w.location.y}" onchange="updateWall(${i}, 'location.y', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.01" max="1" value="${w.width}" onchange="updateWall(${i}, 'width', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.01" max="1" value="${w.height}" onchange="updateWall(${i}, 'height', parseFloat(this.value))"></div>
-			<div class="prop-row"><label>Movable</label><input type="checkbox" ${isMoving ? 'checked' : ''} onchange="updateWall(${i}, 'isMovable', this.checked || undefined)"></div>
-			<div class="prop-row"><label>Background</label><input type="text" value="${w.background || ''}" placeholder="(none)" onchange="updateWall(${i}, 'background', this.value || undefined)"></div>
-		</div>`;
+						<button class="remove-btn" onclick="removeWall(${i})">×</button>
+						<div style="font-size:11px;color:${isMoving ? '#ff9800' : '#78909c'};margin-bottom:4px;font-weight:bold;">${isMoving ? '⬛ Moving Block' : '🧱 Wall'}</div>
+						<div class="prop-row"><label>X</label><input type="number" step="0.01" min="0" max="1" value="${w.location.x}" onchange="updateWall(${i}, 'location.x', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Y</label><input type="number" step="0.01" min="0" max="1" value="${w.location.y}" onchange="updateWall(${i}, 'location.y', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Width</label><input type="number" step="0.01" min="0.01" max="1" value="${w.width}" onchange="updateWall(${i}, 'width', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Height</label><input type="number" step="0.01" min="0.01" max="1" value="${w.height}" onchange="updateWall(${i}, 'height', parseFloat(this.value))"></div>
+						<div class="prop-row"><label>Movable</label><input type="checkbox" ${isMoving ? 'checked' : ''} onchange="updateWall(${i}, 'isMovable', this.checked || undefined)"></div>
+						<div class="prop-row"><label>Background</label><input type="text" value="${w.background || ''}" placeholder="(none)" onchange="updateWall(${i}, 'background', this.value || undefined)"></div>
+					</div>`;
 				});
 				html += `</div>`;
 
@@ -1326,7 +1326,9 @@
 					const ix = roomOriginX + it.location.x * canvasScale;
 					const iy = roomOriginY + it.location.y * canvasScale;
 					const imgSrc = itemImages[it.id];
-					const itemSize = 28;
+					const itemDef = typeof items !== 'undefined' ? items[it.id] : null;
+					const itemSize =
+						itemDef && itemDef.size ? itemDef.size * canvasScale : 28;
 					if (imgSrc) {
 						const img = getImage(imgSrc);
 						if (img.complete && img.naturalWidth) {
@@ -1357,13 +1359,15 @@
 					const cx = roomOriginX + c.location.x * canvasScale;
 					const cy = roomOriginY + c.location.y * canvasScale;
 					const imgSrc = characterImages[c.id];
-					const charSize = 40;
+					const charDef =
+						typeof characters !== 'undefined' ? characters[c.id] : null;
+					const cw =
+						charDef && charDef.width ? charDef.width * canvasScale : 40;
+					const ch =
+						charDef && charDef.height ? charDef.height * canvasScale : 40;
 					if (imgSrc) {
 						const img = getImage(imgSrc);
 						if (img.complete && img.naturalWidth) {
-							const aspect = img.naturalWidth / img.naturalHeight;
-							const cw = charSize * aspect;
-							const ch = charSize;
 							ctx.drawImage(img, cx - cw / 2, cy - ch / 2, cw, ch);
 						} else {
 							ctx.beginPath();

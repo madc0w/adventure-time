@@ -64,6 +64,12 @@ canvas {
 	margin-bottom: 18px;
 }
 
+.controls-separator {
+	border: none;
+	border-top: 1px solid rgba(255, 255, 255, 0.15);
+	margin: 4px 0 18px 0;
+}
+
 .button {
 	border-radius: 10px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
@@ -166,6 +172,26 @@ canvas {
 	margin-top: 0px;
 	margin-left: 8px;
 	padding: 4px;
+}
+
+#kills-modal .button {
+	margin-top: 18px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#kills-table {
+	width: 100%;
+}
+
+#kills-table th {
+	text-align: left;
+	padding: 8px;
+	color: #5eead4;
+}
+
+#kills-table td {
+	padding: 8px;
 }
 
 #inventory-modal tr {
