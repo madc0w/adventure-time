@@ -243,6 +243,22 @@ characters = {
 					'player down wielding bow 02.png',
 				],
 			},
+			flameThrower: {
+				left: [
+					'player left wielding flamethrower 01.png',
+					'player left wielding flamethrower 02.png',
+				],
+				right: [
+					'player right wielding flamethrower 01.png',
+					'player right wielding flamethrower 02.png',
+				],
+				idleFrames: ['player standing wielding flamethrower.png'],
+				up: ['player up wielding 01.png', 'player up wielding 02.png'],
+				down: [
+					'player down wielding flamethrower 01.png',
+					'player down wielding flamethrower 02.png',
+				],
+			},
 		},
 		attack: {
 			enchantedSword: {

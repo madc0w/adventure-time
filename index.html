@@ -108,40 +108,42 @@
 	</head>
 
 	<body onLoad="load();">
-		<div id="page-header">
-			<div id="page-header-text">Adventure Quest</div>
-		</div>
-
-		<div id="outer-container">
-			<div id="game-container">
-				<canvas id="game-canvas"></canvas>
-				<canvas id="status-canvas"></canvas>
+		<div id="game-wrapper">
+			<div id="page-header">
+				<div id="page-header-text">Adventure Quest</div>
 			</div>
-			<div id="controls-conatiner">
-				<div id="level-conatiner" onClick="showLevelSelectionModal()">
-					Level
-					<div id="level"></div>
+
+			<div id="outer-container">
+				<div id="game-container">
+					<canvas id="game-canvas"></canvas>
+					<canvas id="status-canvas"></canvas>
 				</div>
-				<div class="button" onClick="toggleMap()">Map</div>
-				<div class="button" onClick="toggleInventory()">Inventory</div>
-				<div class="button" onClick="showStats()">Stats</div>
-				<hr class="controls-separator" />
-				<div
-					id="how-to-play"
-					class="button"
-					onClick="showModal('instructions-modal')"
-				>
-					How to Play
-				</div>
-				<div id="toggle-pause" class="button" onClick="togglePause()">
-					Pause
-				</div>
-				<div
-					id="reset-game"
-					class="button"
-					onClick="showModal('reset-game-modal')"
-				>
-					Reset Game
+				<div id="controls-conatiner">
+					<div id="level-conatiner" onClick="showLevelSelectionModal()">
+						Level
+						<div id="level"></div>
+					</div>
+					<div class="button" onClick="toggleMap()">Map</div>
+					<div class="button" onClick="toggleInventory()">Inventory</div>
+					<div class="button" onClick="showStats()">Stats</div>
+					<hr class="controls-separator" />
+					<div
+						id="how-to-play"
+						class="button"
+						onClick="showModal('instructions-modal')"
+					>
+						How to Play
+					</div>
+					<div id="toggle-pause" class="button" onClick="togglePause()">
+						Pause
+					</div>
+					<div
+						id="reset-game"
+						class="button"
+						onClick="showModal('reset-game-modal')"
+					>
+						Reset Game
+					</div>
 				</div>
 			</div>
 		</div>

@@ -38,12 +38,19 @@ rooms = [
 				location: 0.5,
 			},
 		],
-		characters: [
+		items: [
 			{
-				id: 'voidWraith',
+				id: 'flameThrower',
 				location: {
-					x: 0.11,
-					y: 0.08,
+					x: 0.71,
+					y: 0.12,
+				},
+			},
+			{
+				id: 'fireball',
+				location: {
+					x: 0.15,
+					y: 0.14,
 				},
 			},
 		],

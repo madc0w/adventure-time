@@ -69,10 +69,10 @@ let state,
 function load() {
 	canvas = document.getElementById('game-canvas');
 	statusCanvas = document.getElementById('status-canvas');
-	canvas.width = Math.min(innerWidth * 0.86 - 28, innerHeight * 0.8 - 68);
+	canvas.width = Math.min(innerWidth - 190, innerHeight * 0.86 - 120);
 	canvas.height = canvas.width;
 	statusCanvas.width = canvas.width;
-	statusCanvas.height = innerHeight * 0.14;
+	statusCanvas.height = innerHeight * 0.12;
 	ctx = canvas.getContext('2d');
 	statusCtx = statusCanvas.getContext('2d');
 	initRooms = JSON.parse(JSON.stringify(rooms));
@@ -2135,7 +2135,7 @@ function showStats() {
 	for (const id in state.kills) {
 		if (state.kills[id] > 0) {
 			hasKills = true;
-			killsHtml += `<tr><td>${id}</td><td>${state.kills[id]}</td></tr>`;
+			killsHtml += `<tr><td>${id[0].toUpperCase() + id.slice(1)}</td><td>${state.kills[id]}</td></tr>`;
 		}
 	}
 	if (!hasKills) {

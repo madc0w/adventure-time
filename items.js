@@ -106,6 +106,37 @@ items = {
 			launch: 'arrow launch.mp3',
 		},
 	},
+	flameThrower: {
+		type: 'weapon',
+		projectile: 'fireball',
+		image: 'flamethrower.png',
+		label: 'Flamethrower',
+		size: 0.1,
+		resetTime: 400,
+		value: 12, // num uses of weapon before it breaks
+		cost: 48,
+		repairCost: 30,
+		sounds: {
+			draw: 'wield flamethrower.mp3',
+			pickup: 'flamethrower pickup.mp3',
+			broken: 'broken weapon.mp3',
+		},
+	},
+	fireball: {
+		type: 'projectile',
+		label: 'Fireballs',
+		image: 'fireball.png',
+		size: 0.04,
+		damage: 0.44,
+		speed: 0.016,
+		cost: 32,
+		value: 20, // num fireballs
+		sounds: {
+			hitWall: 'fireball hit wall.mp3',
+			pickup: 'pickup fireballs.mp3',
+			launch: 'fireball launch.mp3',
+		},
+	},
 	healingPotion1: {
 		type: 'potion',
 		image: 'healing potion 01.png',
