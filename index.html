@@ -124,7 +124,7 @@
 				</div>
 				<div class="button" onClick="toggleMap()">Map</div>
 				<div class="button" onClick="toggleInventory()">Inventory</div>
-				<div class="button" onClick="showKills()">Kills</div>
+				<div class="button" onClick="showStats()">Stats</div>
 				<hr class="controls-separator" />
 				<div
 					id="how-to-play"
@@ -164,11 +164,16 @@
 			<div class="button" onClick="closeModals()">OK</div>
 		</div>
 
-		<div id="kills-modal" class="hidden modal">
-			<div class="header">Kills</div>
+		<div id="stats-modal" class="hidden modal">
+			<div class="header">Stats</div>
 			<hr />
-			<div class="table-container">
+			<div class="stats-section">
+				<div class="header" style="font-size: 1em">Kills</div>
 				<table id="kills-table"></table>
+			</div>
+			<div class="stats-section">
+				<div class="header" style="font-size: 1em">Best Times</div>
+				<table id="best-times-table"></table>
 			</div>
 			<div class="button" onClick="closeModals()">OK</div>
 		</div>

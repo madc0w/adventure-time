@@ -1,4 +1,3 @@
-
 function getValue(object, key) {
 	const val = object[key];
 	if (typeof val == 'function') {
@@ -30,7 +29,12 @@ function assignFunctions(source, dest) {
 			dest[key] = sourceVal;
 		} else if (Array.isArray(sourceVal)) {
 			for (let i = 0; i < sourceVal.length; i++) {
-				if (sourceVal[i] && destVal && destVal[i] && JSON.stringify(sourceVal[i]) == JSON.stringify(destVal[i])) {
+				if (
+					sourceVal[i] &&
+					destVal &&
+					destVal[i] &&
+					JSON.stringify(sourceVal[i]) == JSON.stringify(destVal[i])
+				) {
 					assignFunctions(sourceVal[i], destVal[i]);
 				}
 			}
@@ -43,6 +47,9 @@ function assignFunctions(source, dest) {
 function formatTime(ms) {
 	const hours = Math.floor(ms / (1000 * 60 * 60));
 	const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-	const secs = Math.floor(ms % (1000 * 60) / 1000);
-	return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+	const secs = Math.floor((ms % (1000 * 60)) / 1000);
+	if (hours > 0) {
+		return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+	}
+	return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }

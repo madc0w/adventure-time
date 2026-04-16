@@ -533,12 +533,16 @@ function drawGame() {
 								play(character.sounds.attack);
 							}
 							setTimeout(() => {
-								roomCharacter.motion = 'idleFrames';
-								animate(roomCharacter);
+								if (roomCharacter.motion != 'dieFrames') {
+									roomCharacter.motion = 'idleFrames';
+									animate(roomCharacter);
+								}
 							}, character.attackMetrics.resetTime);
 						} else {
-							roomCharacter.motion = 'idleFrames';
-							animate(roomCharacter);
+							if (roomCharacter.motion != 'dieFrames') {
+								roomCharacter.motion = 'idleFrames';
+								animate(roomCharacter);
+							}
 						}
 					}, character.attackMetrics.prepTime || 0);
 				}
@@ -1338,7 +1342,8 @@ function drawGame() {
 			2;
 		for (const roomCharacter of state.room.characters || []) {
 			const character = characters[roomCharacter.id];
-			if (roomCharacter.motion == 'dieFrames') continue;
+			if (roomCharacter.health <= 0 || roomCharacter.motion == 'dieFrames')
+				continue;
 			const characterWidth =
 				(characterIntersectionLeeway * (character.width / roomWidth)) / 2;
 			const characterHeight =
@@ -2119,23 +2124,43 @@ function toggleInventory() {
 	drawInventory();
 }
 
-function showKills() {
+function showStats() {
 	closeModals();
 	play(clickSound);
 	setPaused(true);
-	let html = '<tr><th>Name</th><th>Kills</th></tr>';
+
+	// Kills table
+	let killsHtml = '<tr><th>Name</th><th>Kills</th></tr>';
 	let hasKills = false;
 	for (const id in state.kills) {
 		if (state.kills[id] > 0) {
 			hasKills = true;
-			html += `<tr><td>${id}</td><td>${state.kills[id]}</td></tr>`;
+			killsHtml += `<tr><td>${id}</td><td>${state.kills[id]}</td></tr>`;
 		}
 	}
 	if (!hasKills) {
-		html = '<tr><th>No kills yet</th></tr>';
+		killsHtml = '<tr><th>No kills yet</th></tr>';
 	}
-	document.getElementById('kills-table').innerHTML = html;
-	document.getElementById('kills-modal').classList.remove('hidden');
+	document.getElementById('kills-table').innerHTML = killsHtml;
+
+	// Best times table
+	let timesHtml = '<tr><th>Level</th><th>Best Time</th></tr>';
+	let hasTimes = false;
+	if (state.levelTimes) {
+		for (const level in state.levelTimes) {
+			if (state.levelTimes[level].best) {
+				hasTimes = true;
+				const best = formatTime(state.levelTimes[level].best);
+				timesHtml += `<tr><td>${level}</td><td>${best}</td></tr>`;
+			}
+		}
+	}
+	if (!hasTimes) {
+		timesHtml = '<tr><th>No completed levels yet</th></tr>';
+	}
+	document.getElementById('best-times-table').innerHTML = timesHtml;
+
+	document.getElementById('stats-modal').classList.remove('hidden');
 }
 
 function aim() {
