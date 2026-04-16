@@ -76,15 +76,14 @@ const interactionFuncs = {
 			if (roomCharacter.motion == 'attackFrames' && dist > 0.04) {
 				roomCharacter.location.x += factor * dx;
 				roomCharacter.location.y += factor * dy;
-			} else if (dist < character.targetDist) {
-				roomCharacter.location.x -= 2 * factor * dx;
-				roomCharacter.location.y -= 2 * factor * dy;
-			} else if (dist > character.targetDist * 2) {
-				roomCharacter.location.x += 2 * factor * dx;
-				roomCharacter.location.y += 2 * factor * dy;
+			} else {
+				// Slowly spiral inward
+				const spiralInward = character.spiralRate || 0.3;
+				roomCharacter.location.x += factor * dx * spiralInward;
+				roomCharacter.location.y += factor * dy * spiralInward;
 			}
 
-			// console.log(dx, dy);
+			// Tangential orbit
 			roomCharacter.location.x += factor * dy;
 			roomCharacter.location.y -= factor * dx;
 		}
@@ -427,16 +426,13 @@ characters = {
 		],
 		attackPrepFrames: ['void wraith attack-prep 01.png'],
 		move: [moveFuncs.random],
-		interact: [
-			interactionFuncs.moveTowardPlayer,
-			interactionFuncs.circlePlayer,
-		],
+		interact: [interactionFuncs.circlePlayer],
 		sounds: {
 			injured: 'void wraith injured.mp3',
 			attack: 'void wraith attack.mp3',
 			die: 'void wraith die.mp3',
 		},
-		resilience: 4.8,
+		resilience: 4,
 		attackMetrics: {
 			prob: 0.02,
 			prepTime: 400,
@@ -444,8 +440,8 @@ characters = {
 			strength: 0.12,
 			resetTime: 800,
 		},
-		targetDist: 0.1,
-		speed: 0.016,
+		targetDist: 0.08,
+		speed: 0.012,
 		deltaSpeed: 0.001,
 		maxSpeed: 0.008,
 	},
