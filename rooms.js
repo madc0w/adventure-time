@@ -326,7 +326,10 @@ rooms = [
 					'venomDagger',
 					'healingPotion1',
 					'electrosmasher',
+					'bow',
 					'arrow',
+					'flameThrower',
+					'fireball',
 				],
 			},
 		],
@@ -351,9 +354,11 @@ rooms = [
 				location: 0.15,
 			},
 			{
+				isOneWay: true,
 				roomId: 9,
 				wall: 'n',
 				location: 0.77,
+				key: 'blueKey',
 			},
 		],
 		characters: [
@@ -412,12 +417,55 @@ rooms = [
 	},
 	{
 		id: 8,
-		width: 0.9,
+		width: 0.52,
 		height: 0.6,
+		items: [
+			{
+				id: 'treasure',
+				location: {
+					x: 0.43,
+					y: 0.5,
+				},
+			},
+			{
+				id: 'healingPotion1',
+				location: {
+					x: 0.35,
+					y: 0.06,
+				},
+			},
+			{
+				id: 'healingPotion1',
+				location: {
+					x: 0.4,
+					y: 0.13,
+				},
+			},
+			{
+				id: 'blueKey',
+				location: {
+					x: 0.14,
+					y: 0.5,
+				},
+			},
+		],
 	},
 	{
 		id: 9,
 		width: 0.9,
-		height: 0.6,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.5,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 0,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
 	},
 ];

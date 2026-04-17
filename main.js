@@ -2709,6 +2709,12 @@ function setRoom(room, isGameOver) {
 				play(levelUpSound);
 			}
 			state.level = room.level;
+			localStorage.levelEntryState = JSON.stringify({
+				player: { ...state.player, motion: 'idleFrames' },
+				inventory: { ...state.inventory },
+				kills: { ...state.kills },
+				mappedRooms: state.mappedRooms ? [...state.mappedRooms] : [],
+			});
 			state.levelTimes = state.levelTimes || {};
 			state.levelTimes[state.level] = state.levelTimes[state.level] || {};
 			state.levelTimes[state.level].start = now;
@@ -2929,6 +2935,75 @@ function reset(isResetTimes) {
 		}
 		saveState();
 		delete localStorage.rooms;
+		location.href = location.href;
+	}, 2000);
+}
+
+function restartLevel() {
+	closeModals();
+	play(dreamSound);
+	let opacity = 1;
+	const fadeOut = setInterval(() => {
+		document.body.style.opacity = opacity;
+		opacity -= 0.01;
+		if (opacity <= 0) {
+			clearInterval(fadeOut);
+		}
+	}, 20);
+	setTimeout(() => {
+		const currentLevel = state.level;
+		const levelTimes = state.levelTimes;
+
+		// restore player state from level entry
+		if (localStorage.levelEntryState) {
+			const saved = JSON.parse(localStorage.levelEntryState);
+			state.player = saved.player;
+			state.player.x = 0.5;
+			state.player.y = 0.5;
+			state.inventory = saved.inventory;
+			state.kills = saved.kills;
+			if (saved.mappedRooms) {
+				state.mappedRooms = saved.mappedRooms;
+			}
+		} else {
+			state.player = {
+				id: 'player',
+				x: 0.5,
+				y: 0.5,
+				health: 1,
+				motion: 'idleFrames',
+			};
+			state.inventory = {};
+		}
+		state.levelTimes = levelTimes;
+		state.level = currentLevel;
+		state.didDie = false;
+		state.isGameOver = false;
+
+		// reset all rooms in current level to initial state
+		for (const initRoom of initRooms) {
+			if (
+				initRoom.level == currentLevel ||
+				(!initRoom.level &&
+					rooms.find((r) => r.id == initRoom.id).level == currentLevel)
+			) {
+				const room = rooms.find((r) => r.id == initRoom.id);
+				if (room) {
+					room.items = JSON.parse(JSON.stringify(initRoom.items || []));
+					room.characters = JSON.parse(
+						JSON.stringify(initRoom.characters || []),
+					);
+					room.walls = JSON.parse(JSON.stringify(initRoom.walls || []));
+					assignFunctions(initRoom, room);
+				}
+			}
+		}
+
+		// find first room of current level
+		const firstRoom = rooms.find((r) => r.level == currentLevel);
+		state.room = firstRoom;
+
+		saveState();
 		location.href = location.href;
 	}, 2000);
 }

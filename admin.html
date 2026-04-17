@@ -1388,25 +1388,33 @@
 				});
 
 				// Portals
+				const portalSize = 0.12;
 				(room.portals || []).forEach((p, i) => {
 					const px = roomOriginX + p.location.x * canvasScale;
 					const py = roomOriginY + p.location.y * canvasScale;
-					// Draw a diamond shape
-					ctx.beginPath();
-					ctx.moveTo(px, py - 10);
-					ctx.lineTo(px + 8, py);
-					ctx.lineTo(px, py + 10);
-					ctx.lineTo(px - 8, py);
-					ctx.closePath();
-					ctx.fillStyle = 'rgba(156, 39, 176, 0.5)';
-					ctx.fill();
-					ctx.strokeStyle = '#9c27b0';
-					ctx.lineWidth = 1.5;
-					ctx.stroke();
+					const pw = portalSize * canvasScale;
+					const ph = portalSize * canvasScale;
+					const portalImg = getImage('img/rooms/portal-frames/portal-01.png');
+					if (portalImg.complete && portalImg.naturalWidth) {
+						ctx.drawImage(portalImg, px - pw / 2, py - ph / 2, pw, ph);
+					} else {
+						// Fallback diamond shape
+						ctx.beginPath();
+						ctx.moveTo(px, py - ph / 2);
+						ctx.lineTo(px + pw / 2, py);
+						ctx.lineTo(px, py + ph / 2);
+						ctx.lineTo(px - pw / 2, py);
+						ctx.closePath();
+						ctx.fillStyle = 'rgba(156, 39, 176, 0.5)';
+						ctx.fill();
+						ctx.strokeStyle = '#9c27b0';
+						ctx.lineWidth = 1.5;
+						ctx.stroke();
+					}
 					ctx.fillStyle = '#fff';
 					ctx.font = '8px sans-serif';
 					ctx.textAlign = 'center';
-					ctx.fillText('P→' + p.destination.roomId, px, py + 3);
+					ctx.fillText('P→' + p.destination.roomId, px, py + ph / 2 + 10);
 				});
 
 				updateCanvasInfo();

@@ -37,6 +37,7 @@ body {
 }
 
 #outer-container {
+	position: relative;
 	background: linear-gradient(145deg, #1e3a2f, #162b22);
 	border-radius: 16px;
 	padding: 12px;
@@ -83,7 +84,7 @@ canvas {
 	background: linear-gradient(180deg, #2d8a4e 0%, #1e6b38 100%);
 	cursor: pointer;
 	text-align: center;
-	max-width: 80px;
+	max-width: 100px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 	color: #fff;
 	font-family: Lato;
@@ -106,17 +107,19 @@ canvas {
 
 .modal {
 	position: absolute;
-	top: 10%;
-	left: calc(50% - 150px);
-	height: 400px;
+	top: 40px;
+	
+	left: 50%;
+	transform: translateX(-50%);
 	width: 300px;
 	border-radius: 14px;
 	border: 4px solid #2dd4a833;
 	padding: 16px;
 	background: linear-gradient(160deg, #1e3a2f 0%, #162b22 100%);
 	color: #e0e0e0;
-	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(45, 212, 168, 0.08);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 50px rgba(45, 212, 168, 0.1);
 	backdrop-filter: blur(8px);
+	z-index: 10;
 }
 
 .hidden {
@@ -131,7 +134,6 @@ canvas {
 
 #instructions-modal {
 	width: 420px;
-	height: 480px;
 }
 
 #instructions-modal .button {
@@ -151,12 +153,12 @@ canvas {
 
 .table-container {
 	overflow: auto;
-	height: calc(100% - 100px);
+	max-height: 420px;
 }
 
 #inventory-table {
 	width: 100%;
-	height: 280px;
+	height: 400px;
 }
 
 #inventory-table td {
@@ -206,11 +208,10 @@ canvas {
 
 #merchant-modal {
 	width: 400px;
-	left: calc(50% - 200px);
 }
 
 #merchant-modal .table-container {
-	height: calc(100% - 140px);
+	max-height: 260px;
 }
 
 #merchant-modal .button {
@@ -256,7 +257,14 @@ canvas {
 }
 
 #reset-game-modal .button {
-	margin-top: 18px;
+	margin-top: 12px;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 200px;
+}
+
+#restart-level-modal .button {
+	margin-top: 12px;
 	margin-left: auto;
 	margin-right: auto;
 	max-width: 200px;
@@ -275,8 +283,7 @@ canvas {
 }
 
 #stats-modal {
-	height: auto;
-	max-height: 80%;
+	max-height: 80vh;
 	overflow: auto;
 }
 

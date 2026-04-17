@@ -30,7 +30,7 @@ items = {
 		value: 24, // num uses of weapon before it breaks
 		resetTime: 480,
 		cost: 22,
-		repairCost: 14,
+		repairCost: 8,
 		sounds: {
 			hit: 'sword 01 hit.mp3',
 			draw: 'sword 01 draw.mp3',
@@ -49,7 +49,7 @@ items = {
 		resetTime: 300,
 		value: 40, // num uses of weapon before it breaks
 		cost: 12,
-		repairCost: 7,
+		repairCost: 5,
 		sounds: {
 			hit: 'sword 02 hit.mp3',
 			draw: 'sword 02 draw.mp3',
@@ -67,7 +67,7 @@ items = {
 		resetTime: 600,
 		value: 20, // num uses of weapon before it breaks
 		cost: 32,
-		repairCost: 20,
+		repairCost: 12,
 		sounds: {
 			hit: 'zap.mp3',
 			draw: 'thunderclap.mp3',
@@ -84,7 +84,7 @@ items = {
 		resetTime: 600,
 		value: 20, // num uses of weapon before it breaks
 		cost: 32,
-		repairCost: 20,
+		repairCost: 12,
 		sounds: {
 			draw: 'wield bow.mp3',
 			pickup: 'sword pickup.mp3',
@@ -115,7 +115,7 @@ items = {
 		resetTime: 400,
 		value: 12, // num uses of weapon before it breaks
 		cost: 48,
-		repairCost: 30,
+		repairCost: 20,
 		sounds: {
 			draw: 'wield flamethrower.mp3',
 			pickup: 'flamethrower pickup.mp3',
