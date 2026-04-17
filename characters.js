@@ -441,6 +441,7 @@ characters = {
 			'void wraith attack 02.png',
 		],
 		attackPrepFrames: ['void wraith attack-prep 01.png'],
+		projectile: 'voidball',
 		move: [moveFuncs.random],
 		interact: [interactionFuncs.circlePlayer],
 		sounds: {
@@ -450,11 +451,11 @@ characters = {
 		},
 		resilience: 4,
 		attackMetrics: {
-			prob: 0.02,
+			prob: 0.008,
 			prepTime: 400,
-			range: 0.2,
+			range: 0.5,
 			strength: 0.12,
-			resetTime: 800,
+			resetTime: 1200,
 		},
 		targetDist: 0.08,
 		speed: 0.012,

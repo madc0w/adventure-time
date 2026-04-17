@@ -157,6 +157,19 @@ items = {
 			launch: 'fireball launch.mp3',
 		},
 	},
+	voidball: {
+		type: 'projectile',
+		label: 'Voidballs',
+		image: 'voidball.png',
+		size: 0.06,
+		damage: 0.44,
+		speed: 0.032,
+		sounds: {
+			hitWall: 'voidball hit wall.mp3',
+			launch: 'voidball launch.mp3',
+			hitPlayer: 'voidball hit player.mp3',
+		},
+	},
 	healingPotion1: {
 		type: 'potion',
 		image: 'healing potion 01.png',

@@ -528,7 +528,25 @@ function drawGame() {
 						) {
 							roomCharacter.motion = 'attackFrames';
 							animate(roomCharacter);
-							state.player.health -= character.attackMetrics.strength;
+							if (character.projectile) {
+								// launch projectile toward player
+								const dx = state.player.x - roomCharacter.location.x;
+								const dy = state.player.y - roomCharacter.location.y;
+								const angle = Math.atan2(dy, dx);
+								state.projectiles = state.projectiles || [];
+								state.projectiles.push({
+									id: character.projectile,
+									loc: {
+										x: roomCharacter.location.x,
+										y: roomCharacter.location.y,
+									},
+									angle,
+									isEnemy: true,
+								});
+								play(items[character.projectile].sounds.launch);
+							} else {
+								state.player.health -= character.attackMetrics.strength;
+							}
 							if (character.sounds.attack) {
 								play(character.sounds.attack);
 							}
@@ -1774,43 +1792,71 @@ function drawGame() {
 			state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
 		}
 
-		for (const roomCharacter of state.room.characters || []) {
-			const character = characters[roomCharacter.id];
-			if (character.type == 'enemy' && roomCharacter.motion != 'dieFrames') {
-				const left = roomCharacter.location.x - character.width / roomWidth / 2;
-				const top =
-					roomCharacter.location.y - character.height / roomHeight / 2;
-				const right =
-					roomCharacter.location.x + character.width / roomWidth / 2;
-				const bottom =
-					roomCharacter.location.y + character.height / roomHeight / 2;
-				const upperLeft = toScreen({
-					x: left,
-					y: top,
-				});
-				const lowerRight = toScreen({
-					x: right,
-					y: bottom,
-				});
-				if (
-					tip.x > upperLeft.x &&
-					tip.x < lowerRight.x &&
-					tip.y > upperLeft.y &&
-					tip.y < lowerRight.y
-				) {
-					injur(roomCharacter, item.damage / character.resilience);
-					state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
-					play(character.sounds.injured);
+		if (projectile.isEnemy) {
+			// enemy projectile: check collision with player
+			const playerLeft =
+				state.player.x - characters.player.width / roomWidth / 2;
+			const playerTop =
+				state.player.y - characters.player.height / roomHeight / 2;
+			const playerRight =
+				state.player.x + characters.player.width / roomWidth / 2;
+			const playerBottom =
+				state.player.y + characters.player.height / roomHeight / 2;
+			const playerUpperLeft = toScreen({ x: playerLeft, y: playerTop });
+			const playerLowerRight = toScreen({ x: playerRight, y: playerBottom });
+			if (
+				tip.x > playerUpperLeft.x &&
+				tip.x < playerLowerRight.x &&
+				tip.y > playerUpperLeft.y &&
+				tip.y < playerLowerRight.y
+			) {
+				state.player.health -= item.damage;
+				state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
+				if (item.sounds.hitPlayer) {
+					play(item.sounds.hitPlayer);
 				}
+			}
+		} else {
+			// player projectile: check collision with enemies
+			for (const roomCharacter of state.room.characters || []) {
+				const character = characters[roomCharacter.id];
+				if (character.type == 'enemy' && roomCharacter.motion != 'dieFrames') {
+					const left =
+						roomCharacter.location.x - character.width / roomWidth / 2;
+					const top =
+						roomCharacter.location.y - character.height / roomHeight / 2;
+					const right =
+						roomCharacter.location.x + character.width / roomWidth / 2;
+					const bottom =
+						roomCharacter.location.y + character.height / roomHeight / 2;
+					const upperLeft = toScreen({
+						x: left,
+						y: top,
+					});
+					const lowerRight = toScreen({
+						x: right,
+						y: bottom,
+					});
+					if (
+						tip.x > upperLeft.x &&
+						tip.x < lowerRight.x &&
+						tip.y > upperLeft.y &&
+						tip.y < lowerRight.y
+					) {
+						injur(roomCharacter, item.damage / character.resilience);
+						state.projectiles.splice(state.projectiles.indexOf(projectile), 1);
+						play(character.sounds.injured);
+					}
 
-				// ctx.fillStyle = '#f00';
-				// ctx.beginPath();
-				// ctx.arc(upperLeft.x, upperLeft.y, 4, 0, Math.PI * 2);
-				// ctx.fill();
-				// ctx.fillStyle = '#f00';
-				// ctx.beginPath();
-				// ctx.arc(lowerRight.x, lowerRight.y, 4, 0, Math.PI * 2);
-				// ctx.fill();
+					// ctx.fillStyle = '#f00';
+					// ctx.beginPath();
+					// ctx.arc(upperLeft.x, upperLeft.y, 4, 0, Math.PI * 2);
+					// ctx.fill();
+					// ctx.fillStyle = '#f00';
+					// ctx.beginPath();
+					// ctx.arc(lowerRight.x, lowerRight.y, 4, 0, Math.PI * 2);
+					// ctx.fill();
+				}
 			}
 		}
 		// ctx.fillStyle = '#f00';

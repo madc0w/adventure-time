@@ -13,6 +13,24 @@ rooms = [
 		level: 1,
 		width: 0.9,
 		height: 0.6,
+		walls: [
+			{
+				location: {
+					x: 0.6,
+					y: 0.69,
+				},
+				width: 0.4,
+				height: 0.04,
+			},
+			{
+				location: {
+					x: 0.6,
+					y: 0.29,
+				},
+				width: 0.4,
+				height: 0.04,
+			},
+		],
 		doors: [
 			{
 				roomId: 3,
@@ -36,22 +54,6 @@ rooms = [
 				roomId: 5,
 				wall: 'e',
 				location: 0.5,
-			},
-		],
-		items: [
-			{
-				id: 'flameThrower',
-				location: {
-					x: 0.71,
-					y: 0.12,
-				},
-			},
-			{
-				id: 'fireball',
-				location: {
-					x: 0.15,
-					y: 0.14,
-				},
 			},
 		],
 	},
@@ -1365,12 +1367,54 @@ rooms = [
 		level: 3,
 		width: 0.9,
 		height: 0.8,
+		doors: [
+			{
+				roomId: 24,
+				wall: 'n',
+				location: 0.2,
+			},
+		],
 		items: [
 			{
 				id: 'superTreasure',
 				location: {
 					x: 0.5,
 					y: 0.1,
+				},
+			},
+			{
+				id: 'flameThrower',
+				location: {
+					x: 0.87,
+					y: 0.75,
+				},
+			},
+			{
+				id: 'fireball',
+				location: {
+					x: 0.79,
+					y: 0.86,
+				},
+			},
+		],
+	},
+	{
+		id: 24,
+		width: 0.75,
+		height: 0.6,
+		characters: [
+			{
+				id: 'voidWraith',
+				location: {
+					x: 0.18,
+					y: 0.22,
+				},
+			},
+			{
+				id: 'voidWraith',
+				location: {
+					x: 0.85,
+					y: 0.22,
 				},
 			},
 		],
