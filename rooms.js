@@ -17,7 +17,7 @@ rooms = [
 			{
 				location: {
 					x: 0.6,
-					y: 0.69,
+					y: 0.74,
 				},
 				width: 0.4,
 				height: 0.04,
@@ -25,7 +25,7 @@ rooms = [
 			{
 				location: {
 					x: 0.6,
-					y: 0.29,
+					y: 0.34,
 				},
 				width: 0.4,
 				height: 0.04,

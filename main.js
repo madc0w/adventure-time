@@ -57,6 +57,7 @@ let state,
 	roomMusic,
 	dreamSound,
 	lockedDoorSound,
+	doorUnlockSound,
 	didUserInteract,
 	initRooms,
 	initCharacters,
@@ -83,6 +84,7 @@ function load() {
 	dreamSound = new Audio('sounds/dream.mp3');
 	clickSound = new Audio('sounds/click.mp3');
 	lockedDoorSound = new Audio('sounds/locked door.mp3');
+	doorUnlockSound = new Audio('sounds/door unlock.mp3');
 	rockScrapeSound = new Audio('sounds/rock scrape.mp3');
 	if (window.defaultRoomMusic) {
 		window.defaultRoomMusic = new Audio(`sounds/${window.defaultRoomMusic}`);
@@ -1349,6 +1351,17 @@ function drawGame() {
 		state.player.y = prevPlayerLoc.y;
 		toast('Ye must be the holder of the key, lest the other side ye see!');
 		play(lockedDoorSound);
+	} else if (
+		throughDoor &&
+		throughDoor.key &&
+		state.inventory[throughDoor.key]
+	) {
+		delete state.inventory[throughDoor.key];
+		if (throughDoor.oppositeDoor) {
+			delete throughDoor.oppositeDoor.key;
+		}
+		delete throughDoor.key;
+		play(doorUnlockSound);
 	}
 
 	// check for intersection with other character
@@ -1663,6 +1676,11 @@ function drawGame() {
 					(state.inventory[itemId] || 0) + (roomItem.value || item.value || 1);
 				play(item.sounds.pickup);
 				// console.log('rooms[0].items.length', rooms[0].items.length);
+			}
+		} else if (item.type == 'weapon' && state.inventory[roomItem.id]) {
+			const dist = distance(roomItem);
+			if (dist < itemTakeDistance) {
+				toast(`You already have a ${item.label}!`);
 			}
 		}
 
