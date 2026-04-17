@@ -412,8 +412,8 @@ characters = {
 			strength: 0.012,
 			resetTime: 200,
 			projectile: {
-				prob: 0.04,
-				prepTime: 20,
+				prob: 0.02,
+				prepTime: 40,
 				resetTime: 40,
 				range: 0.8,
 			},

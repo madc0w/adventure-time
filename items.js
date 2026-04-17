@@ -174,9 +174,9 @@ items = {
 		type: 'projectile',
 		label: 'Bug Darts',
 		image: 'bug dart.png',
-		size: 0.04,
-		damage: 0.08,
-		speed: 0.06,
+		size: 0.02,
+		damage: 0.06,
+		speed: 0.02,
 		sounds: {
 			hitWall: 'bug dart hit wall.mp3',
 			launch: 'bug dart launch.mp3',
