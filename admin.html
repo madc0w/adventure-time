@@ -1268,48 +1268,36 @@
 
 				// Doors
 				(room.doors || []).forEach((d, i) => {
-					const doorSize = 30;
+					const doorColor =
+						(d.key &&
+							typeof items !== 'undefined' &&
+							items[d.key] &&
+							items[d.key].color) ||
+						'#ccc';
 					const isHorizontal = d.wall === 'n' || d.wall === 's';
-					const doorImgSrc = isHorizontal
-						? doorImages.horizontal
-						: doorImages.vertical;
-					const img = getImage(doorImgSrc);
 					let dx, dy, dw, dh;
-					if (d.wall === 'n') {
-						dx = roomOriginX + d.location * roomPixelW - doorSize / 2;
-						dy = roomOriginY - doorSize / 2;
-						dw = doorSize;
-						dh = doorSize;
-					} else if (d.wall === 's') {
-						dx = roomOriginX + d.location * roomPixelW - doorSize / 2;
-						dy = roomOriginY + roomPixelH - doorSize / 2;
-						dw = doorSize;
-						dh = doorSize;
-					} else if (d.wall === 'w') {
-						dx = roomOriginX - doorSize / 2;
-						dy = roomOriginY + d.location * roomPixelH - doorSize / 2;
-						dw = doorSize;
-						dh = doorSize;
+					if (isHorizontal) {
+						dw = 60;
+						dh = 10;
+						dx = roomOriginX + d.location * roomPixelW - dw / 2;
+						dy =
+							d.wall === 'n'
+								? roomOriginY - dh / 2
+								: roomOriginY + roomPixelH - dh / 2;
 					} else {
-						dx = roomOriginX + roomPixelW - doorSize / 2;
-						dy = roomOriginY + d.location * roomPixelH - doorSize / 2;
-						dw = doorSize;
-						dh = doorSize;
+						dw = 10;
+						dh = 60;
+						dy = roomOriginY + d.location * roomPixelH - dh / 2;
+						dx =
+							d.wall === 'w'
+								? roomOriginX - dw / 2
+								: roomOriginX + roomPixelW - dw / 2;
 					}
-					if (img.complete && img.naturalWidth) {
-						const aspect = img.naturalWidth / img.naturalHeight;
-						if (isHorizontal) {
-							dw = doorSize * aspect;
-							dx = roomOriginX + d.location * roomPixelW - dw / 2;
-						} else {
-							dh = doorSize / aspect;
-							dy = roomOriginY + d.location * roomPixelH - dh / 2;
-						}
-						ctx.drawImage(img, dx, dy, dw, dh);
-					} else {
-						ctx.fillStyle = d.key ? '#ff4444' : '#e94560';
-						ctx.fillRect(dx, dy, dw, dh);
-					}
+					ctx.fillStyle = doorColor;
+					ctx.fillRect(dx, dy, dw, dh);
+					ctx.strokeStyle = '#fff';
+					ctx.lineWidth = 1;
+					ctx.strokeRect(dx, dy, dw, dh);
 					ctx.fillStyle = '#fff';
 					ctx.font = '9px sans-serif';
 					ctx.textAlign = 'center';
