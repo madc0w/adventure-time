@@ -521,7 +521,7 @@ rooms = [
 				id: 'copperCoin',
 				location: {
 					x: 0.79,
-					y: 0.19,
+					y: 0.24,
 				},
 			},
 			{
@@ -566,14 +566,14 @@ rooms = [
 				id: 'copperCoin',
 				location: {
 					x: 0.79,
-					y: 0.19,
+					y: 0.35,
 				},
 			},
 			{
 				id: 'copperCoin',
 				location: {
 					x: 0.79,
-					y: 0.12,
+					y: 0.21,
 				},
 			},
 			{
@@ -581,6 +581,796 @@ rooms = [
 				location: {
 					x: 0.79,
 					y: 0.08,
+				},
+			},
+		],
+	},
+	{
+		id: 12,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 10,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 9,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.33,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.2,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.47,
+				},
+			},
+		],
+	},
+	{
+		id: 13,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 14,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 15,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.43,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.32,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.2,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.56,
+				},
+			},
+		],
+	},
+	{
+		id: 14,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 19,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 15,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.44,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.31,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.2,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.57,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.7,
+				},
+			},
+		],
+	},
+	{
+		id: 15,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 9,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 8,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.34,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.47,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.21,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.6,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.74,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.88,
+				},
+			},
+		],
+	},
+	{
+		id: 16,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 19,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 14,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.42,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.31,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.19,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.88,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.08,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.88,
+					y: 0.19,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.88,
+					y: 0.31,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.88,
+					y: 0.42,
+				},
+			},
+		],
+	},
+	{
+		id: 17,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 16,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 23,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.07,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.28,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.39,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.18,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.18,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.07,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.29,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.4,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.83,
+					y: 0.5,
+				},
+			},
+		],
+	},
+	{
+		id: 18,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 14,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 17,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'goldCoin',
+				location: {
+					x: 0.87,
+					y: 0.45,
+				},
+			},
+		],
+	},
+	{
+		id: 19,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 20,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 18,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'goldCoin',
+				location: {
+					x: 0.89,
+					y: 0.4,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.89,
+					y: 0.53,
+				},
+			},
+		],
+	},
+	{
+		id: 20,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 21,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 22,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'goldCoin',
+				location: {
+					x: 0.86,
+					y: 0.41,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.86,
+					y: 0.53,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.86,
+					y: 0.65,
+				},
+			},
+		],
+	},
+	{
+		id: 21,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 22,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 19,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'goldCoin',
+				location: {
+					x: 0.84,
+					y: 0.4,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.88,
+					y: 0.52,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.84,
+					y: 0.63,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.8,
+					y: 0.52,
+				},
+			},
+		],
+	},
+	{
+		id: 22,
+		width: 0.9,
+		height: 0.35,
+		portals: [
+			{
+				location: {
+					x: 0.09,
+					y: 0.25,
+				},
+				destination: {
+					roomId: 9,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+			{
+				location: {
+					x: 0.09,
+					y: 0.75,
+				},
+				destination: {
+					roomId: 16,
+					x: 0.5,
+					y: 0.5,
+				},
+			},
+		],
+		items: [
+			{
+				id: 'goldCoin',
+				location: {
+					x: 0.82,
+					y: 0.41,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.68,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.69,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.87,
+					y: 0.55,
+				},
+			},
+			{
+				id: 'copperCoin',
+				location: {
+					x: 0.79,
+					y: 0.55,
+				},
+			},
+		],
+	},
+	{
+		id: 23,
+		level: 3,
+		width: 0.9,
+		height: 0.8,
+		items: [
+			{
+				id: 'superTreasure',
+				location: {
+					x: 0.5,
+					y: 0.1,
 				},
 			},
 		],
