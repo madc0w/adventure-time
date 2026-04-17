@@ -1,4 +1,24 @@
 items = {
+	copperCoin: {
+		type: 'treasure',
+		image: 'copper coin.png',
+		label: 'Copper Coin',
+		value: 0.01,
+		size: 0.04,
+		sounds: {
+			pickup: 'treasure pickup 2.mp3',
+		},
+	},
+	goldCoin: {
+		type: 'treasure',
+		image: 'gold coin.png',
+		label: 'Gold Coin',
+		value: 0.1,
+		size: 0.04,
+		sounds: {
+			pickup: 'treasure pickup 2.mp3',
+		},
+	},
 	treasure: {
 		type: 'treasure',
 		image: 'treasure-05.png',

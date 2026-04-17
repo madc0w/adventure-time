@@ -154,6 +154,25 @@ canvas {
 .table-container {
 	overflow: auto;
 	max-height: 420px;
+	padding-right: 8px;
+}
+
+.table-container::-webkit-scrollbar {
+	width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+	background: #1e3a2f;
+	border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+	background: #2dd4a866;
+	border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+	background: #2dd4a8aa;
 }
 
 #inventory-table {
@@ -168,6 +187,10 @@ canvas {
 #inventory-table td img {
 	max-width: 40px;
 	max-height: 40px;
+}
+
+#inventory-modal {
+	width: 340px;
 }
 
 #inventory-modal .button {

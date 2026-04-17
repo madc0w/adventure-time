@@ -1205,15 +1205,15 @@
 				ctx.strokeStyle = 'rgba(255,255,255,0.05)';
 				ctx.lineWidth = 1;
 				const gridStep = 0.1;
-				for (let gx = gridStep; gx < rw; gx += gridStep) {
-					const px = roomOriginX + gx * canvasScale;
+				for (let gx = gridStep; gx < 1; gx += gridStep) {
+					const px = roomOriginX + gx * roomPixelW;
 					ctx.beginPath();
 					ctx.moveTo(px, roomOriginY);
 					ctx.lineTo(px, roomOriginY + roomPixelH);
 					ctx.stroke();
 				}
-				for (let gy = gridStep; gy < rh; gy += gridStep) {
-					const py = roomOriginY + gy * canvasScale;
+				for (let gy = gridStep; gy < 1; gy += gridStep) {
+					const py = roomOriginY + gy * roomPixelH;
 					ctx.beginPath();
 					ctx.moveTo(roomOriginX, py);
 					ctx.lineTo(roomOriginX + roomPixelW, py);
@@ -1241,10 +1241,10 @@
 
 				// Walls
 				(room.walls || []).forEach((w, i) => {
-					const wx = roomOriginX + w.location.x * canvasScale;
-					const wy = roomOriginY + w.location.y * canvasScale;
-					const ww = w.width * canvasScale;
-					const wh = w.height * canvasScale;
+					const wx = roomOriginX + w.location.x * roomPixelW;
+					const wy = roomOriginY + w.location.y * roomPixelH;
+					const ww = w.width * roomPixelW;
+					const wh = w.height * roomPixelH;
 					if (w.background) {
 						const img = getImage('img/rooms/' + w.background);
 						if (img.complete && img.naturalWidth) {
@@ -1323,8 +1323,8 @@
 
 				// Items
 				(room.items || []).forEach((it, i) => {
-					const ix = roomOriginX + it.location.x * canvasScale;
-					const iy = roomOriginY + it.location.y * canvasScale;
+					const ix = roomOriginX + it.location.x * roomPixelW;
+					const iy = roomOriginY + it.location.y * roomPixelH;
 					const imgSrc = itemImages[it.id];
 					const itemDef = typeof items !== 'undefined' ? items[it.id] : null;
 					const itemSize =
@@ -1356,8 +1356,8 @@
 
 				// Characters
 				(room.characters || []).forEach((c, i) => {
-					const cx = roomOriginX + c.location.x * canvasScale;
-					const cy = roomOriginY + c.location.y * canvasScale;
+					const cx = roomOriginX + c.location.x * roomPixelW;
+					const cy = roomOriginY + c.location.y * roomPixelH;
 					const imgSrc = characterImages[c.id];
 					const charDef =
 						typeof characters !== 'undefined' ? characters[c.id] : null;
@@ -1390,8 +1390,8 @@
 				// Portals
 				const portalSize = 0.12;
 				(room.portals || []).forEach((p, i) => {
-					const px = roomOriginX + p.location.x * canvasScale;
-					const py = roomOriginY + p.location.y * canvasScale;
+					const px = roomOriginX + p.location.x * roomPixelW;
+					const py = roomOriginY + p.location.y * roomPixelH;
 					const pw = portalSize * canvasScale;
 					const ph = portalSize * canvasScale;
 					const portalImg = getImage('img/rooms/portal-frames/portal-01.png');
@@ -1442,8 +1442,8 @@
 				const rect = canvas.getBoundingClientRect();
 				const mx = e.clientX - rect.left;
 				const my = e.clientY - rect.top;
-				const rx = (mx - roomOriginX) / canvasScale;
-				const ry = (my - roomOriginY) / canvasScale;
+				const rx = (mx - roomOriginX) / roomPixelW;
+				const ry = (my - roomOriginY) / roomPixelH;
 				return {
 					mx,
 					my,
@@ -1531,7 +1531,7 @@
 				} else if (currentTool === 'wall') {
 					wallDrawStart = { x: rx, y: ry };
 				} else if (currentTool === 'item') {
-					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+					if (rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) {
 						if (!room.items) room.items = [];
 						room.items.push({
 							id: document.getElementById('item-select').value,
@@ -1541,7 +1541,7 @@
 						drawRoom();
 					}
 				} else if (currentTool === 'character') {
-					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+					if (rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) {
 						if (!room.characters) room.characters = [];
 						room.characters.push({
 							id: document.getElementById('char-select').value,
@@ -1555,9 +1555,9 @@
 					const room = rooms[selectedRoomIndex];
 					const dists = {
 						n: ry,
-						s: room.height - ry,
+						s: 1 - ry,
 						w: rx,
-						e: room.width - rx,
+						e: 1 - rx,
 					};
 					let closestWall = 'n';
 					let minDist = Infinity;
@@ -1567,10 +1567,7 @@
 							closestWall = wall;
 						}
 					}
-					const loc =
-						closestWall === 'n' || closestWall === 's'
-							? rx / room.width
-							: ry / room.height;
+					const loc = closestWall === 'n' || closestWall === 's' ? rx : ry;
 					if (!room.doors) room.doors = [];
 					room.doors.push({
 						roomId: 0,
@@ -1580,7 +1577,7 @@
 					renderProps();
 					drawRoom();
 				} else if (currentTool === 'portal') {
-					if (rx >= 0 && ry >= 0 && rx <= room.width && ry <= room.height) {
+					if (rx >= 0 && ry >= 0 && rx <= 1 && ry <= 1) {
 						if (!room.portals) room.portals = [];
 						room.portals.push({
 							location: { x: rx, y: ry },
@@ -1614,10 +1611,10 @@
 				if (wallDrawStart && currentTool === 'wall') {
 					drawRoom();
 					// Preview wall being drawn
-					const x1 = roomOriginX + Math.min(wallDrawStart.x, rx) * canvasScale;
-					const y1 = roomOriginY + Math.min(wallDrawStart.y, ry) * canvasScale;
-					const w = Math.abs(rx - wallDrawStart.x) * canvasScale;
-					const h = Math.abs(ry - wallDrawStart.y) * canvasScale;
+					const x1 = roomOriginX + Math.min(wallDrawStart.x, rx) * roomPixelW;
+					const y1 = roomOriginY + Math.min(wallDrawStart.y, ry) * roomPixelH;
+					const w = Math.abs(rx - wallDrawStart.x) * roomPixelW;
+					const h = Math.abs(ry - wallDrawStart.y) * roomPixelH;
 					ctx.fillStyle = 'rgba(120, 144, 156, 0.3)';
 					ctx.fillRect(x1, y1, w, h);
 					ctx.strokeStyle = '#78909c';

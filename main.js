@@ -2981,12 +2981,12 @@ function restartLevel() {
 		state.isGameOver = false;
 
 		// reset all rooms in current level to initial state
+		const levelStartRoom = rooms.find((r) => r.level == currentLevel);
+		const nextLevelRoom = rooms.find((r) => r.level == currentLevel + 1);
+		const minId = levelStartRoom ? levelStartRoom.id : 0;
+		const maxId = nextLevelRoom ? nextLevelRoom.id : Infinity;
 		for (const initRoom of initRooms) {
-			if (
-				initRoom.level == currentLevel ||
-				(!initRoom.level &&
-					rooms.find((r) => r.id == initRoom.id).level == currentLevel)
-			) {
+			if (initRoom.id >= minId && initRoom.id < maxId) {
 				const room = rooms.find((r) => r.id == initRoom.id);
 				if (room) {
 					room.items = JSON.parse(JSON.stringify(initRoom.items || []));

@@ -29,13 +29,17 @@ function assignFunctions(source, dest) {
 			dest[key] = sourceVal;
 		} else if (Array.isArray(sourceVal)) {
 			for (let i = 0; i < sourceVal.length; i++) {
-				if (
-					sourceVal[i] &&
-					destVal &&
-					destVal[i] &&
-					JSON.stringify(sourceVal[i]) == JSON.stringify(destVal[i])
-				) {
-					assignFunctions(sourceVal[i], destVal[i]);
+				try {
+					if (
+						sourceVal[i] &&
+						destVal &&
+						destVal[i] &&
+						JSON.stringify(sourceVal[i]) == JSON.stringify(destVal[i])
+					) {
+						assignFunctions(sourceVal[i], destVal[i]);
+					}
+				} catch (e) {
+					// skip items with circular references (e.g. doors)
 				}
 			}
 		} else if (destVal && typeof sourceVal == 'object') {
