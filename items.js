@@ -170,6 +170,19 @@ items = {
 			hitPlayer: 'voidball hit player.mp3',
 		},
 	},
+	bugDart: {
+		type: 'projectile',
+		label: 'Bug Darts',
+		image: 'bug dart.png',
+		size: 0.04,
+		damage: 0.08,
+		speed: 0.06,
+		sounds: {
+			hitWall: 'bug dart hit wall.mp3',
+			launch: 'bug dart launch.mp3',
+			hitPlayer: 'voidball hit player.mp3',
+		},
+	},
 	healingPotion1: {
 		type: 'potion',
 		image: 'healing potion 01.png',

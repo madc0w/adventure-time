@@ -393,6 +393,7 @@ characters = {
 			'megabug v2 attack 01.png',
 		],
 		attackPrepFrames: ['megabug v2 01.png'],
+		projectile: 'bugDart',
 		move: [moveFuncs.random],
 		interact: [
 			interactionFuncs.moveTowardPlayer,
@@ -410,6 +411,12 @@ characters = {
 			range: 0.1, // proportion of canvas
 			strength: 0.012,
 			resetTime: 200,
+			projectile: {
+				prob: 0.04,
+				prepTime: 20,
+				resetTime: 40,
+				range: 0.8,
+			},
 		},
 		targetDist: 0.08,
 		speed: 0.006,
@@ -456,6 +463,12 @@ characters = {
 			range: 0.5,
 			strength: 0.12,
 			resetTime: 1200,
+			projectile: {
+				prob: 0.008,
+				prepTime: 400,
+				range: 0.5,
+				resetTime: 1200,
+			},
 		},
 		targetDist: 0.08,
 		speed: 0.012,

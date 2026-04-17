@@ -515,17 +515,21 @@ function drawGame() {
 			const character = characters[roomCharacter.id];
 
 			if (!state.isGameOver && roomCharacter.motion != 'dieFrames') {
+				const atkMetrics =
+					character.projectile && character.attackMetrics.projectile
+						? character.attackMetrics.projectile
+						: character.attackMetrics;
 				if (
 					roomCharacter.motion != 'attackFrames' &&
 					character.attackMetrics &&
-					Math.random() < character.attackMetrics.prob &&
-					distance(roomCharacter) < character.attackMetrics.range
+					Math.random() < atkMetrics.prob &&
+					distance(roomCharacter) < atkMetrics.range
 				) {
 					roomCharacter.motion = 'attackPrepFrames';
 					animate(roomCharacter);
 					setTimeout(() => {
 						if (
-							distance(roomCharacter) < character.attackMetrics.range &&
+							distance(roomCharacter) < atkMetrics.range &&
 							roomCharacter.motion != 'dieFrames'
 						) {
 							roomCharacter.motion = 'attackFrames';
@@ -557,14 +561,14 @@ function drawGame() {
 									roomCharacter.motion = 'idleFrames';
 									animate(roomCharacter);
 								}
-							}, character.attackMetrics.resetTime);
+							}, atkMetrics.resetTime);
 						} else {
 							if (roomCharacter.motion != 'dieFrames') {
 								roomCharacter.motion = 'idleFrames';
 								animate(roomCharacter);
 							}
 						}
-					}, character.attackMetrics.prepTime || 0);
+					}, atkMetrics.prepTime || 0);
 				}
 
 				const prevCharacterLoc = {
@@ -1677,10 +1681,13 @@ function drawGame() {
 				play(item.sounds.pickup);
 				// console.log('rooms[0].items.length', rooms[0].items.length);
 			}
-		} else if (item.type == 'weapon' && state.inventory[roomItem.id]) {
+		} else if (item.type == 'weapon' && state.inventory[roomItem.id] && !roomItem.takeAnimIntervalId) {
 			const dist = distance(roomItem);
-			if (dist < itemTakeDistance) {
-				toast(`You already have a ${item.label}!`);
+			if (!roomItem.isToastShown && dist < itemTakeDistance) {
+				roomItem.isToastShown = true;
+				toast(`You already have a ${item.label}`);
+			} else if (dist >= itemTakeDistance) {
+				roomItem.isToastShown = false;
 			}
 		}
 
